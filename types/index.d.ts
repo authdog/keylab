@@ -3,5 +3,4 @@ export interface CustomReqExpress {
 }
 
 export interface CustomResExpress {
-    originalUrl?: string;
 }
