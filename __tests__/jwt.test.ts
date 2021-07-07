@@ -3,15 +3,15 @@ import { CustomReqExpress } from "../types";
 // var jwt = require('jsonwebtoken');
 var assert = require('assert');
 
-var expressjwt = require('../lib');
+import {asyncExpressJwtLib} from '../lib/vendors'
 
+const req: CustomReqExpress = {};
+const res = {};
 
-var req: CustomReqExpress = {};
-var res = {};
-
-it('should throw if options not set', function() {
+it('should throw if options not set', () => {
+    const options: any = {};
     try {
-      expressjwt();
+        asyncExpressJwtLib(options);
     } catch(e) {
       assert.ok(e);
       assert.equal(e.message, 'secret should be set');
@@ -22,7 +22,7 @@ it('should throw if options not set', function() {
 
   it('should throw if algorithms is not sent', function() {
     try {
-      expressjwt({ secret: 'shhhh' });
+        asyncExpressJwtLib({ secret: 'shhhh' });
     } catch(e) {
       assert.ok(e);
       assert.equal(e.message, 'algorithms should be set');
@@ -31,7 +31,7 @@ it('should throw if options not set', function() {
 
   it('should throw if algorithms is not an array', function() {
     try {
-      expressjwt({ secret: 'shhhh', algorithms: 'foo' });
+        asyncExpressJwtLib({ secret: 'shhhh', algorithms: 'foo' });
     } catch(e) {
       assert.ok(e);
       assert.equal(e.message, 'algorithms must be an array');
@@ -39,7 +39,7 @@ it('should throw if options not set', function() {
   });
 
   it('should throw if no authorization header and credentials are required', function() {
-    expressjwt({secret: 'shhhh', credentialsRequired: true, algorithms: ['HS256']})(req, res, function(err) {
+    asyncExpressJwtLib({secret: 'shhhh', credentialsRequired: true, algorithms: ['HS256']})(req, res, function(err) {
       assert.ok(err);
       assert.equal(err.code, 'credentials_required');
     });
@@ -47,7 +47,7 @@ it('should throw if options not set', function() {
 
   it('support unless skip', () => {
     req.originalUrl = '/index.html';
-    expressjwt({secret: 'shhhh', algorithms: ['HS256']}).unless({path: '/index.html'})(req, res, function(err) {
+    asyncExpressJwtLib({secret: 'shhhh', algorithms: ['HS256']}).unless({path: '/index.html'})(req, res, function(err) {
       assert.ok(!err);
     });
   });

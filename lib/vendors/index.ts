@@ -1,0 +1,1 @@
+export {asyncExpressJwtLib} from './express'
