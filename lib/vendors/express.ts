@@ -1,6 +1,6 @@
 var jwt = require('jsonwebtoken');
 import {UnauthorizedError }  from '../errors';
-import {default as unless} from 'express-unless';
+import * as unless from 'express-unless';
 import async from 'async';
 import set from 'lodash.set';
 import { DEFAULT_REVOKED_FUNCTION, isFunction, wrapStaticSecretInCallback } from '../utils';

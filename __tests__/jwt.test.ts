@@ -47,7 +47,8 @@ it('should throw if options not set', () => {
 
   it('support unless skip', () => {
     req.originalUrl = '/index.html';
-    asyncExpressJwtLib({secret: 'shhhh', algorithms: ['HS256']}).unless({path: '/index.html'})(req, res, function(err) {
+    // @ts-ignore
+    asyncExpressJwtLib({secret: 'shhhh', algorithms: ['HS256']}).unless({path: '/index.html'})(req, res, (err) => {
       assert.ok(!err);
     });
   });
