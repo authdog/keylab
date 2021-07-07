@@ -3,21 +3,11 @@ import {UnauthorizedError }  from './errors';
 var unless = require('express-unless');
 import async from 'async';
 import set from 'lodash.set';
+import { DEFAULT_REVOKED_FUNCTION, isFunction, wrapStaticSecretInCallback } from './utils';
+import { Request, Response } from 'express';
 
-var DEFAULT_REVOKED_FUNCTION = (_: any, __: any, cb: Function) => {
-  return cb(null, false);
-}
-
-export const isFunction = (object) => Object
-  .prototype.toString.call(object) === '[object Function]';
-
-export const wrapStaticSecretInCallback = (secret: string) => {
-  return function(_, __, cb: Function){
-    return cb(null, secret);
-  };
-}
-
-module.exports = (options) => {
+// import {Request as IExpressRequest, Response as IExpressResponse} from 'express'
+const asyncJwtLib = (options) => {
   if (!options || !options.secret) throw new Error('secret should be set');
 
   if (!options.algorithms) throw new Error('algorithms should be set');
@@ -35,11 +25,12 @@ module.exports = (options) => {
   var _resultProperty = options.resultProperty;
   var credentialsRequired = typeof options.credentialsRequired === 'undefined' ? true : options.credentialsRequired;
 
-  var middleware = function(req, res, next) {
+  var middleware = (req: Request, res: Response, next: Function) => {
     var token;
 
     if (req.method === 'OPTIONS' && req.headers.hasOwnProperty('access-control-request-headers')) {
-      var hasAuthInAccessControl = !!~req.headers['access-control-request-headers']
+      var hasAuthInAccessControl = !!~req
+                                    .headers['access-control-request-headers']
                                     .split(',')
                                       .map((header: string) => header.trim()).indexOf('authorization');
 
@@ -57,8 +48,7 @@ module.exports = (options) => {
     } else if (req.headers && req.headers.authorization) {
       var parts = req.headers.authorization.split(' ');
       if (parts.length == 2) {
-        var scheme = parts[0];
-        var credentials = parts[1];
+        const [scheme, credentials]  = parts;
 
         if (/^Bearer$/i.test(scheme)) {
           token = credentials;
@@ -82,16 +72,16 @@ module.exports = (options) => {
       }
     }
 
-    var dtoken;
+    let decoded;
 
     try {
-      dtoken = jwt.decode(token, { complete: true }) || {};
+      decoded = jwt.decode(token, { complete: true }) || {};
     } catch (err) {
       return next(new UnauthorizedError('invalid_token', err));
     }
 
     const checkRevoked = (decoded: any, callback: Function) => {
-      const payload = dtoken?.payload;
+      const payload = decoded?.payload;
       isRevokedCallback(req, payload, (err, revoked: boolean) => {
         if (err) {
           callback(err);
@@ -109,9 +99,9 @@ module.exports = (options) => {
       function getSecret(callback){
         var arity = secretCallback.length;
         if (arity == 4) {
-          secretCallback(req, dtoken.header, dtoken.payload, callback);
+          secretCallback(req, decoded.header, decoded.payload, callback);
         } else { // arity == 3
-          secretCallback(req, dtoken.payload, callback);
+          secretCallback(req, decoded.payload, callback);
         }
       },
       function verifyToken(secret, callback) {
@@ -145,3 +135,4 @@ module.exports = (options) => {
 };
 
 module.exports.UnauthorizedError = UnauthorizedError;
+module.exports = asyncJwtLib;

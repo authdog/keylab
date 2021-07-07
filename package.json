@@ -25,6 +25,7 @@
   "homepage": "https://github.com/authdog/async-jwt-lib#readme",
   "devDependencies": {
     "@types/async": "^3.2.7",
+    "@types/express": "^4.17.13",
     "@types/jest": "^26.0.24",
     "@types/lodash": "^4.14.170",
     "@types/lodash.set": "^4.3.6",
