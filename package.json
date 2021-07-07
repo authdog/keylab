@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --config config/jest.config.js --collect-coverage",
     "start:dev": "ts-node lib"
   },
   "repository": {
@@ -24,13 +24,21 @@
   },
   "homepage": "https://github.com/authdog/async-jwt-lib#readme",
   "devDependencies": {
+    "@types/async": "^3.2.7",
+    "@types/jest": "^26.0.24",
+    "@types/lodash": "^4.14.170",
+    "@types/lodash.set": "^4.3.6",
     "@types/node": "^16.0.0",
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.3",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.5"
   },
   "dependencies": {
+    "async": "^3.2.0",
     "express-unless": "^0.5.0",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "lodash.set": "^4.3.2"
   }
 }

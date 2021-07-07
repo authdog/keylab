@@ -11,4 +11,6 @@ function UnauthorizedError (code, error) {
   UnauthorizedError.prototype = Object.create(Error.prototype);
   UnauthorizedError.prototype.constructor = UnauthorizedError;
   
-  module.exports = UnauthorizedError;
+export {
+  UnauthorizedError
+}

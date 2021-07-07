@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+      "target": "es2017",
+      "module": "commonjs",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "allowJs": true,
+      "declaration": true,
+      "resolveJsonModule": true,
+      "allowSyntheticDefaultImports": true,
+      "outDir": "build",
+      "baseUrl": ".",
+      "lib": ["es6"],
+      "sourceMap": true,
+      "strictNullChecks": false,
+      "noUnusedLocals": true,
+      "pretty": true,
+      "skipLibCheck": true
+    },
+    "include": [
+        "./lib/**/*"
+    ],
+    "exclude": [
+      "./node_modules/*"
+    ]
+  }

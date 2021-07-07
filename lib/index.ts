@@ -1,14 +1,15 @@
 var jwt = require('jsonwebtoken');
-var UnauthorizedError = require('./errors/UnauthorizedError');
+import {UnauthorizedError }  from './errors';
 var unless = require('express-unless');
-var async = require('async');
-var set = require('lodash.set');
+import async from 'async';
+import set from 'lodash.set';
 
-var DEFAULT_REVOKED_FUNCTION = function(_, __, cb) { return cb(null, false); };
-
-export const isFunction = (object) => {
-  return Object.prototype.toString.call(object) === '[object Function]';
+var DEFAULT_REVOKED_FUNCTION = (_: any, __: any, cb: Function) => {
+  return cb(null, false);
 }
+
+export const isFunction = (object) => Object
+  .prototype.toString.call(object) === '[object Function]';
 
 export const wrapStaticSecretInCallback = (secret: string) => {
   return function(_, __, cb: Function){
@@ -16,7 +17,7 @@ export const wrapStaticSecretInCallback = (secret: string) => {
   };
 }
 
-module.exports = function(options) {
+module.exports = (options) => {
   if (!options || !options.secret) throw new Error('secret should be set');
 
   if (!options.algorithms) throw new Error('algorithms should be set');
@@ -39,9 +40,8 @@ module.exports = function(options) {
 
     if (req.method === 'OPTIONS' && req.headers.hasOwnProperty('access-control-request-headers')) {
       var hasAuthInAccessControl = !!~req.headers['access-control-request-headers']
-                                    .split(',').map(function (header) {
-                                      return header.trim();
-                                    }).indexOf('authorization');
+                                    .split(',')
+                                      .map((header: string) => header.trim()).indexOf('authorization');
 
       if (hasAuthInAccessControl) {
         return next();
@@ -90,6 +90,21 @@ module.exports = function(options) {
       return next(new UnauthorizedError('invalid_token', err));
     }
 
+    const checkRevoked = (decoded: any, callback: Function) => {
+      const payload = dtoken?.payload;
+      isRevokedCallback(req, payload, (err, revoked: boolean) => {
+        if (err) {
+          callback(err);
+        }
+        else if (revoked) {
+          callback(new UnauthorizedError('revoked_token', {message: 'The token has been revoked.'}));
+        } else {
+          callback(null, decoded);
+        }
+      });
+    }
+
+
     async.waterfall([
       function getSecret(callback){
         var arity = secretCallback.length;
@@ -108,18 +123,7 @@ module.exports = function(options) {
           }
         });
       },
-      function checkRevoked(decoded, callback) {
-        isRevokedCallback(req, dtoken.payload, function (err, revoked) {
-          if (err) {
-            callback(err);
-          }
-          else if (revoked) {
-            callback(new UnauthorizedError('revoked_token', {message: 'The token has been revoked.'}));
-          } else {
-            callback(null, decoded);
-          }
-        });
-      }
+      checkRevoked
 
     ], (err, result) => {
       if (err) { return next(err); }
