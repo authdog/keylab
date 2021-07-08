@@ -1,16 +1,12 @@
-function UnauthorizedError (code, error) {
-    this.name = "UnauthorizedError";
-    this.message = error.message;
-    Error.call(this, error.message);
-    Error.captureStackTrace(this, this.constructor);
-    this.code = code;
-    this.status = 401;
-    this.inner = error;
+export const UnauthorizedError = (code, error) => {
+    // const name = "UnauthorizedError";
+    const message = error.message;
+    Error.call(this, message);
+    Error.captureStackTrace(this);
+    // const code = code;
+    // const status = 401;
+    // const inner = error;
   }
   
-  UnauthorizedError.prototype = Object.create(Error.prototype);
-  UnauthorizedError.prototype.constructor = UnauthorizedError;
-  
-export {
-  UnauthorizedError
-}
+UnauthorizedError.prototype = Object.create(Error.prototype);
+UnauthorizedError.prototype.constructor = UnauthorizedError;
