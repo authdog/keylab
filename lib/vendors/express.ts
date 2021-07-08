@@ -8,9 +8,14 @@ import * as c from '../constants'
 
 import {CustomReqExpress, CustomResExpress} from '../../types'
 import { REGEX_BEARER_HEADERS } from '../constants';
+// import { promisify } from 'util';
+
+// interface IOptionAsyncExpressJwtLib {
+//     secret: string;
+// }
 
 const asyncExpressJwtLib = (options) => {
-  if (!options || !options.secret) throw new Error(c.SECRET_MUST_BE_SET_MSG);
+//   if (!options || !options.secret) throw new Error(c.SECRET_MUST_BE_SET_MSG);
 
   if (!options.algorithms) throw new Error(c.ALGORITHMS_MUST_BE_SET_MSG);
   if (!Array.isArray(options.algorithms)) throw new Error(c.ALGORITHMS_MUST_BE_ARR_MSG);
@@ -136,7 +141,7 @@ const asyncExpressJwtLib = (options) => {
   middleware.UnauthorizedError = UnauthorizedError;
 
   return middleware;
-};
+}
 
 module.exports.UnauthorizedError = UnauthorizedError;
 export {asyncExpressJwtLib};

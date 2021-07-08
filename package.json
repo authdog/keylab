@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --config config/jest.config.js --collect-coverage",
+    "test": "jest --config config/jest.config.js",
+    "test-with-coverage": "jest --config config/jest.config.js --collect-coverage",
     "start:dev": "ts-node lib"
   },
   "repository": {
@@ -31,6 +32,7 @@
     "@types/lodash.set": "^4.3.6",
     "@types/node": "^16.0.0",
     "jest": "^27.0.6",
+    "nock": "^13.1.1",
     "ts-jest": "^27.0.3",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.5"
@@ -40,6 +42,8 @@
     "express-unless": "^0.5.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
-    "lodash.set": "^4.3.2"
+    "lodash.set": "^4.3.2",
+    "node-fetch": "^2.6.1",
+    "node-jose": "^2.0.0"
   }
 }

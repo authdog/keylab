@@ -2,7 +2,8 @@ export interface CustomReqExpress {
     originalUrl?: string;
     method?: string;
     headers?: {
-        authorization?: string
+        authorization?: string;
+        'access-control-request-headers'?: string;
     };
 }
 

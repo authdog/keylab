@@ -1,1 +1,1 @@
-export {asyncExpressJwtLib} from './express'
+export * from './jwks'
