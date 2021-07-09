@@ -108,13 +108,16 @@ export const validateJwt = async (
     console.log(secret);
 };
 
-export const verifyHSTokenWithSecretString = async (token: string, secret: string) => {
+export const verifyHSTokenWithSecretString = async (
+    token: string,
+    secret: string
+) => {
     let isVerified = false;
     try {
         const decoded = jwt.verify(token, secret);
         if (decoded.iat && decoded.exp) {
-            isVerified = true
-        }        
+            isVerified = true;
+        }
     } catch (err) {}
     return isVerified;
-}
+};
