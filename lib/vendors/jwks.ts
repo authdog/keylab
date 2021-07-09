@@ -5,8 +5,8 @@ import { JwkRecordVisible } from "./jwks.d";
 import { throwJwtError } from "../errors";
 
 /**
- * 
- * @returns 
+ *
+ * @returns
  */
 export const createKeyStore = () => {
     return jose.JWK.createKeyStore();
@@ -49,9 +49,9 @@ export const keyExistsInSet = (keyId: string, jwks: JwkRecordVisible[]) => {
 };
 
 /**
- * 
- * @param keyId 
- * @param jwks 
+ *
+ * @param keyId
+ * @param jwks
  * @returns retrieves the key from the json web key set
  */
 export const getKeyFromSet = (keyId: string, jwks: JwkRecordVisible[]) => {
