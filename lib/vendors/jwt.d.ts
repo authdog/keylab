@@ -5,3 +5,19 @@ export interface IValidateJwtCredentials {
     domainUri?: string;
     jwksUri?: string;
 }
+
+export interface IJwtTokenClaims {
+    adid: string;
+    issuer: string;
+    audiences: string[];
+    sessionDuration: number; // minutes
+    scopes: string;
+}
+
+export interface IJwtTokenOpts {
+    compact: true;
+    jwk: any;
+    fields: {
+        typ: string;
+    };
+}

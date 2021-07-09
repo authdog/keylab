@@ -1,18 +1,22 @@
 import {
-    verifyRSTokenWithUri,
+    fetchJwksWithUri,
     createKeyStore,
     generateKeyFromStore,
     keyExistsInSet,
 } from ".";
 import * as nock from "nock";
 
+import { generateJwtFromPayload } from "./jwt";
+
+import * as c from "../constants";
+
 const tenantUuid = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
 const applicationUuid = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
-it("initiate properly verifyRSTokenWithUri", async () => {
+it("initiate properly fetchJwksWithUri", async () => {
     const store = createKeyStore();
-    const keyGenerated = await generateKeyFromStore(store);
+    const keyGenerated = await generateKeyFromStore(store, true);
     const regExpPathAppJwks = new RegExp(
         `api\/v1\/${tenantUuid}\/${applicationUuid}\/.well-known\/jwks.json*`
     );
@@ -21,16 +25,41 @@ it("initiate properly verifyRSTokenWithUri", async () => {
         .persist()
         .get(regExpPathAppJwks)
         .reply(200, {
+            // TODO: hide sensitive fields from the response
             keys: [keyGenerated],
         });
 
-    const res = await verifyRSTokenWithUri({
+    const payload = {
+        userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
+        userName: "dbrrt",
+    };
+
+    const token = await generateJwtFromPayload(
+        {
+            adid: payload?.userId,
+            audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
+            issuer: c.AUTHDOG_ID_ISSUER,
+            scopes: "user",
+            sessionDuration: 8 * 60,
+        },
+        {
+            compact: true,
+            fields: { typ: "jwt" },
+            jwk: keyGenerated,
+        }
+    );
+
+    expect(token).toBeTruthy();
+
+    const jwksResource = await fetchJwksWithUri({
         jwksUri: `${AUTHDOG_API_ROOT}/api/v1/${tenantUuid}/${applicationUuid}/.well-known/jwks.json`,
         verifySsl: false,
     });
 
-    expect(res.keys).toBeTruthy();
-    expect(res.keys.length).toEqual(1);
+    expect(jwksResource.keys).toBeTruthy();
+    expect(jwksResource.keys.length).toEqual(1);
+
+    expect(keyExistsInSet(keyGenerated.kid, jwksResource.keys)).toBeTruthy();
 });
 
 it("check if key exists in set", () => {

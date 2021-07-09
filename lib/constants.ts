@@ -18,3 +18,5 @@ export const JWT_SUPPORTED_ALGS = [
 ];
 
 export const REGEX_BEARER_HEADERS = /^Bearer$/i;
+
+export const AUTHDOG_ID_ISSUER = "https://id.authdog.com";

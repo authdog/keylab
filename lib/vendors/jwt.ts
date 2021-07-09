@@ -2,7 +2,12 @@ import * as jwt from "jsonwebtoken";
 import { atob } from "./ponyfills";
 import * as c from "../constants";
 import { throwJwtError } from "../errors";
-import { IValidateJwtCredentials } from "./jwt.d";
+import {
+    IJwtTokenClaims,
+    IJwtTokenOpts,
+    IValidateJwtCredentials,
+} from "./jwt.d";
+import * as jose from "node-jose";
 
 /**
  *
@@ -87,7 +92,7 @@ export const validateJwt = async (
                 missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
-                break;
+                throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
             } else {
                 throwJwtError(
                     `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(
@@ -120,4 +125,36 @@ export const verifyHSTokenWithSecretString = async (
         }
     } catch (err) {}
     return isVerified;
+};
+
+export const generateJwtFromPayload = async (
+    { adid, issuer, audiences, sessionDuration, scopes }: IJwtTokenClaims,
+    { compact, jwk, fields }: IJwtTokenOpts
+) => {
+    const payload = JSON.stringify({
+        // iss: "https://api.authdog.com",
+        iss: issuer,
+        sub: adid,
+        aud: [
+            ...audiences,
+            // "https://api.authdog.com/userinfo",
+            // "https://db.fauna.com/db/yxxeeaaqcydyy" // TODO: check if API are enabled for a given app.
+        ],
+        // ...userRecord,
+        exp: Math.floor(Date.now() / 1000 + sessionDuration * 60),
+        iat: Math.floor(Date.now() / 1000),
+        azp: issuer,
+        // https://stackoverflow.com/a/49492971/8483084
+        gzp: "client-credentials",
+        scp: scopes,
+    });
+
+    const token = await jose.JWS.createSign(
+        Object.assign({ compact, jwk, fields }),
+        jwk
+    )
+        .update(payload)
+        .final();
+
+    return token;
 };

@@ -18,7 +18,7 @@ export const generateKeyFromStore: any = async (
     return generatedKey.toJSON(exposePrivateFields);
 };
 
-export const verifyRSTokenWithUri = async ({ jwksUri, verifySsl }) => {
+export const fetchJwksWithUri = async ({ jwksUri, verifySsl }) => {
     const httpsAgent = new https.Agent({
         rejectUnauthorized: verifySsl,
     });
@@ -32,6 +32,11 @@ export const verifyRSTokenWithUri = async ({ jwksUri, verifySsl }) => {
         .then((res) => res.json())
         .catch((err) => console.log(err));
 };
+
+export const verifyRSTokenWithUri = async (
+    token: string,
+    { jwksUri, verifySsl }
+) => {};
 
 /**
  *
