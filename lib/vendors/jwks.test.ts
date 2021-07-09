@@ -19,7 +19,7 @@ const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
 it("initiate properly fetchJwksWithUri", async () => {
     const store = createKeyStore();
-    const keyGenerated = await generateKeyFromStore(store, true);
+    const keyGenerated = await generateKeyFromStore(store, 'RSA256', true);
     const regExpPathAppJwks = new RegExp(
         `api\/v1\/${tenantUuid}\/${applicationUuid}\/.well-known\/jwks.json*`
     );

@@ -131,7 +131,7 @@ export const verifyRSTokenWithUri = async (
     token: string,
     { jwksUri, verifySsl }
 ) => {
-    console.log(token)
+    console.log(token);
 };
 
 export const generateJwtFromPayload = async (
