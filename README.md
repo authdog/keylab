@@ -1,6 +1,8 @@
-# async-jwt-lib
+# easyjwt
 
-Async-jwt-lib is a library aiming to validate JWT sent to a nodeJS API against a static string secret or a remote JSON Web Key set with a convenient http wrapper.
+easyjwt is a library aiming to validate JWT sent to a nodeJS API against a static string secret or a remote JSON Web Key set with a convenient http wrapper.
+
+Can also be used to validate a RSA256 token in the browser directly.
 
 ## Install
 
@@ -8,5 +10,5 @@ Async-jwt-lib is a library aiming to validate JWT sent to a nodeJS API against a
 
 ## Credits
 
-This library is a TypeScript port of https://github.com/auth0/express-jwt and https://github.com/auth0/node-jwks-rsa.
-As both were initially developed in pure JavaScript, and often coupled, this project is aiming to add some typing and improve the code clarity with more ES6 patterns.
+- jsonwebtoken
+- node-jose

@@ -1,7 +1,7 @@
-import * as jwt from "jsonwebtoken"
-import { atob } from "./ponyfills"
-import * as c from "../constants"
-import { throwJwtError } from "../errors"
+import * as jwt from "jsonwebtoken";
+import { atob } from "./ponyfills";
+import * as c from "../constants";
+import { throwJwtError } from "../errors";
 
 /**
  *
@@ -9,18 +9,18 @@ import { throwJwtError } from "../errors"
  * @returns headers from the jwt passed as parameter
  */
 export const readTokenHeaders = (token: string) => {
-    let headers
+    let headers;
     const decodedToken = jwt.decode(token, {
         complete: true,
-    })
+    });
 
     if (!decodedToken) {
-        throwJwtError(c.JWT_CANNOT_BE_DECODED)
+        throwJwtError(c.JWT_CANNOT_BE_DECODED);
     } else {
-        headers = decodedToken.header
+        headers = decodedToken.header;
     }
-    return headers
-}
+    return headers;
+};
 
 /**
  *
@@ -28,15 +28,15 @@ export const readTokenHeaders = (token: string) => {
  * @returns algorithm used for used
  */
 export const getAlgorithmJwt = (token: string) => {
-    let algorithm
-    const headers = readTokenHeaders(token)
+    let algorithm;
+    const headers = readTokenHeaders(token);
     if (headers && headers.alg) {
-        algorithm = headers.alg
+        algorithm = headers.alg;
     } else {
-        throw throwJwtError(c.JWT_MALFORMED_HEADERS)
+        throw throwJwtError(c.JWT_MALFORMED_HEADERS);
     }
-    return algorithm
-}
+    return algorithm;
+};
 
 // https://stackoverflow.com/a/38552302/8483084
 /**
@@ -45,16 +45,16 @@ export const getAlgorithmJwt = (token: string) => {
  * @returns JSON payload from token passed as parameter
  */
 export const parseJwt = (token: string) => {
-    var base64Url = token.split(".")[1]
-    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+    var base64Url = token.split(".")[1];
+    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     var jsonPayload = decodeURIComponent(
         atob(base64)
             .split("")
             .map((c: string) => {
-                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
             })
             .join("")
-    )
+    );
 
-    return JSON.parse(jsonPayload)
-}
+    return JSON.parse(jsonPayload);
+};
