@@ -1,12 +1,19 @@
-export const UnauthorizedError = (code, error) => {
-    // const name = "UnauthorizedError";
-    const message = error.message;
+import {JsonWebTokenError} from 'jsonwebtoken'
+
+class UnauthorizedError extends Error {
+  code = 401;
+  constructor(message) {
+    super(message);
+    this.name = "UnauthorizedError";
     Error.call(this, message);
     Error.captureStackTrace(this);
-    // const code = code;
-    // const status = 401;
-    // const inner = error;
   }
-  
-UnauthorizedError.prototype = Object.create(Error.prototype);
-UnauthorizedError.prototype.constructor = UnauthorizedError;
+}
+
+export const throwUnauthorized = (message: string) => {
+  throw new UnauthorizedError(message); 
+}
+
+export const throwJwtError = (message?: string) => {
+  throw new JsonWebTokenError(message || "error jwt")
+}
