@@ -3,7 +3,7 @@ import {
     createKeyStore,
     generateKeyFromStore,
     keyExistsInSet,
-    getKeyFromSet,
+    getKeyFromSet
 } from ".";
 import * as nock from "nock";
 
@@ -29,12 +29,12 @@ it("initiate properly fetchJwksWithUri", async () => {
         .get(regExpPathAppJwks)
         .reply(200, {
             // TODO: hide sensitive fields from the response
-            keys: [keyGenerated],
+            keys: [keyGenerated]
         });
 
     const payload = {
         userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
-        userName: "dbrrt",
+        userName: "dbrrt"
     };
 
     const token = await generateJwtFromPayload(
@@ -43,12 +43,12 @@ it("initiate properly fetchJwksWithUri", async () => {
             audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
             issuer: c.AUTHDOG_ID_ISSUER,
             scopes: "user",
-            sessionDuration: 8 * 60,
+            sessionDuration: 8 * 60
         },
         {
             compact: true,
             fields: { typ: "jwt" },
-            jwk: keyGenerated,
+            jwk: keyGenerated
         }
     );
 
@@ -56,7 +56,7 @@ it("initiate properly fetchJwksWithUri", async () => {
 
     const jwksResource = await fetchJwksWithUri({
         jwksUri: `${AUTHDOG_API_ROOT}/api/v1/${tenantUuid}/${applicationUuid}/.well-known/jwks.json`,
-        verifySsl: false,
+        verifySsl: false
     });
 
     expect(jwksResource.keys).toBeTruthy();
@@ -82,8 +82,8 @@ it("check if key exists in set", () => {
             use: "sig",
             alg: "RS256",
             e: "AQAB",
-            n: "s5rjPEt0pnbEUzYKKN6BsB5OdK4P5WRnYyil-lAgySihNUr8P3qzNUcEUnMrrhd2W2M3a4DI0tfd1qWINpIjr14udvZkUV9zTeep24LwFU7JZ2NyvIO8yJ8ZXyNNhGgcW3MFKO5pcGb54Q2k0dViSWSyJJ8pzJCpsHMcUduJRooTuB9SkPwz1p14LMHJTUjdZCB1wAnjjSMmoX-9oaLHLAfSJ1laB2m4P_cZfsXZiR_uMhxoMd6JZAm3SfmoKc23UbNypDdIeUfMTj7av09nxq2V5P06wt4Hi1pEehgC9BPRfVvERW4LHtRBtRb9sBpki5AjhUcSzFgxjQlQNnLW2Q",
-        },
+            n: "s5rjPEt0pnbEUzYKKN6BsB5OdK4P5WRnYyil-lAgySihNUr8P3qzNUcEUnMrrhd2W2M3a4DI0tfd1qWINpIjr14udvZkUV9zTeep24LwFU7JZ2NyvIO8yJ8ZXyNNhGgcW3MFKO5pcGb54Q2k0dViSWSyJJ8pzJCpsHMcUduJRooTuB9SkPwz1p14LMHJTUjdZCB1wAnjjSMmoX-9oaLHLAfSJ1laB2m4P_cZfsXZiR_uMhxoMd6JZAm3SfmoKc23UbNypDdIeUfMTj7av09nxq2V5P06wt4Hi1pEehgC9BPRfVvERW4LHtRBtRb9sBpki5AjhUcSzFgxjQlQNnLW2Q"
+        }
     ];
 
     const exists = keyExistsInSet(

@@ -5,7 +5,7 @@ import { throwJwtError } from "../errors";
 import {
     IJwtTokenClaims,
     IJwtTokenOpts,
-    IValidateJwtCredentials,
+    IValidateJwtCredentials
 } from "./jwt.d";
 import * as jose from "node-jose";
 
@@ -17,7 +17,7 @@ import * as jose from "node-jose";
 export const readTokenHeaders = (token: string) => {
     let headers;
     const decodedToken = jwt.decode(token, {
-        complete: true,
+        complete: true
     });
 
     if (!decodedToken) {
@@ -143,7 +143,7 @@ export const generateJwtFromPayload = async (
         iss: issuer,
         sub: adid,
         aud: [
-            ...audiences,
+            ...audiences
             // "https://api.authdog.com/userinfo",
             // "https://db.fauna.com/db/yxxeeaaqcydyy" // TODO: check if API are enabled for a given app.
         ],
@@ -153,7 +153,7 @@ export const generateJwtFromPayload = async (
         azp: issuer,
         // https://stackoverflow.com/a/49492971/8483084
         gzp: "client-credentials",
-        scp: scopes,
+        scp: scopes
     });
 
     const token = await jose.JWS.createSign(

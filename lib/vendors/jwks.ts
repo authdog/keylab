@@ -19,19 +19,19 @@ export const generateKeyFromStore: any = async (
 ) => {
     const generatedKey = await store.generate("RSA", 2048, {
         alg: "RS256",
-        use: "sig",
+        use: "sig"
     });
     return generatedKey.toJSON(exposePrivateFields);
 };
 
 export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }) => {
     const httpsAgent = new https.Agent({
-        rejectUnauthorized: verifySsl,
+        rejectUnauthorized: verifySsl
     });
 
     return await fetch(jwksUri, {
         method: "GET",
-        agent: httpsAgent,
+        agent: httpsAgent
     })
         .then((res) => res.json())
         .catch((err) => console.log(err));

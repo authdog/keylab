@@ -14,7 +14,7 @@ export const JWT_SUPPORTED_ALGS = [
     "ES384",
     "ES512",
     "PS256",
-    "PS384",
+    "PS384"
 ];
 
 export const REGEX_BEARER_HEADERS = /^Bearer$/i;

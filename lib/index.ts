@@ -1,5 +1,5 @@
 export {
     verifyHSTokenWithSecretString,
     verifyRSTokenWithUri,
-    validateJwt,
+    validateJwt
 } from "./vendors";

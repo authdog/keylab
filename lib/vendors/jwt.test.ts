@@ -1,7 +1,7 @@
 import {
     readTokenHeaders,
     getAlgorithmJwt,
-    verifyHSTokenWithSecretString,
+    verifyHSTokenWithSecretString
 } from "./jwt";
 import { JsonWebTokenError } from "jsonwebtoken";
 import * as c from "../constants";
@@ -38,7 +38,7 @@ it("verifies HS256 token", async () => {
     const signedToken = jwt.sign(
         {
             exp: Math.floor(Date.now() / 1000) + 60 * 60,
-            data: "foobar",
+            data: "foobar"
         },
         SECRET_STRING
     );
@@ -58,7 +58,7 @@ it("verifies HS256 token", async () => {
     const signedTokenAlreadyExpired = jwt.sign(
         {
             exp: Math.floor(Date.now() / 1000) + 0,
-            data: "foobar",
+            data: "foobar"
         },
         SECRET_STRING
     );
