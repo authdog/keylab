@@ -21,7 +21,9 @@ export const generateKeyFromStore: any = async (
     exposePrivateFields: boolean = false
 ) => {
     const generatedKey = await store.generate("RSA", 2048, {
-        alg: String(algorithm),
+        alg: algorithm,
+        // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
+        // The "use" and "key_ops" JWK members SHOULD NOT be used together;
         use: enums.JwtPublicKeyUse.SIGNATURE
     });
     return generatedKey.toJSON(exposePrivateFields);
