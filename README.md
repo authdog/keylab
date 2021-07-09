@@ -6,7 +6,11 @@ Can also be used to validate a RSA256 token in the browser directly.
 
 ## Install
 
+`yarn add easyjwt`
+
 ## Usage
+
+
 
 ## Credits
 

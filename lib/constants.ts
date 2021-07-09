@@ -3,7 +3,7 @@
 // export const ALGORITHMS_MUST_BE_ARR_MSG = 'algorithms must be an array';
 export const JWT_CANNOT_BE_DECODED = "impossible to decode jwt";
 export const JWT_MALFORMED_HEADERS = "malformed jwt headers";
-export const JWT_NON_SUPPORTED_ALGORITHM = "invalid algorithm"
+export const JWT_NON_SUPPORTED_ALGORITHM = "invalid algorithm";
 export const JWT_SUPPORTED_ALGS = [
     "HS256",
     "HS384",
@@ -15,7 +15,7 @@ export const JWT_SUPPORTED_ALGS = [
     "ES384",
     "ES512",
     "PS256",
-    "PS384"
+    "PS384",
 ];
 
 export const REGEX_BEARER_HEADERS = /^Bearer$/i;
