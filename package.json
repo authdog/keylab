@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --config config/jest.config.js",
-    "test-with-coverage": "jest --config config/jest.config.js --collect-coverage"
+    "test": "jest",
+    "test-with-coverage": "jest --collect-coverage"
   },
   "repository": {
     "type": "git",

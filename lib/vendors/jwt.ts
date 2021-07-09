@@ -2,16 +2,38 @@ import {atob} from './ponyfills'
 
 import * as jwt from 'jsonwebtoken'
 
+/**
+ * 
+ * @param token 
+ * @returns headers from the jwt passed as parameter
+ */
 export const readTokenHeaders = (token: string) => {
-    const decodedToken = jwt.decode(token, {
-    complete: true
-    });
-    
-    if (!decodedToken) {
-        throw new Error(`provided token does not decode as JWT`);
+    let headers;
+    try {
+        const decodedToken = jwt.decode(token, {
+            complete: true
+        });
+        
+        if (!decodedToken) {
+            throw new Error(`provided token does not decode as JWT`);
+        }
+            
+        headers = decodedToken.header;
+    } catch(e) {
+        throw new Error (e.message)
     }
-      
-    return decodedToken.header;
+    return headers;
+}
+
+export const getAlgorithmJwt = (token: string) => {
+    let algorithm;
+    const headers = readTokenHeaders(token)
+    if (headers && headers.alg) {
+        algorithm = headers.alg;
+    } else {
+        throw new Error("malformed jwt headers")
+    }
+    return algorithm;
 }
 
 // https://stackoverflow.com/a/38552302/8483084
