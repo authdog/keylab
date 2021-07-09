@@ -17,12 +17,14 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
 
+
+            - run: yarn install --ignore-engines
+
             - uses: actions/cache@v2
                 with:
-                    path: '**/node_modules'
-                    key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-            - run: yarn install
+                path: '**/node_modules'
+                key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                
             - run: yarn test
               env:
                   NODE_ENV: test
