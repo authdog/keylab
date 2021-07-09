@@ -1,15 +1,14 @@
 export interface CustomReqExpress {
-    originalUrl?: string;
-    method?: string;
+    originalUrl?: string
+    method?: string
     headers?: {
-        authorization?: string;
-        'access-control-request-headers'?: string;
-    };
+        authorization?: string
+        "access-control-request-headers"?: string
+    }
 }
 
-export interface CustomResExpress {
-}
+export interface CustomResExpress {}
 
 export interface CustomMiddlewareExpress {
-    unless?: Function;
+    unless?: Function
 }

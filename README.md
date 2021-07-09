@@ -2,7 +2,6 @@
 
 Async-jwt-lib is a library aiming to validate JWT sent to a nodeJS API against a static string secret or a remote JSON Web Key set with a convenient http wrapper.
 
-
 ## Install
 
 ## Usage

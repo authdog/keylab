@@ -1,56 +1,46 @@
 {
-  "name": "easyjwt",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest",
-    "test-with-coverage": "jest --collect-coverage",
-    "prepare": "husky install"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/authdog/easyjwt.git"
-  },
-  "keywords": [
-    "jwt",
-    "jwks",
-    "authentication",
-    "security",
-    "openid",
-    "token",
-    "node-jose",
-    "jose"
-  ],
-  "author": "Authdog, Inc.",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/authdog/easyjwt/issues"
-  },
-  "homepage": "https://github.com/authdog/easyjwt#readme",
-  "devDependencies": {
-    "@types/jest": "^26.0.24",
-    "@types/node": "^16.0.0",
-    "husky": "^7.0.0",
-    "jest": "^27.0.6",
-    "nock": "^13.1.1",
-    "ts-jest": "^27.0.3",
-    "ts-node": "^10.0.0",
-    "typescript": "^4.3.5"
-  },
-  "dependencies": {
-    "jsonwebtoken": "^8.5.1",
-    "node-fetch": "^2.6.1",
-    "node-jose": "^2.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
+    "name": "easyjwt",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest",
+        "test-with-coverage": "jest --collect-coverage",
+        "prepare": "husky install"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/authdog/easyjwt.git"
+    },
+    "keywords": [
+        "jwt",
+        "jwks",
+        "authentication",
+        "security",
+        "openid",
+        "token",
+        "node-jose",
+        "jose"
+    ],
+    "author": "Authdog, Inc.",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/authdog/easyjwt/issues"
+    },
+    "homepage": "https://github.com/authdog/easyjwt#readme",
+    "devDependencies": {
+        "@types/jest": "^26.0.24",
+        "@types/node": "^16.0.0",
+        "husky": "^7.0.0",
+        "jest": "^27.0.6",
+        "nock": "^13.1.1",
+        "ts-jest": "^27.0.3",
+        "ts-node": "^10.0.0",
+        "typescript": "^4.3.5"
+    },
+    "dependencies": {
+        "jsonwebtoken": "^8.5.1",
+        "node-fetch": "^2.6.1",
+        "node-jose": "^2.0.0"
     }
-  },
-  "lint-staged": {
-    "*.+(ts|tsx|js|jsx|json|css|md)": [
-      "prettier --write"
-    ]
-  }
 }

@@ -4,4 +4,4 @@
 export const JWT_CANNOT_BE_DECODED = "impossible to decode jwt"
 export const JWT_MALFORMED_HEADERS = "malformed jwt headers"
 
-export const REGEX_BEARER_HEADERS = /^Bearer$/i;
+export const REGEX_BEARER_HEADERS = /^Bearer$/i

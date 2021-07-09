@@ -1,1 +1,1 @@
-export {} from './vendors'
+export {} from "./vendors"
