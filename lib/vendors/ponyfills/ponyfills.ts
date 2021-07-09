@@ -6,7 +6,7 @@ const isServer = (): boolean => {
 };
 
 /**
- * Constant set to true if the code if executed on the server
+ * set to true if the code if executed on the server
  */
 export const IS_NODEJS = isServer();
 

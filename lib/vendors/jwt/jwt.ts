@@ -126,7 +126,7 @@ export const verifyHSTokenWithSecretString = async (
     let isVerified = false;
     try {
         const decoded = jwt.verify(token, secret);
-        if (decoded.iat && decoded.exp) {
+        if (typeof decoded === "object" && decoded.iat && decoded.exp) {
             isVerified = true;
         }
     } catch (err) {}
