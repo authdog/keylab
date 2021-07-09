@@ -6,7 +6,8 @@
     "scripts": {
         "test": "jest",
         "test-with-coverage": "jest --collect-coverage",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "pretty": "npx prettier --write lib"
     },
     "repository": {
         "type": "git",
