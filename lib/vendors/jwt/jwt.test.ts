@@ -4,7 +4,7 @@ import {
     verifyHSTokenWithSecretString
 } from "./jwt";
 import { JsonWebTokenError } from "jsonwebtoken";
-import * as c from "../constants";
+import * as c from "../../constants";
 import * as jwt from "jsonwebtoken";
 
 const DUMMY_HS256_TOKEN =

@@ -1,7 +1,7 @@
 import * as jwt from "jsonwebtoken";
-import { atob } from "./ponyfills";
-import * as c from "../constants";
-import { throwJwtError } from "../errors";
+import { atob } from "../ponyfills/ponyfills";
+import * as c from "../../constants";
+import { throwJwtError } from "../../errors";
 import {
     IJwtTokenClaims,
     IJwtTokenOpts,
@@ -68,9 +68,10 @@ export const parseJwt = (token: string) => {
 export const validateJwt = async (
     token: string,
     { secret, jwksUri }: IValidateJwtCredentials
-) => {
+): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
+    let isValid = false;
     switch (algorithm) {
         case "HS256" || "HS384" || "HS512":
             if (!secret) {
@@ -78,6 +79,7 @@ export const validateJwt = async (
             }
 
             if (missingCredentials.length === 0) {
+                isValid = await verifyHSTokenWithSecretString(token, secret);
                 break;
             } else {
                 throwJwtError(
@@ -103,14 +105,12 @@ export const validateJwt = async (
 
         case "ES256" || "ES384" || "ES512" || "PS256" || "PS384":
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
-            break;
 
         default:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
     }
 
-    console.log(token);
-    console.log(secret);
+    return isValid;
 };
 
 export const verifyHSTokenWithSecretString = async (
@@ -135,19 +135,14 @@ export const verifyRSTokenWithUri = async (
 };
 
 export const generateJwtFromPayload = async (
-    { adid, issuer, audiences, sessionDuration, scopes }: IJwtTokenClaims,
+    { adid, issuer, audiences, sessionDuration, scopes, data }: IJwtTokenClaims,
     { compact, jwk, fields }: IJwtTokenOpts
 ) => {
     const payload = JSON.stringify({
-        // iss: "https://api.authdog.com",
         iss: issuer,
         sub: adid,
-        aud: [
-            ...audiences
-            // "https://api.authdog.com/userinfo",
-            // "https://db.fauna.com/db/yxxeeaaqcydyy" // TODO: check if API are enabled for a given app.
-        ],
-        // ...userRecord,
+        aud: [...audiences],
+        ...data,
         exp: Math.floor(Date.now() / 1000 + sessionDuration * 60),
         iat: Math.floor(Date.now() / 1000),
         azp: issuer,

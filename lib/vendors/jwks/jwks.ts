@@ -2,11 +2,11 @@ import { default as fetch } from "node-fetch";
 import * as https from "https";
 import * as jose from "node-jose";
 import { JwkRecordVisible } from "./jwks.d";
-import { throwJwtError } from "../errors";
+import { throwJwtError } from "../../errors";
 
 /**
  *
- * @returns
+ * @returns new JWK store
  */
 export const createKeyStore = () => {
     return jose.JWK.createKeyStore();
@@ -14,7 +14,8 @@ export const createKeyStore = () => {
 
 export const generateKeyFromStore: any = async (
     store: jose.JWK.KeyStore,
-    algorithm: string,
+    algorithm: string, // TODO: use enum
+    // keyType default = RSA
     exposePrivateFields: boolean = false
 ) => {
     const generatedKey = await store.generate("RSA", 2048, {

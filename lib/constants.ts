@@ -20,3 +20,5 @@ export const JWT_SUPPORTED_ALGS = [
 export const REGEX_BEARER_HEADERS = /^Bearer$/i;
 
 export const AUTHDOG_ID_ISSUER = "https://id.authdog.com";
+export const CODE_NOT_RUNNING_IN_BROWSER =
+    "code is not executed in the browser";

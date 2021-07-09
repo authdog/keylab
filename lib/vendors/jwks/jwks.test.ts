@@ -4,12 +4,12 @@ import {
     generateKeyFromStore,
     keyExistsInSet,
     getKeyFromSet
-} from ".";
+} from "..";
 import * as nock from "nock";
 
-import { generateJwtFromPayload } from "./jwt";
+import { generateJwtFromPayload } from "../jwt/jwt";
 
-import * as c from "../constants";
+import * as c from "../../constants";
 import * as jwkToPem from "jwk-to-pem";
 import * as jwt from "jsonwebtoken";
 

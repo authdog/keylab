@@ -12,6 +12,7 @@ export interface IJwtTokenClaims {
     audiences: string[];
     sessionDuration: number; // minutes
     scopes: string;
+    data?: any;
 }
 
 export interface IJwtTokenOpts {
