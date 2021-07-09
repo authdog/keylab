@@ -1,4 +1,4 @@
-name: adg-ajwt-lib
+name: adg-easyjwt-lib
 
 on: [push]
 
