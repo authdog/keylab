@@ -10,8 +10,8 @@ class UnauthorizedError extends Error {
     }
 }
 
-export const throwUnauthorized = (message: string) => {
-    throw new UnauthorizedError(message);
+export const throwUnauthorized = (message?: string) => {
+    throw new UnauthorizedError(message || "unauthorized");
 };
 
 export const throwJwtError = (message?: string) => {

@@ -67,32 +67,36 @@ export const validateJwt = async (
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
     switch (algorithm) {
-        
         case "HS256" || "HS384" || "HS512":
             if (!secret) {
-                missingCredentials.push("secret")
+                missingCredentials.push("secret");
             }
 
             if (missingCredentials.length === 0) {
-                
                 break;
             } else {
-                throwJwtError(`${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(missingCredentials)}`);
+                throwJwtError(
+                    `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(
+                        missingCredentials
+                    )}`
+                );
             }
 
-
-        case "RS256" || "RS384" || "RS512":
+        case "RS256" || "RS384" || "RS512":
             if (!jwksUri) {
-                missingCredentials.push("jwksUri")
+                missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
-                
                 break;
             } else {
-                throwJwtError(`${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(missingCredentials)}`);
+                throwJwtError(
+                    `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(
+                        missingCredentials
+                    )}`
+                );
             }
-        
-        case "ES256" || "ES384" || "ES512" || "PS256" || "PS384":
+
+        case "ES256" || "ES384" || "ES512" || "PS256" || "PS384":
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
             break;
 
@@ -103,3 +107,14 @@ export const validateJwt = async (
     console.log(token);
     console.log(secret);
 };
+
+export const verifyHSTokenWithSecretString = async (token: string, secret: string) => {
+    let isVerified = false;
+    try {
+        const decoded = jwt.verify(token, secret);
+        if (decoded.iat && decoded.exp) {
+            isVerified = true
+        }        
+    } catch (err) {}
+    return isVerified;
+}

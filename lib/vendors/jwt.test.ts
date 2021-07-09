@@ -1,6 +1,7 @@
-import { readTokenHeaders, getAlgorithmJwt } from "./jwt";
+import { readTokenHeaders, getAlgorithmJwt, verifyHSTokenWithSecretString } from "./jwt";
 import { JsonWebTokenError } from "jsonwebtoken";
 import * as c from "../constants";
+import * as jwt from 'jsonwebtoken'
 
 const DUMMY_HS256_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -27,3 +28,27 @@ it("should throw an exception if token is malformed", async () => {
         readTokenHeaders(DUMMY_NON_JWT_TOKEN);
     }).toThrowError(JsonWebTokenError);
 });
+
+
+it("verifies HS256 token", async () => {
+    const SECRET_STRING = 'secret'
+    const signedToken = jwt.sign({
+        exp: Math.floor(Date.now() / 1000) + (60 * 60),
+        data: 'foobar'
+    }, SECRET_STRING);
+
+    const isVerified = await verifyHSTokenWithSecretString(signedToken, SECRET_STRING);
+    expect(isVerified).toBeTruthy()
+
+    const shouldNotBeVerified = await verifyHSTokenWithSecretString(signedToken, 'wrong-secret');
+    expect(shouldNotBeVerified).toBeFalsy()
+
+    const signedTokenAlreadyExpired = jwt.sign({
+        exp: Math.floor(Date.now() / 1000) + 0,
+        data: 'foobar'
+    }, SECRET_STRING);
+
+    const shouldNotBeVerifiedAsExpired = await verifyHSTokenWithSecretString(signedTokenAlreadyExpired, SECRET_STRING);
+    expect(shouldNotBeVerifiedAsExpired).toBeFalsy()
+
+})
