@@ -10,6 +10,7 @@ import * as nock from "nock";
 import { generateJwtFromPayload } from "../jwt/jwt";
 
 import * as c from "../../constants";
+import * as enums from "../../enums";
 import * as jwkToPem from "jwk-to-pem";
 import * as jwt from "jsonwebtoken";
 
@@ -19,7 +20,11 @@ const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
 it("initiate properly fetchJwksWithUri", async () => {
     const store = createKeyStore();
-    const keyGenerated = await generateKeyFromStore(store, "RSA256", true);
+    const keyGenerated = await generateKeyFromStore(
+        store,
+        enums.JwtAlgorithmsEnum.RS256,
+        true
+    );
     const regExpPathAppJwks = new RegExp(
         `api\/v1\/${tenantUuid}\/${applicationUuid}\/.well-known\/jwks.json*`
     );

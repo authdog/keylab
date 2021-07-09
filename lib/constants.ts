@@ -4,6 +4,8 @@ export const JWT_NON_SUPPORTED_ALGORITHM = "invalid algorithm";
 export const JWT_NON_IMPLEMENTED_ALGORITHM = "non implemented algorithm";
 export const JWT_MISSING_VALIDATION_CREDENTIALS = "missing credential";
 
+export const JWKS_MISSING_KEY_ID = "keyId does not exist in the target set";
+
 import * as enums from "./enums";
 
 export const JWT_SUPPORTED_ALGS = Object.values(enums.JwtAlgorithmsEnum);

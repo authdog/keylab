@@ -3,6 +3,8 @@ import * as https from "https";
 import * as jose from "node-jose";
 import { JwkRecordVisible } from "./jwks.d";
 import { throwJwtError } from "../../errors";
+import * as enums from "../../enums";
+import * as c from "../../constants";
 
 /**
  *
@@ -14,18 +16,21 @@ export const createKeyStore = () => {
 
 export const generateKeyFromStore: any = async (
     store: jose.JWK.KeyStore,
-    algorithm: string, // TODO: use enum
+    algorithm: enums.JwtAlgorithmsEnum, // TODO: use enum
     // keyType default = RSA
     exposePrivateFields: boolean = false
 ) => {
     const generatedKey = await store.generate("RSA", 2048, {
-        alg: "RS256",
-        use: "sig"
+        alg: String(algorithm),
+        use: enums.JwtPublicKeyUse.SIGNATURE
     });
     return generatedKey.toJSON(exposePrivateFields);
 };
 
 // TODO
+/**
+ * will remove private fields from jwk, in order to make sure a jwk is exposable publicly
+ */
 export const makeKeyExposable = async () => {};
 
 export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }) => {
@@ -64,6 +69,6 @@ export const getKeyFromSet = (keyId: string, jwks: JwkRecordVisible[]) => {
     if (keyExistsInSet(keyId, jwks)) {
         return jwks.find((jwk: JwkRecordVisible) => jwk.kid === keyId);
     } else {
-        throwJwtError("keyId does not exist in the target set");
+        throwJwtError(c.JWKS_MISSING_KEY_ID);
     }
 };
