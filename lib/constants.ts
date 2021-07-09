@@ -4,21 +4,10 @@ export const JWT_NON_SUPPORTED_ALGORITHM = "invalid algorithm";
 export const JWT_NON_IMPLEMENTED_ALGORITHM = "non implemented algorithm";
 export const JWT_MISSING_VALIDATION_CREDENTIALS = "missing credential";
 
-export enum JwtAlgorithmsEnum {
-    HS256 = "HS256",
-    HS384 = "HS384",
-    HS512 = "HS512",
-    RS256 = "RS256",
-    RS384 = "RS384",
-    RS512 = "RS512",
-    ES256 = "ES256",
-    ES384 = "ES384",
-    ES512 = "ES512",
-    PS256 = "PS256",
-    PS384 = "PS384"
-}
+import * as enums from "./enums";
 
-export const JWT_SUPPORTED_ALGS = Object.values(JwtAlgorithmsEnum);
+export const JWT_SUPPORTED_ALGS = Object.values(enums.JwtAlgorithmsEnum);
+export const JWT_PUBLIC_KEY_USES = Object.values(enums.JwtPublicKeyUse);
 
 export const REGEX_BEARER_HEADERS = /^Bearer$/i;
 

@@ -1,6 +1,7 @@
 import * as jwt from "jsonwebtoken";
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
+import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
 import {
     IJwtTokenClaims,
@@ -73,7 +74,7 @@ export const validateJwt = async (
     const missingCredentials = [];
     let isValid = false;
 
-    const algEnums = c.JwtAlgorithmsEnum;
+    const algEnums = enums.JwtAlgorithmsEnum;
 
     switch (algorithm) {
         case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
