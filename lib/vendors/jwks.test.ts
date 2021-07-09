@@ -3,12 +3,15 @@ import {
     createKeyStore,
     generateKeyFromStore,
     keyExistsInSet,
+    getKeyFromSet,
 } from ".";
 import * as nock from "nock";
 
 import { generateJwtFromPayload } from "./jwt";
 
 import * as c from "../constants";
+import * as jwkToPem from "jwk-to-pem";
+import * as jwt from "jsonwebtoken";
 
 const tenantUuid = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
 const applicationUuid = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
@@ -60,6 +63,15 @@ it("initiate properly fetchJwksWithUri", async () => {
     expect(jwksResource.keys.length).toEqual(1);
 
     expect(keyExistsInSet(keyGenerated.kid, jwksResource.keys)).toBeTruthy();
+
+    const keyFromStore = getKeyFromSet(keyGenerated.kid, jwksResource.keys);
+
+    expect(keyFromStore);
+
+    const publicKey = jwkToPem(keyFromStore);
+    const decoded = jwt.verify(token, publicKey);
+
+    expect(decoded?.sub).toBeTruthy();
 });
 
 it("check if key exists in set", () => {

@@ -2,6 +2,7 @@ import { default as fetch } from "node-fetch";
 import * as https from "https";
 import * as jose from "node-jose";
 import { JwkRecordVisible } from "./jwks.d";
+import { throwJwtError } from "../errors";
 
 export const createKeyStore = () => {
     return jose.JWK.createKeyStore();
@@ -47,4 +48,12 @@ export const verifyRSTokenWithUri = async (
 export const keyExistsInSet = (keyId: string, jwks: JwkRecordVisible[]) => {
     const exists = jwks.find((jwk: JwkRecordVisible) => jwk.kid === keyId);
     return Boolean(exists);
+};
+
+export const getKeyFromSet = (keyId: string, jwks: JwkRecordVisible[]) => {
+    if (keyExistsInSet(keyId, jwks)) {
+        return jwks.find((jwk: JwkRecordVisible) => jwk.kid === keyId);
+    } else {
+        throwJwtError("keyId does not exist in the target set");
+    }
 };
