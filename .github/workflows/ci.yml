@@ -19,8 +19,8 @@ jobs:
 
             - uses: actions/cache@v2
                 with:
-                path: '**/node_modules'
-                key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+                    path: '**/node_modules'
+                    key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
             - run: yarn install
             - run: yarn test
