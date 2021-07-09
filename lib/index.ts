@@ -1,1 +1,3 @@
-export {} from "./vendors";
+export {
+    verifyRSTokenWithUri
+} from "./vendors";

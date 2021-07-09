@@ -2,7 +2,7 @@ import * as jwt from "jsonwebtoken";
 import { atob } from "./ponyfills";
 import * as c from "../constants";
 import { throwJwtError } from "../errors";
-import {IValidateJwtCredentials} from './jwt.d'
+import { IValidateJwtCredentials } from "./jwt.d";
 
 /**
  *
@@ -60,31 +60,46 @@ export const parseJwt = (token: string) => {
     return JSON.parse(jsonPayload);
 };
 
-
-// export type IValidateJwtCredentials =
-// IValidateJwtCredentialsHS |
-// IValidateJwtCredentialsRS
-
-
-
-
-export const validateJwt = async (token: string, {secret}: IValidateJwtCredentials) => {
-
+export const validateJwt = async (
+    token: string,
+    { secret, jwksUri }: IValidateJwtCredentials
+) => {
     const algorithm = getAlgorithmJwt(token);
-
+    const missingCredentials = [];
     switch (algorithm) {
-        case "HS256" || "HS384":
-            console.log('decode HS256');
-            break;
         
-        case "RS256":
-            console.log('decode RS256');
-            break;
+        case "HS256" || "HS384" || "HS512":
+            if (!secret) {
+                missingCredentials.push("secret")
+            }
+
+            if (missingCredentials.length === 0) {
+                
+                break;
+            } else {
+                throwJwtError(`${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(missingCredentials)}`);
+            }
+
+
+        case "RS256" || "RS384" || "RS512":
+            if (!jwksUri) {
+                missingCredentials.push("jwksUri")
+            }
+            if (missingCredentials.length === 0) {
+                
+                break;
+            } else {
+                throwJwtError(`${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(missingCredentials)}`);
+            }
         
+        case "ES256" || "ES384" || "ES512" || "PS256" || "PS384":
+            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
+            break;
+
         default:
-            throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM)
+            throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
     }
 
-    console.log(token)
-    console.log(secret)
-}
+    console.log(token);
+    console.log(secret);
+};

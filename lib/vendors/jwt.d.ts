@@ -1,4 +1,3 @@
-
 export interface IValidateJwtCredentials {
     // HS256
     secret?: string;
