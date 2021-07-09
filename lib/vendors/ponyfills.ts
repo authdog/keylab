@@ -3,6 +3,8 @@ const isServer = () => {
     return !(typeof window != "undefined" && window.document);
 };
 
+const IS_NODEJS = isServer();
+
 const getClientWindowMethod = (method: string) => {
     if (!isServer()) {
         // @ts-ignore
@@ -11,8 +13,6 @@ const getClientWindowMethod = (method: string) => {
         throw new Error("code is not executed in the browser");
     }
 };
-
-const IS_NODEJS = isServer();
 
 // decode
 export const atob = IS_NODEJS

@@ -127,6 +127,13 @@ export const verifyHSTokenWithSecretString = async (
     return isVerified;
 };
 
+export const verifyRSTokenWithUri = async (
+    token: string,
+    { jwksUri, verifySsl }
+) => {
+    console.log(token)
+};
+
 export const generateJwtFromPayload = async (
     { adid, issuer, audiences, sessionDuration, scopes }: IJwtTokenClaims,
     { compact, jwk, fields }: IJwtTokenOpts

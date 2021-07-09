@@ -34,10 +34,6 @@ export const fetchJwksWithUri = async ({ jwksUri, verifySsl }) => {
         .catch((err) => console.log(err));
 };
 
-export const verifyRSTokenWithUri = async (
-    token: string,
-    { jwksUri, verifySsl }
-) => {};
 
 /**
  *
