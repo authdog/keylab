@@ -72,8 +72,11 @@ export const validateJwt = async (
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
     let isValid = false;
+
+    const algEnums = c.JwtAlgorithmsEnum;
+
     switch (algorithm) {
-        case "HS256" || "HS384" || "HS512":
+        case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
             if (!secret) {
                 missingCredentials.push("secret");
             }
@@ -88,8 +91,7 @@ export const validateJwt = async (
                     )}`
                 );
             }
-
-        case "RS256" || "RS384" || "RS512":
+        case algEnums.RS256 || algEnums.RS384 || algEnums.RS512:
             if (!jwksUri) {
                 missingCredentials.push("jwksUri");
             }
@@ -103,7 +105,11 @@ export const validateJwt = async (
                 );
             }
 
-        case "ES256" || "ES384" || "ES512" || "PS256" || "PS384":
+        case algEnums.ES256 ||
+            algEnums.ES384 ||
+            algEnums.ES512 ||
+            algEnums.PS256 ||
+            algEnums.PS384:
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
 
         default:

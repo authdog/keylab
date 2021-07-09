@@ -14,13 +14,15 @@ const DUMMY_NON_JWT_TOKEN = "hello-i-am-not-a-jwt";
 it("extract properly token headers", async () => {
     const headers = readTokenHeaders(DUMMY_HS256_TOKEN);
     expect(headers).toBeTruthy();
-    expect(headers.alg).toEqual("HS256");
+    expect(headers.alg).toEqual(c.JwtAlgorithmsEnum.HS256);
     expect(headers.typ).toEqual("JWT");
     expect(c.JWT_SUPPORTED_ALGS.includes(headers.alg)).toBeTruthy();
 });
 
 it("extract properly algorithm from token", async () => {
-    expect(getAlgorithmJwt(DUMMY_HS256_TOKEN)).toEqual("HS256");
+    expect(getAlgorithmJwt(DUMMY_HS256_TOKEN)).toEqual(
+        c.JwtAlgorithmsEnum.HS256
+    );
 });
 
 it("should throw an exception if token is malformed", async () => {

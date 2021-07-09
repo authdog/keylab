@@ -35,7 +35,9 @@ export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }) => {
         agent: httpsAgent
     })
         .then((res) => res.json())
-        .catch((err) => console.log(err));
+        .catch((err) => {
+            throw new Error(err.message);
+        });
 };
 
 /**
