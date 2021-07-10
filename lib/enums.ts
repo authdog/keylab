@@ -1,3 +1,5 @@
+// https://www.rfc-editor.org/rfc/pdfrfc/rfc7518.txt.pdf
+// section 3.1
 export enum JwtAlgorithmsEnum {
     HS256 = "HS256",
     HS384 = "HS384",
