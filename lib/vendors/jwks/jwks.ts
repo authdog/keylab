@@ -16,11 +16,12 @@ export const createKeyStore = () => {
 
 export const generateKeyFromStore: any = async (
     store: jose.JWK.KeyStore,
-    algorithm: enums.JwtAlgorithmsEnum, // TODO: use enum
+    algorithm: enums.JwtAlgorithmsEnum,
     // keyType default = RSA
     exposePrivateFields: boolean = false
 ) => {
     const generatedKey = await store.generate("RSA", 2048, {
+        // jwa: https://datatracker.ietf.org/doc/html/rfc7518
         alg: algorithm,
         // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
         // The "use" and "key_ops" JWK members SHOULD NOT be used together;
@@ -33,7 +34,7 @@ export const generateKeyFromStore: any = async (
 /**
  * will remove private fields from jwk, in order to make sure a jwk is exposable publicly
  */
-export const makeKeyExposable = async () => {};
+export const makeKeyExposable = async (key: any) => {};
 
 export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }) => {
     const httpsAgent = new https.Agent({

@@ -1,4 +1,14 @@
+# https://prettier.io/docs/en/options.html
 trailingComma = "none"
 tabWidth = 4
 semi = true
 singleQuote = false
+printWidth = 80
+useTabs = false
+quoteProps = "consistent"
+jsxSingleQuote = false
+bracketSpacing = true
+jsxBracketSameLine = true
+arrowParens = "always"
+parser = "typescript"
+endOfLine = "auto"

@@ -1,4 +1,10 @@
-import { btoa, atob, getClientWindowMethod, IS_NODEJS } from "./ponyfills";
+import {
+    btoa,
+    atob,
+    getClientWindowMethod,
+    IS_NODEJS,
+    isServer
+} from "./ponyfills";
 import { EnvironmentError } from "../../errors/environment";
 
 test("encodes and decodes properly with ponyfilled atob and btoa", () => {
@@ -18,4 +24,8 @@ test("should throw an error if client is trying to access window based methods",
             getClientWindowMethod(existingBrowserFunctionName);
         }).toBeTruthy();
     }
+});
+
+test("isServer should return true when executed on the server", () => {
+    expect(isServer()).toEqual(IS_NODEJS);
 });

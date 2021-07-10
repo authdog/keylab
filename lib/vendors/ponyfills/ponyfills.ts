@@ -1,8 +1,8 @@
 import * as e from "../../errors";
 
-const isServer = (): boolean => {
+export const isServer = (): boolean => {
     // @ts-ignore
-    return !(typeof window != "undefined" && window.document);
+    return !(typeof window !== "undefined" && window.document);
 };
 
 /**

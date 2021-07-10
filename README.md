@@ -1,8 +1,6 @@
 # easyjwt
 
-easyjwt is a library aiming to validate JWT sent to a nodeJS API against a static string secret or a remote JSON Web Key set with a convenient http wrapper.
-
-Can also be used to validate a RSA256 token in the browser directly.
+easyjwt is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.
 
 ## Install
 
@@ -10,9 +8,36 @@ Can also be used to validate a RSA256 token in the browser directly.
 
 ## Usage
 
+```typescript
 
+import { validateJwt } from "easyjwt"
 
-## Credits
+const myToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+
+const checkUserPermissions = () => {
+    // server only !!!
+    const isValid = await validateJwt(myToken, { secret: "mysecret" })
+
+    if (isValid) {
+        // do somethinf
+    }
+}
+
+```
+
+## Roadmap
+
+- [ ] Validate HS256 token
+- [ ] Validate RS256 token
+- [ ] End user Documentation
+
+## Dependencies
 
 - jsonwebtoken
 - node-jose
+- jwk-to-pem
+- node-fetch
+
+## Credits
+
+@dbrrt
