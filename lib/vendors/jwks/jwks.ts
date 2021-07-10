@@ -34,7 +34,22 @@ export const generateKeyFromStore: any = async (
 /**
  * will remove private fields from jwk, in order to make sure a jwk is exposable publicly
  */
-export const makeKeyExposable = async (key: any) => {};
+export const makeKeyExposable = (key: any) => {
+    // "kty":"RSA","kid":"LtQ8v6tdhTycscqav6FsIqjmdUpHNx0dli_q17A4lek","use":"sig","alg":"RS256","x5c":"","x5t":"","x5u":"","key_ops":"","n":"dVJSTFFEcEpPc01xS0E4eUtadlpSTUNUNXhWSjBodnZfd2w1Vm1qeGhrX1RNbTh1ZGdwdnBYYWRYeU5WSGxwQTVzdzdGOEFFWFBaUGFZY1VuQXhpQW0xUTAzUzBLWkJNMWRQTjRaY2JnX1pOcjFJRG8zRDJzMVlHTjlGaTFEUnJjVXg2THgwSXgyRm9TWjJoLU1MS3NSME1CS1ZVdDl5NWlwaHVCT3pvZzh4el9CLWZZYlhMRzRLbkNXQjk2aGxBTzVwUjlZbHFHN1hVTWZqSlBnNVNJWW9EVlFab2lMalIyMHVWVktjUVZyOVZqVklMZEpvdEhndWlLMWFncHc0NXdQTHZJdnB3N24zVnpTTEM2dW5xVjlsZjY4aG9NOFRiMGxweXV4djBjeER6RDNDZ3o3WjlHak5jdEZnLVhacjQxdjk3R0kxN2RIUjJZTGRVZzl6SnBR","e":"AQAB","key_id":"GC8skJWjSX8y5x3rLsRFLmbzqoRw6ALSwp1muUibeHk"
+    return Object.freeze({
+        kty: key.kty,
+        kid: key.kid,
+        use: key.sig,
+        alg: key.alg,
+        x5c: key.x5c,
+        x5t: key.x5t,
+        x5u: key.x5u,
+        key_ops: key.key_ops,
+        n: key.n,
+        e: key.e,
+        key_id: key.key_id
+    });
+};
 
 export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }) => {
     const httpsAgent = new https.Agent({

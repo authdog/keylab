@@ -7,6 +7,8 @@ import {
 } from "..";
 import * as nock from "nock";
 
+import { makeKeyExposable } from "./jwks";
+
 import { generateJwtFromPayload } from "../jwt/jwt";
 
 import * as c from "../../constants";
@@ -34,7 +36,7 @@ it("initiate properly fetchJwksWithUri", async () => {
         .get(regExpPathAppJwks)
         .reply(200, {
             // TODO: hide sensitive fields from the response
-            keys: [keyGenerated]
+            keys: [makeKeyExposable(keyGenerated)]
         });
 
     const payload = {

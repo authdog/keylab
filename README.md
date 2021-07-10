@@ -19,7 +19,7 @@ const checkUserPermissions = () => {
     const isValid = await validateJwt(myToken, { secret: "mysecret" })
 
     if (isValid) {
-        // do somethinf
+        // do something
     }
 }
 
