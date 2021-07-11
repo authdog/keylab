@@ -27,4 +27,6 @@ export interface IJwtTokenOpts {
 export interface IDecodedJwt {
     aud: string[] | string;
     sub: string;
+    iat: number;
+    exp: number;
 }

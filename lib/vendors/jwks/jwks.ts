@@ -118,30 +118,30 @@ export const verifyRSATokenWithUri = async (
         const publicKey = jwkToPem(keyFromStore);
         const decoded = <IDecodedJwt>jwt.verify(token, publicKey);
 
-        if (decoded?.sub && requiredAudiences.length === 0) {
+        if (decoded?.iat && decoded?.exp) {
             verified = true;
         }
 
-        if (
-            decoded?.aud &&
-            typeof decoded?.aud === "string" &&
-            requiredAudiences.length > 0
-        ) {
-            if (decoded?.aud !== requiredAudiences[0]) {
-                throwJwtError(c.JWT_NON_COMPLIANT_AUDIENCE);
-            }
-        } else if (
-            decoded?.aud &&
-            Array.isArray(decoded?.aud) &&
-            requiredAudiences.length > 0
-        ) {
-            requiredAudiences.map((audience: string) => {
-                if (!decoded?.aud.includes(audience)) {
-                    throwJwtError(c.JWT_NON_COMPLIANT_AUDIENCE);
-                }
-            });
-        }
-        verified = true;
+        // if (
+        //     decoded?.aud &&
+        //     typeof decoded?.aud === "string" &&
+        //     requiredAudiences.length > 0
+        // ) {
+        //     if (decoded?.aud !== requiredAudiences[0]) {
+        //         throwJwtError(c.JWT_NON_COMPLIANT_AUDIENCE);
+        //     }
+        // } else if (
+        //     decoded?.aud &&
+        //     Array.isArray(decoded?.aud) &&
+        //     requiredAudiences.length > 0
+        // ) {
+        //     requiredAudiences.map((audience: string) => {
+        //         if (!decoded?.aud.includes(audience)) {
+        //             throwJwtError(c.JWT_NON_COMPLIANT_AUDIENCE);
+        //         }
+        //     });
+        // }
+        // verified = true;
     } else {
         throwJwtError(c.JWK_MISSING_KEY_ID_FROM_HEADERS);
     }
