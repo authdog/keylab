@@ -7,7 +7,7 @@ const eastjwtGithub = 'https://github.com/authdog/easyjwt'
 module.exports = {
   title: 'easyjwt',
   tagline: 'JSON Web Token made easy',
-  url: 'https://www.easyjwt.org',
+  url: 'https://www.authdog.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',

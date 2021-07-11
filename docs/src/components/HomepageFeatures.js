@@ -5,31 +5,28 @@ import styles from './HomepageFeatures.module.css';
 const FeatureList = [
   {
     title: 'Easy to Use',
-    Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('/static/img/undraw_Personal_settings_re_i6w4.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        easyjwt has been designed with simplicity and reusability in mind 
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('../../static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Simple JWT validation',
+    Svg: require('/static/img/undraw_Safe_re_kiil.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        easyjwt allows you to validate your JWT with a single function
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
+    title: 'No-brainer JWT signing',
+    Svg: require('/static/img/undraw_Security_on_re_e491.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        easyjwt permits you to create jwt with simple and minimal steps with no crypto knowledge
       </>
     ),
   },
