@@ -1,10 +1,4 @@
-import {
-    // fetchJwksWithUri,
-    createKeyStore,
-    generateKeyFromStore,
-    keyExistsInSet
-    // getKeyFromSet
-} from "..";
+import { createKeyStore, generateKeyFromStore, keyExistsInSet } from "..";
 import * as nock from "nock";
 
 import { makeKeyExposable, verifyRSATokenWithUri } from "./jwks";
@@ -12,75 +6,8 @@ import { generateJwtFromPayload } from "../jwt/jwt";
 
 import * as c from "../../constants";
 import * as enums from "../../enums";
-// import * as jwkToPem from "jwk-to-pem";
-// import * as jwt from "jsonwebtoken";
 
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
-
-// it("initiate properly fetchJwksWithUri", async () => {
-//     const tenantUuid = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
-//     const applicationUuid = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
-
-//     const store = createKeyStore();
-//     const exposeJwkPrivateFields = true;
-//     const keyGenerated = await generateKeyFromStore(
-//         store,
-//         enums.JwtKeyTypes.RSA,
-//         enums.JwtAlgorithmsEnum.RS256,
-//         exposeJwkPrivateFields
-//     );
-//     const regExpPathAppJwks = new RegExp(
-//         `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid}\/${applicationUuid}\/.well-known\/jwks.json*`
-//     );
-
-//     nock(AUTHDOG_API_ROOT)
-//         .persist()
-//         .get(regExpPathAppJwks)
-//         .reply(200, {
-//             // TODO: hide sensitive fields from the response
-//             keys: [makeKeyExposable(keyGenerated)]
-//         });
-
-//     const payload = {
-//         userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
-//         userName: "dbrrt"
-//     };
-
-//     const token = await generateJwtFromPayload(
-//         {
-//             adid: payload?.userId,
-//             audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
-//             issuer: c.AUTHDOG_ID_ISSUER,
-//             scopes: "user openid",
-//             sessionDuration: 8 * 60 // 8 hours
-//         },
-//         {
-//             compact: true,
-//             fields: { typ: "jwt" },
-//             jwk: keyGenerated
-//         }
-//     );
-
-//     expect(token).toBeTruthy();
-
-//     const jwksResource = await fetchJwksWithUri({
-//         jwksUri: `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid}/${applicationUuid}/.well-known/jwks.json`
-//     });
-
-//     expect(jwksResource.keys).toBeTruthy();
-//     expect(jwksResource.keys.length).toEqual(1);
-
-//     expect(keyExistsInSet(keyGenerated.kid, jwksResource.keys)).toBeTruthy();
-
-//     const keyFromStore = getKeyFromSet(keyGenerated.kid, jwksResource.keys);
-
-//     expect(keyFromStore).toBeTruthy();
-
-//     const publicKey = jwkToPem(keyFromStore);
-//     const decoded: string | jwt.JwtPayload = jwt.verify(token, publicKey);
-
-//     expect(decoded?.sub).toBeTruthy();
-// });
 
 it("check if key exists in set", () => {
     const jwks = [
@@ -154,10 +81,30 @@ it("verifies correctly token with public uri", async () => {
 
     const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
 
-    const verified = await verifyRSATokenWithUri(token, {
-        jwksUri,
-        verifySsl: false
-    });
+    let verified = false;
+
+    try {
+        verified = await verifyRSATokenWithUri(token, {
+            jwksUri,
+            verifySsl: false
+        });
+    } catch (e) {}
 
     expect(verified).toBeTruthy();
+
+    const wrongToken =
+        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.POstGetfAytaZS82wHcjoTyoqhMyxXiWdR7Nn7A29DNSl0EiXLdwJ6xC6AfgZWF1bOsS_TuYI3OG85AmiExREkrS6tDfTQ2B3WXlrr-wp5AokiRbz3_oB4OxG-W9KcEEbDRcZc0nH3L7LzYptiy1PtAylQGxHTWZXtGz4ht0bAecBgmpdgXMguEIcoqPJ1n3pIWk_dUZegpqx0Lka21H6XxUTxiy8OcaarA8zdnPUnV6AmNP3ecFawIFYdvJB_cm-GvpCSbr8G8y_Mllj8f4x9nBH8pQux89_6gUY618iYv7tuPWBFfEbLxtF2pZS6YC1aSfLQxeNe8djT9YjpvRZA";
+
+    let verified2 = false;
+
+    try {
+        verified2 = await verifyRSATokenWithUri(wrongToken, {
+            jwksUri,
+            verifySsl: false
+        });
+    } catch (e) {
+        expect(e).toBeTruthy();
+    }
+
+    expect(verified2).toBeFalsy();
 });
