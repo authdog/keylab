@@ -182,12 +182,7 @@ export const checkJwtFields = (
     try {
         const parsedToken: any = parseJwt(token);
 
-        if (requiredAudiences.length > 0) {
-            requiredAudiences.map((audience: string) => {
-                parsedToken?.aud.includes(audience);
-            });
-        }
-
+        // audience
         if (
             parsedToken?.aud &&
             typeof parsedToken?.aud === "string" &&
@@ -205,6 +200,15 @@ export const checkJwtFields = (
                 }
             });
         }
+        // issuer
+        if (
+            parsedToken?.iss &&
+            typeof parsedToken?.iss === "string" &&
+            requiredIssuer
+        ) {
+            validFields = parsedToken?.iss === requiredIssuer;
+        }
+
     } catch (e) {
         validFields = false;
     }

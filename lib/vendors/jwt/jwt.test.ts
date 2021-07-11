@@ -75,31 +75,52 @@ it("verifies HS256 token", async () => {
 });
 
 it("verifies token audience", async () => {
+    // invalid token
     const token = "dummy-string";
     const valid = checkJwtFields(token, {});
     expect(valid).toBeFalsy();
 
+    // wrong audience
     const token2 = jwt.sign({ aud: c.AUTHDOG_ID_ISSUER }, "secret");
     const valid2 = checkJwtFields(token2, {
         requiredAudiences: ["wrong-audience"]
     });
     expect(valid2).toBeFalsy();
 
+    // right audience - aud string
     const token3 = jwt.sign({ aud: c.AUTHDOG_ID_ISSUER }, "secret");
     const valid3 = checkJwtFields(token3, {
         requiredAudiences: [c.AUTHDOG_ID_ISSUER]
     });
     expect(valid3).toBeTruthy();
 
+    // right audience - aud array
     const token4 = jwt.sign({ aud: [c.AUTHDOG_ID_ISSUER] }, "secret");
     const valid4 = checkJwtFields(token4, {
         requiredAudiences: [c.AUTHDOG_ID_ISSUER]
     });
     expect(valid4).toBeTruthy();
 
+    // right audience - aud array, but missing `missing-audience`
     const token5 = jwt.sign({ aud: [c.AUTHDOG_ID_ISSUER] }, "secret");
     const valid5 = checkJwtFields(token5, {
         requiredAudiences: [c.AUTHDOG_ID_ISSUER, "missing-audience"]
     });
     expect(valid5).toBeFalsy();
+
+    // issuer
+    // wrong issuer
+    const token6 = jwt.sign({ aud: [c.AUTHDOG_ID_ISSUER], iss: c.AUTHDOG_ID_ISSUER }, "secret");
+    const valid6 = checkJwtFields(token6, {
+        requiredAudiences: [c.AUTHDOG_ID_ISSUER],
+        requiredIssuer: 'https://wrong-issuer'
+    });
+    expect(valid6).toBeFalsy();
+
+    // right issuer
+    const valid7 = checkJwtFields(token6, {
+        requiredAudiences: [c.AUTHDOG_ID_ISSUER],
+        requiredIssuer: c.AUTHDOG_ID_ISSUER
+    });
+    expect(valid7).toBeTruthy();
 });
