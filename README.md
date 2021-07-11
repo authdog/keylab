@@ -61,8 +61,9 @@ const initializeSession = async () => {
 
 ## Roadmap
 
-- [ ] Validate HS256 token
-- [ ] Validate RS256 token
+- [x] Validate HS256 token
+- [x] Validate RS256 token
+- [x] Basic readme validation info
 - [ ] End user Documentation
 
 ## Dependencies
