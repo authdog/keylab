@@ -1,7 +1,8 @@
 import {
     readTokenHeaders,
     getAlgorithmJwt,
-    verifyHSTokenWithSecretString
+    verifyHSTokenWithSecretString,
+    checkJwtFields
 } from "./jwt";
 import { JsonWebTokenError } from "jsonwebtoken";
 import * as c from "../../constants";
@@ -73,8 +74,32 @@ it("verifies HS256 token", async () => {
     expect(shouldNotBeVerifiedAsExpired).toBeFalsy();
 });
 
-// TODO
+it("verifies token audience", async () => {
+    const token = "dummy-string";
+    const valid = checkJwtFields(token, {});
+    expect(valid).toBeFalsy();
 
-// HS256
-// checkTokenValidness("ey...", {}) -> should throw JWTError missing secret
-// checkTokenValidness("ey...", {secret: "supersecret"})
+    const token2 = jwt.sign({ aud: c.AUTHDOG_ID_ISSUER }, "secret");
+    const valid2 = checkJwtFields(token2, {
+        requiredAudiences: ["wrong-audience"]
+    });
+    expect(valid2).toBeFalsy();
+
+    const token3 = jwt.sign({ aud: c.AUTHDOG_ID_ISSUER }, "secret");
+    const valid3 = checkJwtFields(token3, {
+        requiredAudiences: [c.AUTHDOG_ID_ISSUER]
+    });
+    expect(valid3).toBeTruthy();
+
+    const token4 = jwt.sign({ aud: [c.AUTHDOG_ID_ISSUER] }, "secret");
+    const valid4 = checkJwtFields(token4, {
+        requiredAudiences: [c.AUTHDOG_ID_ISSUER]
+    });
+    expect(valid4).toBeTruthy();
+
+    const token5 = jwt.sign({ aud: [c.AUTHDOG_ID_ISSUER] }, "secret");
+    const valid5 = checkJwtFields(token5, {
+        requiredAudiences: [c.AUTHDOG_ID_ISSUER, "missing-audience"]
+    });
+    expect(valid5).toBeFalsy();
+});

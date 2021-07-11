@@ -173,3 +173,40 @@ export const generateJwtFromPayload = async (
 
     return token;
 };
+
+export const checkJwtFields = (
+    token: string,
+    { requiredAudiences = [], requiredIssuer = null }: JwtTypes.ICheckJwtFields
+) => {
+    let validFields = true;
+    try {
+        const parsedToken: any = parseJwt(token);
+
+        if (requiredAudiences.length > 0) {
+            requiredAudiences.map((audience: string) => {
+                parsedToken?.aud.includes(audience);
+            });
+        }
+
+        if (
+            parsedToken?.aud &&
+            typeof parsedToken?.aud === "string" &&
+            requiredAudiences.length > 0
+        ) {
+            validFields = parsedToken?.aud === requiredAudiences[0];
+        } else if (
+            parsedToken?.aud &&
+            Array.isArray(parsedToken?.aud) &&
+            requiredAudiences.length > 0
+        ) {
+            requiredAudiences.map((el: string) => {
+                if (!parsedToken?.aud.includes(el)) {
+                    validFields = false;
+                }
+            });
+        }
+    } catch (e) {
+        validFields = false;
+    }
+    return validFields;
+};

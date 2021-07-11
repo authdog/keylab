@@ -30,3 +30,8 @@ export interface IDecodedJwt {
     iat: number;
     exp: number;
 }
+
+export interface ICheckJwtFields {
+    requiredAudiences?: string[];
+    requiredIssuer?: string;
+}

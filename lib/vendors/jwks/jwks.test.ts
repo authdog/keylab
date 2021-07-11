@@ -50,7 +50,7 @@ it("verifies correctly token with public uri", async () => {
         `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
     );
 
-    nock(AUTHDOG_API_ROOT)
+    const scopeNock = nock(AUTHDOG_API_ROOT)
         .persist()
         .get(regExpPathAppJwks)
         .reply(200, {
@@ -90,5 +90,5 @@ it("verifies correctly token with public uri", async () => {
 
     expect(verified).toBeTruthy();
 
-    nock.cleanAll();
+    scopeNock.persist(false);
 });
