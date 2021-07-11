@@ -1,85 +1,86 @@
 import {
-    fetchJwksWithUri,
+    // fetchJwksWithUri,
     createKeyStore,
     generateKeyFromStore,
-    keyExistsInSet,
-    getKeyFromSet
+    keyExistsInSet
+    // getKeyFromSet
 } from "..";
 import * as nock from "nock";
 
-import { makeKeyExposable } from "./jwks";
-
+import { makeKeyExposable, verifyRSATokenWithUri } from "./jwks";
 import { generateJwtFromPayload } from "../jwt/jwt";
 
 import * as c from "../../constants";
 import * as enums from "../../enums";
-import * as jwkToPem from "jwk-to-pem";
-import * as jwt from "jsonwebtoken";
+// import * as jwkToPem from "jwk-to-pem";
+// import * as jwt from "jsonwebtoken";
 
-const tenantUuid = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
-const applicationUuid = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
-it("initiate properly fetchJwksWithUri", async () => {
-    const store = createKeyStore();
-    const keyGenerated = await generateKeyFromStore(
-        store,
-        enums.JwtAlgorithmsEnum.RS256,
-        true
-    );
-    const regExpPathAppJwks = new RegExp(
-        `api\/v1\/${tenantUuid}\/${applicationUuid}\/.well-known\/jwks.json*`
-    );
+// it("initiate properly fetchJwksWithUri", async () => {
+//     const tenantUuid = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
+//     const applicationUuid = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
 
-    nock(AUTHDOG_API_ROOT)
-        .persist()
-        .get(regExpPathAppJwks)
-        .reply(200, {
-            // TODO: hide sensitive fields from the response
-            keys: [makeKeyExposable(keyGenerated)]
-        });
+//     const store = createKeyStore();
+//     const exposeJwkPrivateFields = true;
+//     const keyGenerated = await generateKeyFromStore(
+//         store,
+//         enums.JwtKeyTypes.RSA,
+//         enums.JwtAlgorithmsEnum.RS256,
+//         exposeJwkPrivateFields
+//     );
+//     const regExpPathAppJwks = new RegExp(
+//         `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid}\/${applicationUuid}\/.well-known\/jwks.json*`
+//     );
 
-    const payload = {
-        userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
-        userName: "dbrrt"
-    };
+//     nock(AUTHDOG_API_ROOT)
+//         .persist()
+//         .get(regExpPathAppJwks)
+//         .reply(200, {
+//             // TODO: hide sensitive fields from the response
+//             keys: [makeKeyExposable(keyGenerated)]
+//         });
 
-    const token = await generateJwtFromPayload(
-        {
-            adid: payload?.userId,
-            audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
-            issuer: c.AUTHDOG_ID_ISSUER,
-            scopes: "user",
-            sessionDuration: 8 * 60
-        },
-        {
-            compact: true,
-            fields: { typ: "jwt" },
-            jwk: keyGenerated
-        }
-    );
+//     const payload = {
+//         userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
+//         userName: "dbrrt"
+//     };
 
-    expect(token).toBeTruthy();
+//     const token = await generateJwtFromPayload(
+//         {
+//             adid: payload?.userId,
+//             audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
+//             issuer: c.AUTHDOG_ID_ISSUER,
+//             scopes: "user openid",
+//             sessionDuration: 8 * 60 // 8 hours
+//         },
+//         {
+//             compact: true,
+//             fields: { typ: "jwt" },
+//             jwk: keyGenerated
+//         }
+//     );
 
-    const jwksResource = await fetchJwksWithUri({
-        jwksUri: `${AUTHDOG_API_ROOT}/api/v1/${tenantUuid}/${applicationUuid}/.well-known/jwks.json`,
-        verifySsl: false
-    });
+//     expect(token).toBeTruthy();
 
-    expect(jwksResource.keys).toBeTruthy();
-    expect(jwksResource.keys.length).toEqual(1);
+//     const jwksResource = await fetchJwksWithUri({
+//         jwksUri: `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid}/${applicationUuid}/.well-known/jwks.json`
+//     });
 
-    expect(keyExistsInSet(keyGenerated.kid, jwksResource.keys)).toBeTruthy();
+//     expect(jwksResource.keys).toBeTruthy();
+//     expect(jwksResource.keys.length).toEqual(1);
 
-    const keyFromStore = getKeyFromSet(keyGenerated.kid, jwksResource.keys);
+//     expect(keyExistsInSet(keyGenerated.kid, jwksResource.keys)).toBeTruthy();
 
-    expect(keyFromStore);
+//     const keyFromStore = getKeyFromSet(keyGenerated.kid, jwksResource.keys);
 
-    const publicKey = jwkToPem(keyFromStore);
-    const decoded = jwt.verify(token, publicKey);
+//     expect(keyFromStore).toBeTruthy();
 
-    expect(decoded?.sub).toBeTruthy();
-});
+//     const publicKey = jwkToPem(keyFromStore);
+//     const decoded: string | jwt.JwtPayload = jwt.verify(token, publicKey);
+
+//     expect(decoded?.sub).toBeTruthy();
+// });
 
 it("check if key exists in set", () => {
     const jwks = [
@@ -106,4 +107,57 @@ it("check if key exists in set", () => {
     );
 
     expect(shouldNotExist).toBeFalsy();
+});
+
+it("verifies correctly token with public uri", async () => {
+    const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
+    const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
+    const store = createKeyStore();
+    const exposeJwkPrivateFields = true;
+    const keyGenerated = await generateKeyFromStore(
+        store,
+        enums.JwtKeyTypes.RSA,
+        enums.JwtAlgorithmsEnum.RS256,
+        exposeJwkPrivateFields
+    );
+    const regExpPathAppJwks = new RegExp(
+        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
+    );
+
+    nock(AUTHDOG_API_ROOT)
+        .persist()
+        .get(regExpPathAppJwks)
+        .reply(200, {
+            // TODO: hide sensitive fields from the response
+            keys: [makeKeyExposable(keyGenerated)]
+        });
+
+    const payload = {
+        userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
+        userName: "dbrrt"
+    };
+
+    const token = await generateJwtFromPayload(
+        {
+            adid: payload?.userId,
+            audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
+            issuer: c.AUTHDOG_ID_ISSUER,
+            scopes: "user openid",
+            sessionDuration: 8 * 60 // 8 hours
+        },
+        {
+            compact: true,
+            fields: { typ: "jwt" },
+            jwk: keyGenerated
+        }
+    );
+
+    const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
+
+    const verified = await verifyRSATokenWithUri(token, {
+        jwksUri,
+        verifySsl: false
+    });
+
+    expect(verified).toBeTruthy();
 });

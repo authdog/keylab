@@ -5,11 +5,16 @@ export interface IJwksClient {
 }
 
 // https://datatracker.ietf.org/doc/html/rfc7517
-export interface JwkRecordVisible {
+export interface IJwkRecordVisible {
     kty: string; // key type
     kid: string; // key id
     use: string; // public key use
     alg: string; // algorithm
     e: string; // exponent
     n: string; // modulus
+}
+
+export interface IVerifyRSATokenCredentials {
+    jwksUri: string;
+    verifySsl?: boolean;
 }

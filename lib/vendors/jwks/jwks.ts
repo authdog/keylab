@@ -1,7 +1,11 @@
 import { default as fetch } from "node-fetch";
 import * as https from "https";
 import * as jose from "node-jose";
-import { JwkRecordVisible } from "./jwks.d";
+import * as jwkToPem from "jwk-to-pem";
+import * as jwt from "jsonwebtoken";
+
+import { IJwkRecordVisible, IVerifyRSATokenCredentials } from "./jwks.d";
+import { readTokenHeaders } from "../jwt";
 import { throwJwtError } from "../../errors";
 import * as enums from "../../enums";
 import * as c from "../../constants";
@@ -16,11 +20,11 @@ export const createKeyStore = () => {
 
 export const generateKeyFromStore: any = async (
     store: jose.JWK.KeyStore,
+    keyType: enums.JwtKeyTypes,
     algorithm: enums.JwtAlgorithmsEnum,
-    // keyType default = RSA
     exposePrivateFields: boolean = false
 ) => {
-    const generatedKey = await store.generate("RSA", 2048, {
+    const generatedKey = await store.generate(keyType, 2048, {
         // jwa: https://datatracker.ietf.org/doc/html/rfc7518
         alg: algorithm,
         // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
@@ -72,8 +76,8 @@ export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }) => {
  * @param jwks JSON Web Key Set
  * @returns true if the key exists in the set passed as parameter
  */
-export const keyExistsInSet = (keyId: string, jwks: JwkRecordVisible[]) => {
-    const exists = jwks.find((jwk: JwkRecordVisible) => jwk.kid === keyId);
+export const keyExistsInSet = (keyId: string, jwks: IJwkRecordVisible[]) => {
+    const exists = jwks.find((jwk: IJwkRecordVisible) => jwk.kid === keyId);
     return Boolean(exists);
 };
 
@@ -83,10 +87,38 @@ export const keyExistsInSet = (keyId: string, jwks: JwkRecordVisible[]) => {
  * @param jwks
  * @returns retrieves the key from the json web key set
  */
-export const getKeyFromSet = (keyId: string, jwks: JwkRecordVisible[]) => {
+export const getKeyFromSet = (keyId: string, jwks: IJwkRecordVisible[]) => {
     if (keyExistsInSet(keyId, jwks)) {
-        return jwks.find((jwk: JwkRecordVisible) => jwk.kid === keyId);
+        return jwks.find((jwk: IJwkRecordVisible) => jwk.kid === keyId);
     } else {
         throwJwtError(c.JWKS_MISSING_KEY_ID);
     }
+};
+
+export const verifyRSATokenWithUri = async (
+    token: string,
+    { jwksUri, verifySsl = false }: IVerifyRSATokenCredentials
+) => {
+    const jwksResource = await fetchJwksWithUri({
+        jwksUri,
+        verifySsl
+    });
+
+    let verified = false;
+    const { kid } = readTokenHeaders(token);
+    const keyExists = keyExistsInSet(kid, jwksResource.keys);
+
+    if (keyExists && kid) {
+        const keyFromStore = getKeyFromSet(kid, jwksResource.keys);
+        const publicKey = jwkToPem(keyFromStore);
+        const decoded: string | jwt.JwtPayload = jwt.verify(token, publicKey);
+
+        if (decoded?.sub) {
+            verified = true;
+        }
+    } else {
+        throwJwtError(c.JWK_MISSING_KEY_ID_FROM_HEADERS);
+    }
+
+    return verified;
 };

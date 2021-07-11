@@ -72,3 +72,9 @@ it("verifies HS256 token", async () => {
     );
     expect(shouldNotBeVerifiedAsExpired).toBeFalsy();
 });
+
+// TODO
+
+// HS256
+// validateJwt("ey...", {}) -> should throw JWTError missing secret
+// validateJwt("ey...", {secret: "supersecret"})
