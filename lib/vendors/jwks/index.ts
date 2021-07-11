@@ -3,5 +3,6 @@ export {
     fetchJwksWithUri,
     generateKeyFromStore,
     getKeyFromSet,
-    keyExistsInSet
+    keyExistsInSet,
+    verifyRSATokenWithUri
 } from "./jwks";

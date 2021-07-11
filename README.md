@@ -10,13 +10,19 @@ easyjwt is a library aiming to create and validate JSON Web Tokens without hussl
 
 ```typescript
 
-import { validateJwt } from "easyjwt"
+import { checkTokenValidness } from "easyjwt"
 
 const myToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
-const checkUserPermissions = () => {
+const initializeSession = async () => {
     // server only !!!
-    const isValid = await validateJwt(myToken, { secret: "mysecret" })
+    let isValid: boolean = false;
+    
+    try {
+        isValid = await checkTokenValidness(myToken, { secret: process.env.JWT_SECRET })
+    } catch(e) {
+        // handle exception
+    }
 
     if (isValid) {
         // do something

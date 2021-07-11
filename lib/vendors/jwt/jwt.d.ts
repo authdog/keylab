@@ -1,9 +1,10 @@
-export interface IValidateJwtCredentials {
+export interface IcheckTokenValidnessCredentials {
     // HS256
     secret?: string;
     // RS256
     domainUri?: string;
     jwksUri?: string;
+    verifySsl?: boolean;
 }
 
 export interface IJwtTokenClaims {

@@ -1,14 +1,12 @@
 import * as jwt from "jsonwebtoken";
+import * as jose from "node-jose";
+
+import * as JwtTypes from "./jwt.d";
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
 import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
-import {
-    IJwtTokenClaims,
-    IJwtTokenOpts,
-    IValidateJwtCredentials
-} from "./jwt.d";
-import * as jose from "node-jose";
+import { verifyRSATokenWithUri } from "../jwks";
 
 /**
  *
@@ -66,9 +64,9 @@ export const parseJwt = (token: string) => {
     return JSON.parse(jsonPayload);
 };
 
-export const validateJwt = async (
+export const checkTokenValidness = async (
     token: string,
-    { secret, jwksUri }: IValidateJwtCredentials
+    { secret, jwksUri, verifySsl = true }: JwtTypes.IcheckTokenValidnessCredentials
 ): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
@@ -97,7 +95,11 @@ export const validateJwt = async (
                 missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
-                throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
+                isValid = await verifyRSATokenWithUri(token, {
+                    jwksUri,
+                    verifySsl
+                });
+                // throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
             } else {
                 throwJwtError(
                     `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(
@@ -135,8 +137,8 @@ export const verifyHSTokenWithSecretString = async (
 };
 
 export const generateJwtFromPayload = async (
-    { adid, issuer, audiences, sessionDuration, scopes, data }: IJwtTokenClaims,
-    { compact, jwk, fields }: IJwtTokenOpts
+    { adid, issuer, audiences, sessionDuration, scopes, data }: JwtTypes.IJwtTokenClaims,
+    { compact, jwk, fields }: JwtTypes.IJwtTokenOpts
 ) => {
     const payload = JSON.stringify({
         iss: issuer,

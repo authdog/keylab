@@ -76,5 +76,5 @@ it("verifies HS256 token", async () => {
 // TODO
 
 // HS256
-// validateJwt("ey...", {}) -> should throw JWTError missing secret
-// validateJwt("ey...", {secret: "supersecret"})
+// checkTokenValidness("ey...", {}) -> should throw JWTError missing secret
+// checkTokenValidness("ey...", {secret: "supersecret"})
