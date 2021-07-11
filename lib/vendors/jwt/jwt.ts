@@ -66,7 +66,11 @@ export const parseJwt = (token: string) => {
 
 export const checkTokenValidness = async (
     token: string,
-    { secret, jwksUri, verifySsl = true }: JwtTypes.IcheckTokenValidnessCredentials
+    {
+        secret,
+        jwksUri,
+        verifySsl = true
+    }: JwtTypes.IcheckTokenValidnessCredentials
 ): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
@@ -137,7 +141,14 @@ export const verifyHSTokenWithSecretString = async (
 };
 
 export const generateJwtFromPayload = async (
-    { adid, issuer, audiences, sessionDuration, scopes, data }: JwtTypes.IJwtTokenClaims,
+    {
+        adid,
+        issuer,
+        audiences,
+        sessionDuration,
+        scopes,
+        data
+    }: JwtTypes.IJwtTokenClaims,
     { compact, jwk, fields }: JwtTypes.IJwtTokenOpts
 ) => {
     const payload = JSON.stringify({
