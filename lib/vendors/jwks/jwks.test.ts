@@ -6,7 +6,6 @@ import { generateJwtFromPayload } from "../jwt/jwt";
 
 import * as c from "../../constants";
 import * as enums from "../../enums";
-
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
 it("check if key exists in set", () => {
@@ -55,7 +54,6 @@ it("verifies correctly token with public uri", async () => {
         .persist()
         .get(regExpPathAppJwks)
         .reply(200, {
-            // TODO: hide sensitive fields from the response
             keys: [makeKeyExposable(keyGenerated)]
         });
 
@@ -107,4 +105,80 @@ it("verifies correctly token with public uri", async () => {
     }
 
     expect(verified2).toBeFalsy();
+
+    nock.cleanAll();
+});
+
+it("verifies correctly required audiences", async () => {
+    const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
+    const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
+    const store = createKeyStore();
+    const exposeJwkPrivateFields = true;
+    const keyGenerated = await generateKeyFromStore(
+        store,
+        enums.JwtKeyTypes.RSA,
+        enums.JwtAlgorithmsEnum.RS256,
+        exposeJwkPrivateFields
+    );
+    const regExpPathAppJwks = new RegExp(
+        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
+    );
+
+    nock(AUTHDOG_API_ROOT)
+        .persist()
+        .get(regExpPathAppJwks)
+        .reply(200, {
+            keys: [makeKeyExposable(keyGenerated)]
+        });
+
+    const payload = {
+        userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
+        userName: "dbrrt"
+    };
+
+    const token = await generateJwtFromPayload(
+        {
+            adid: payload?.userId,
+            audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
+            issuer: c.AUTHDOG_ID_ISSUER,
+            scopes: "user openid",
+            sessionDuration: 8 * 60 // 8 hours
+        },
+        {
+            compact: true,
+            fields: { typ: "jwt" },
+            jwk: keyGenerated
+        }
+    );
+
+    const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
+
+    let verified = false;
+
+    try {
+        verified = await verifyRSATokenWithUri(token, {
+            jwksUri,
+            verifySsl: false,
+            requiredAudiences: [c.AUTHDOG_ID_ISSUER]
+        });
+    } catch (e) {
+        console.log(e);
+    }
+
+    expect(verified).toBeTruthy();
+
+    try {
+        await verifyRSATokenWithUri(token, {
+            jwksUri,
+            verifySsl: false,
+            requiredAudiences: [
+                c.AUTHDOG_ID_ISSUER,
+                "https://www.unknownissuer.invalidid"
+            ]
+        });
+    } catch (e) {
+        expect(e).toBeTruthy();
+    }
+
+    nock.cleanAll();
 });

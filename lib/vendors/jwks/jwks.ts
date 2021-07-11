@@ -9,6 +9,7 @@ import { readTokenHeaders } from "../jwt";
 import { throwJwtError } from "../../errors";
 import * as enums from "../../enums";
 import * as c from "../../constants";
+import { IDecodedJwt } from "../jwt/jwt.d";
 
 /**
  *
@@ -97,7 +98,11 @@ export const getKeyFromSet = (keyId: string, jwks: IJwkRecordVisible[]) => {
 
 export const verifyRSATokenWithUri = async (
     token: string,
-    { jwksUri, verifySsl = false }: IVerifyRSATokenCredentials
+    {
+        jwksUri,
+        verifySsl = false,
+        requiredAudiences = []
+    }: IVerifyRSATokenCredentials
 ) => {
     const jwksResource = await fetchJwksWithUri({
         jwksUri,
@@ -111,11 +116,32 @@ export const verifyRSATokenWithUri = async (
     if (keyExists && kid) {
         const keyFromStore = getKeyFromSet(kid, jwksResource.keys);
         const publicKey = jwkToPem(keyFromStore);
-        const decoded: string | jwt.JwtPayload = jwt.verify(token, publicKey);
+        const decoded = <IDecodedJwt>jwt.verify(token, publicKey);
 
-        if (decoded?.sub) {
+        if (decoded?.sub && requiredAudiences.length === 0) {
             verified = true;
         }
+
+        if (
+            decoded?.aud &&
+            typeof decoded?.aud === "string" &&
+            requiredAudiences.length > 0
+        ) {
+            if (decoded?.aud !== requiredAudiences[0]) {
+                throwJwtError(c.JWT_NON_COMPLIANT_AUDIENCE);
+            }
+        } else if (
+            decoded?.aud &&
+            Array.isArray(decoded?.aud) &&
+            requiredAudiences.length > 0
+        ) {
+            requiredAudiences.map((audience: string) => {
+                if (!decoded?.aud.includes(audience)) {
+                    throwJwtError(c.JWT_NON_COMPLIANT_AUDIENCE);
+                }
+            });
+        }
+        verified = true;
     } else {
         throwJwtError(c.JWK_MISSING_KEY_ID_FROM_HEADERS);
     }

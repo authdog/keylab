@@ -27,3 +27,16 @@
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+.hero.hero--primary {
+  background: linear-gradient(
+      to right bottom,
+      rgba(21, 7, 231, 0.866667),
+      rgba(43, 29, 237, 0.866667),
+      rgba(59, 44, 243, 0.866667),
+      rgba(71, 56, 253, 0.85098),
+      rgba(83, 68, 255, 0.866667)
+    ),
+    url(/img/bg-hero.png);
+  color: #fff !important;
+}

@@ -3,6 +3,8 @@ export const JWT_MALFORMED_HEADERS = "malformed jwt headers";
 export const JWT_NON_SUPPORTED_ALGORITHM = "invalid algorithm";
 export const JWT_NON_IMPLEMENTED_ALGORITHM = "non implemented algorithm";
 export const JWT_MISSING_VALIDATION_CREDENTIALS = "missing credential";
+export const JWT_NON_COMPLIANT_AUDIENCE =
+    "non compliant or missing audience from jwt";
 
 export const JWKS_MISSING_KEY_ID = "keyId does not exist in the target set";
 export const JWK_MISSING_KEY_ID_FROM_HEADERS = "kid missing from token headers";

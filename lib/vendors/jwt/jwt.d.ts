@@ -23,3 +23,8 @@ export interface IJwtTokenOpts {
         typ: string;
     };
 }
+
+export interface IDecodedJwt {
+    aud: string[] | string;
+    sub: string;
+}
