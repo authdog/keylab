@@ -208,7 +208,6 @@ export const checkJwtFields = (
         ) {
             validFields = parsedToken?.iss === requiredIssuer;
         }
-
     } catch (e) {
         validFields = false;
     }

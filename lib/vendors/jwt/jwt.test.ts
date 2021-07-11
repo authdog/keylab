@@ -110,10 +110,13 @@ it("verifies token audience", async () => {
 
     // issuer
     // wrong issuer
-    const token6 = jwt.sign({ aud: [c.AUTHDOG_ID_ISSUER], iss: c.AUTHDOG_ID_ISSUER }, "secret");
+    const token6 = jwt.sign(
+        { aud: [c.AUTHDOG_ID_ISSUER], iss: c.AUTHDOG_ID_ISSUER },
+        "secret"
+    );
     const valid6 = checkJwtFields(token6, {
         requiredAudiences: [c.AUTHDOG_ID_ISSUER],
-        requiredIssuer: 'https://wrong-issuer'
+        requiredIssuer: "https://wrong-issuer"
     });
     expect(valid6).toBeFalsy();
 
