@@ -1,5 +1,9 @@
 # easyjwt
 
+![](https://github.com/authdog/easyjwt/workflows/adg-easyjwt-lib/badge.svg)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
+
 easyjwt is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.
 
 ## Install
