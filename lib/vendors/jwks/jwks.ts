@@ -148,7 +148,7 @@ export const verifyRSATokenWithUri = async (
         throwJwtError(c.JWK_MISSING_KEY_ID_FROM_HEADERS);
     }
 
-    validationFieldsPassed = requiresFieldsCheck ? validFields : true
+    validationFieldsPassed = requiresFieldsCheck ? validFields : true;
 
     return verified && validationFieldsPassed;
 };
