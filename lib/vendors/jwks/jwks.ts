@@ -22,12 +22,12 @@ export const createKeyStore = () => {
 export const generateKeyFromStore: any = async (
     store: jose.JWK.KeyStore,
     keyType: enums.JwtKeyTypes,
-    algorithm: enums.JwtAlgorithmsEnum,
+    algorithm: string,
     exposePrivateFields: boolean = false
 ) => {
     const generatedKey = await store.generate(keyType, 2048, {
         // jwa: https://datatracker.ietf.org/doc/html/rfc7518
-        alg: algorithm,
+        alg: enums.JwtAlgorithmsEnum[algorithm],
         // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
         // The "use" and "key_ops" JWK members SHOULD NOT be used together;
         use: enums.JwtPublicKeyUse.SIGNATURE

@@ -72,7 +72,7 @@ it("verifies correctly token with public uri", async () => {
         },
         {
             compact: true,
-            fields: { typ: "jwt" },
+            fields: { typ: enums.JwtKeyTypes.JWT },
             jwk: keyGenerated
         }
     );
