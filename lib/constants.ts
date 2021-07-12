@@ -9,6 +9,8 @@ export const JWT_NON_COMPLIANT_AUDIENCE =
 export const JWKS_MISSING_KEY_ID = "keyId does not exist in the target set";
 export const JWK_MISSING_KEY_ID_FROM_HEADERS = "kid missing from token headers";
 
+export const GLOBAL_FUNCTION_NOT_IMPLEMENTED = "function not implemented";
+
 import * as enums from "./enums";
 
 export const JWT_SUPPORTED_ALGS = Object.values(enums.JwtAlgorithmsEnum);

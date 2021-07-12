@@ -105,7 +105,6 @@ export const checkTokenValidness = async (
                     jwksUri,
                     verifySsl
                 });
-                // throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
             } else {
                 throwJwtError(
                     `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(
@@ -131,7 +130,7 @@ export const checkTokenValidness = async (
     return isValid;
 };
 
-// TODO: replace implementation with jose directly
+// TODO: replace implementation with jose
 export const verifyHSTokenWithSecretString = async (
     token: string,
     secret: string

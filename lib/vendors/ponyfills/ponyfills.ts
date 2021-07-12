@@ -1,4 +1,5 @@
 import * as e from "../../errors";
+import * as c from "../../constants";
 
 export const isServer = (): boolean => {
     // @ts-ignore
@@ -23,7 +24,7 @@ export const getClientWindowMethod = (method: string) => {
         if (browserImplementation) {
             return browserImplementation;
         } else {
-            throw new Error("function not implemented");
+            throw new Error(c.GLOBAL_FUNCTION_NOT_IMPLEMENTED);
         }
     } else {
         e.throwEnvironmentError();

@@ -58,14 +58,21 @@ const initializeSession = async () => {
 
 ```
 
-
-## Roadmap
+## Roadmap Features
 
 - [x] Validate HS256 token
 - [x] Validate RS256 token
 - [x] Basic readme validation info
 - [x] Helpers to check issuer and audiences of a given token
+- [ ] Sign HS256 token
+- [ ] Sign RS256 token
+
+## Roadmap Security
+
 - [ ] Rate limiting
+
+## Roadmap Documentation
+
 - [ ] Documentation End user *Introduction*
 - [ ] Documentation End user *Get Started*
 - [ ] Documentation End user *API*
