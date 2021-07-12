@@ -5,7 +5,8 @@ import {
     IS_NODEJS,
     isServer
 } from "./ponyfills";
-import { EnvironmentError } from "../../errors/environment";
+
+import * as c from "../../constants";
 
 test("encodes and decodes properly with ponyfilled atob and btoa", () => {
     expect(btoa("hello world")).toEqual("aGVsbG8gd29ybGQ=");
@@ -18,7 +19,7 @@ test("should throw an error if client is trying to access window based methods",
     if (IS_NODEJS) {
         expect(() => {
             getClientWindowMethod(existingBrowserFunctionName);
-        }).toThrowError(EnvironmentError);
+        }).toThrowError(c.CODE_NOT_RUNNING_IN_BROWSER);
     } else {
         expect(() => {
             getClientWindowMethod(existingBrowserFunctionName);

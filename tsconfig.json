@@ -1,14 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es2017",
+        "target": "es5",
         "module": "commonjs",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "allowJs": true,
         "declaration": true,
+        "esModuleInterop": true,
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
-        "outDir": "build",
+        "outDir": "dist",
         "baseUrl": ".",
         "lib": ["es6"],
         "sourceMap": true,
@@ -17,6 +18,13 @@
         "pretty": true,
         "skipLibCheck": true
     },
-    "include": ["./lib/**/*"],
-    "exclude": ["./node_modules/*"]
+    "include": ["."],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "docs",
+        "tsdoc",
+        "coverage",
+
+    ]
 }

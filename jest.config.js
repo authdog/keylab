@@ -9,7 +9,7 @@ module.exports = {
         "^.+\\.(ts)$": "ts-jest",
     },
     testMatch: ["**/test/**/*.test.(ts|js)", "**/**/*.test.(ts|js)"],
-    testPathIgnorePatterns: ["/node_modules/", "build"],
+    testPathIgnorePatterns: ["/node_modules/", "build", "dist", "docs"],
     testEnvironment: "node",
     rootDir: ".",
     collectCoverageFrom: ["<rootDir>/lib/**/*.ts"],

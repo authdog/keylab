@@ -1,5 +1,5 @@
 import { createKeyStore, generateKeyFromStore, keyExistsInSet } from "..";
-import * as nock from "nock";
+import { default as nock } from "nock";
 
 import { makePublicKey, verifyRSATokenWithUri } from "./jwks";
 import { generateJwtFromPayload } from "../jwt/jwt";
@@ -86,7 +86,9 @@ it("verifies correctly token with public uri", async () => {
             jwksUri,
             verifySsl: false
         });
-    } catch (e) {}
+    } catch (e) {
+        console.log(e);
+    }
 
     expect(verified).toBeTruthy();
 

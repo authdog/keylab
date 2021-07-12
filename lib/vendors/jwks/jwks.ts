@@ -1,7 +1,7 @@
 import { default as fetch } from "node-fetch";
 import * as https from "https";
 import * as jose from "node-jose";
-import * as jwkToPem from "jwk-to-pem";
+import { default as jwkToPem } from "jwk-to-pem";
 import * as jwt from "jsonwebtoken";
 
 import { IJwkRecordVisible, IVerifyRSATokenCredentials } from "./jwks.d";
@@ -21,17 +21,21 @@ export const createKeyStore = () => {
 
 export const generateKeyFromStore: any = async (
     store: jose.JWK.KeyStore,
-    keyType: enums.JwtKeyTypes,
+    keyType: string,
     algorithm: string,
     exposePrivateFields: boolean = false
 ) => {
-    const generatedKey = await store.generate(keyType, 2048, {
-        // jwa: https://datatracker.ietf.org/doc/html/rfc7518
-        alg: enums.JwtAlgorithmsEnum[algorithm],
-        // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
-        // The "use" and "key_ops" JWK members SHOULD NOT be used together;
-        use: enums.JwtPublicKeyUse.SIGNATURE
-    });
+    const generatedKey = await store.generate(
+        enums.JwtKeyTypes[keyType],
+        2048,
+        {
+            // jwa: https://datatracker.ietf.org/doc/html/rfc7518
+            alg: enums.JwtAlgorithmsEnum[algorithm],
+            // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
+            // The "use" and "key_ops" JWK members SHOULD NOT be used together;
+            use: enums.JwtPublicKeyUse.SIGNATURE
+        }
+    );
     return generatedKey.toJSON(exposePrivateFields);
 };
 

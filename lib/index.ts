@@ -1,3 +1,3 @@
-export { checkTokenValidness } from "./vendors";
+export { checkTokenValidness, createSignedJwt } from "./vendors";
 export * from "./enums";
 export * from "./types.d";
