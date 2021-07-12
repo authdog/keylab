@@ -65,12 +65,22 @@ const initializeSession = async () => {
 
 ## Roadmap Features
 
-- [x] Validate HS256 token
-- [x] Validate RS256 token
 - [x] Basic readme validation info
 - [x] Helpers to check issuer and audiences of a given token
-- [x] Sign HS256 token
-- [ ] Sign RS256 token
+- [x] Sign/Verify HS256 token
+- [x] Sign/Verify RS256 token
+- [x] Sign/Verify RS384 token
+- [x] Sign/Verify RS512 token
+- [x] Sign/Verify PS256 token
+- [x] Sign/Verify PS384 token
+- [x] Sign/Verify PS512 token
+- [ ] Sign/Verify HS384 token 
+- [ ] Sign/Verify ES256 token 
+- [ ] Sign/Verify ES384 token 
+- [ ] Sign/Verify ES512 token 
+- [ ] Sign/Verify EdDSA token 
+- [ ] Sign/Verify ES256K token 
+
 
 ## Roadmap Security
 
