@@ -8,6 +8,7 @@ import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
 import { verifyRSATokenWithUri } from "../jwks";
 import { ICreateSignedJwtOptions } from "./jwt.d";
+import {signJwtWithSecret} from './jwt-sign'
 
 /**
  *
@@ -117,8 +118,11 @@ export const checkTokenValidness = async (
             algEnums.ES384 ||
             algEnums.ES512 ||
             algEnums.PS256 ||
-            algEnums.PS384:
-            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
+            algEnums.PS384 ||
+            algEnums.PS512 ||
+            algEnums.ES256K ||
+            algEnums.EdDSA:
+                throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
 
         default:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
@@ -127,6 +131,7 @@ export const checkTokenValidness = async (
     return isValid;
 };
 
+// TODO: replace implementation with jose directly
 export const verifyHSTokenWithSecretString = async (
     token: string,
     secret: string
@@ -217,7 +222,7 @@ export const checkJwtFields = (
 export const createSignedJwt = (
     payload: any,
     { algorithm, claims, signinOptions }: ICreateSignedJwtOptions
-) => {
+): string => {
     const algEnums = enums.JwtAlgorithmsEnum;
     let token;
     const jwtClaims = {
@@ -227,28 +232,18 @@ export const createSignedJwt = (
     };
 
     switch (algorithm) {
-        case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
-            token = jwt.sign({ ...jwtClaims }, signinOptions?.secret);
+        case algEnums.HS256:
+            token = signJwtWithSecret({
+                    ...jwtClaims,
+                    payload
+                }, signinOptions?.secret);
             break;
+
+        case algEnums.HS384 || algEnums.HS512:
+            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
 
         case algEnums.RS256 || algEnums.RS384 || algEnums.RS512:
             break;
-        // if (!jwksUri) {
-        //     missingCredentials.push("jwksUri");
-        // }
-        // if (missingCredentials.length === 0) {
-        //     isValid = await verifyRSATokenWithUri(token, {
-        //         jwksUri,
-        //         verifySsl
-        //     });
-        //     // throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
-        // } else {
-        //     throwJwtError(
-        //         `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(
-        //             missingCredentials
-        //         )}`
-        //     );
-        // }
 
         case algEnums.ES256 ||
             algEnums.ES384 ||
