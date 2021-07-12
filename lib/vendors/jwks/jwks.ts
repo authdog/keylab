@@ -124,6 +124,8 @@ export const verifyRSATokenWithUri = async (
 
     let verified = false;
     let validFields = false;
+    let validationFieldsPassed = false;
+    let requiresFieldsCheck = requiredAudiences || requiredIssuer;
     const { kid } = readTokenHeaders(token);
     const keyExists = keyExistsInSet(kid, jwksResource.keys);
 
@@ -136,8 +138,7 @@ export const verifyRSATokenWithUri = async (
             verified = true;
         }
 
-        // check requiredAudiences and/or requiredIssuer
-        if (requiredAudiences || requiredIssuer) {
+        if (requiresFieldsCheck) {
             validFields = checkJwtFields(token, {
                 requiredAudiences,
                 requiredIssuer
@@ -147,5 +148,7 @@ export const verifyRSATokenWithUri = async (
         throwJwtError(c.JWK_MISSING_KEY_ID_FROM_HEADERS);
     }
 
-    return verified && validFields;
+    validationFieldsPassed = requiresFieldsCheck ? validFields : true
+
+    return verified && validationFieldsPassed;
 };
