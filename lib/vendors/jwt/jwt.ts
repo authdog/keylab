@@ -8,7 +8,7 @@ import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
 import { verifyRSATokenWithUri } from "../jwks";
 import { ICreateSignedJwtOptions } from "./jwt.d";
-import {signJwtWithSecret} from './jwt-sign'
+import { signJwtWithSecret } from "./jwt-sign";
 
 /**
  *
@@ -122,7 +122,7 @@ export const checkTokenValidness = async (
             algEnums.PS512 ||
             algEnums.ES256K ||
             algEnums.EdDSA:
-                throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
+            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
 
         default:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
@@ -233,10 +233,13 @@ export const createSignedJwt = (
 
     switch (algorithm) {
         case algEnums.HS256:
-            token = signJwtWithSecret({
+            token = signJwtWithSecret(
+                {
                     ...jwtClaims,
                     payload
-                }, signinOptions?.secret);
+                },
+                signinOptions?.secret
+            );
             break;
 
         case algEnums.HS384 || algEnums.HS512:
