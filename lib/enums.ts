@@ -11,7 +11,10 @@ export enum JwtAlgorithmsEnum {
     ES384 = "ES384",
     ES512 = "ES512",
     PS256 = "PS256",
-    PS384 = "PS384"
+    PS384 = "PS384",
+    PS512 = "PS512",
+    EdDSA = "EdDSA", // not supported by jsonwebtoken
+    ES256K = "ES256K" // not supported by jsonwebtoken
 }
 
 // https://datatracker.ietf.org/doc/html/rfc7517#section-4.2

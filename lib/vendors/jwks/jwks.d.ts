@@ -18,4 +18,5 @@ export interface IVerifyRSATokenCredentials {
     jwksUri: string;
     verifySsl?: boolean;
     requiredAudiences?: string[];
+    requiredIssuer?: string;
 }

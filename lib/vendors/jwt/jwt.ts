@@ -7,6 +7,7 @@ import * as c from "../../constants";
 import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
 import { verifyRSATokenWithUri } from "../jwks";
+import { ICreateSignedJwtOptions } from "./jwt.d";
 
 /**
  *
@@ -142,7 +143,7 @@ export const verifyHSTokenWithSecretString = async (
 
 export const generateJwtFromPayload = async (
     {
-        adid,
+        sub,
         issuer,
         audiences,
         sessionDuration,
@@ -153,7 +154,7 @@ export const generateJwtFromPayload = async (
 ) => {
     const payload = JSON.stringify({
         iss: issuer,
-        sub: adid,
+        sub,
         aud: [...audiences],
         ...data,
         exp: Math.floor(Date.now() / 1000 + sessionDuration * 60),
@@ -181,7 +182,6 @@ export const checkJwtFields = (
     let validFields = true;
     try {
         const parsedToken: any = parseJwt(token);
-
         // audience
         if (
             parsedToken?.aud &&
@@ -212,4 +212,53 @@ export const checkJwtFields = (
         validFields = false;
     }
     return validFields;
+};
+
+export const createSignedJwt = (
+    payload: any,
+    { algorithm, claims, signinOptions }: ICreateSignedJwtOptions
+) => {
+    const algEnums = enums.JwtAlgorithmsEnum;
+    let token;
+    const jwtClaims = {
+        iss: claims.issuer,
+        aud: claims.audiences,
+        scp: claims.scopes
+    };
+
+    switch (algorithm) {
+        case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
+            token = jwt.sign({ ...jwtClaims }, signinOptions?.secret);
+            break;
+
+        case algEnums.RS256 || algEnums.RS384 || algEnums.RS512:
+            break;
+        // if (!jwksUri) {
+        //     missingCredentials.push("jwksUri");
+        // }
+        // if (missingCredentials.length === 0) {
+        //     isValid = await verifyRSATokenWithUri(token, {
+        //         jwksUri,
+        //         verifySsl
+        //     });
+        //     // throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
+        // } else {
+        //     throwJwtError(
+        //         `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(
+        //             missingCredentials
+        //         )}`
+        //     );
+        // }
+
+        case algEnums.ES256 ||
+            algEnums.ES384 ||
+            algEnums.ES512 ||
+            algEnums.PS256 ||
+            algEnums.PS384 ||
+            algEnums.PS512 ||
+            algEnums.ES256K ||
+            algEnums.EdDSA:
+            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
+    }
+    return token;
 };

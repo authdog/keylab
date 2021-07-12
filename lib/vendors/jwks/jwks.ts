@@ -5,7 +5,7 @@ import * as jwkToPem from "jwk-to-pem";
 import * as jwt from "jsonwebtoken";
 
 import { IJwkRecordVisible, IVerifyRSATokenCredentials } from "./jwks.d";
-import { readTokenHeaders } from "../jwt";
+import { checkJwtFields, readTokenHeaders } from "../jwt";
 import { throwJwtError } from "../../errors";
 import * as enums from "../../enums";
 import * as c from "../../constants";
@@ -35,27 +35,35 @@ export const generateKeyFromStore: any = async (
     return generatedKey.toJSON(exposePrivateFields);
 };
 
-// TODO
+// TODO: add proper type for key parameter
 /**
+ * @param privateKey is a JSON Web Key object with private fields
+ * @returns public key (without private fields)
  * will remove private fields from jwk, in order to make sure a jwk is exposable publicly
  */
-export const makeKeyExposable = (key: any) => {
-    // "kty":"RSA","kid":"LtQ8v6tdhTycscqav6FsIqjmdUpHNx0dli_q17A4lek","use":"sig","alg":"RS256","x5c":"","x5t":"","x5u":"","key_ops":"","n":"dVJSTFFEcEpPc01xS0E4eUtadlpSTUNUNXhWSjBodnZfd2w1Vm1qeGhrX1RNbTh1ZGdwdnBYYWRYeU5WSGxwQTVzdzdGOEFFWFBaUGFZY1VuQXhpQW0xUTAzUzBLWkJNMWRQTjRaY2JnX1pOcjFJRG8zRDJzMVlHTjlGaTFEUnJjVXg2THgwSXgyRm9TWjJoLU1MS3NSME1CS1ZVdDl5NWlwaHVCT3pvZzh4el9CLWZZYlhMRzRLbkNXQjk2aGxBTzVwUjlZbHFHN1hVTWZqSlBnNVNJWW9EVlFab2lMalIyMHVWVktjUVZyOVZqVklMZEpvdEhndWlLMWFncHc0NXdQTHZJdnB3N24zVnpTTEM2dW5xVjlsZjY4aG9NOFRiMGxweXV4djBjeER6RDNDZ3o3WjlHak5jdEZnLVhacjQxdjk3R0kxN2RIUjJZTGRVZzl6SnBR","e":"AQAB","key_id":"GC8skJWjSX8y5x3rLsRFLmbzqoRw6ALSwp1muUibeHk"
-    return Object.freeze({
-        kty: key.kty,
-        kid: key.kid,
-        use: key.sig,
-        alg: key.alg,
-        x5c: key.x5c,
-        x5t: key.x5t,
-        x5u: key.x5u,
-        key_ops: key.key_ops,
-        n: key.n,
-        e: key.e,
-        key_id: key.key_id
-    });
+export const makePublicKey = (privateKey: any) => {
+    const publicKey = {
+        kty: privateKey.kty,
+        kid: privateKey.kid,
+        use: privateKey.sig,
+        alg: privateKey.alg,
+        x5c: privateKey.x5c,
+        x5t: privateKey.x5t,
+        x5u: privateKey.x5u,
+        key_ops: privateKey.key_ops,
+        n: privateKey.n,
+        e: privateKey.e,
+        key_id: privateKey.key_id
+    };
+    return publicKey;
 };
 
+/**
+ *
+ * @param jwksUri is the endpoint to retrieve the public Json web keys
+ * @param verifySsl can be used in a context where self-signed certificates are being used
+ * @returns return an array with keys objects
+ */
 export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }) => {
     const httpsAgent = new https.Agent({
         rejectUnauthorized: verifySsl
@@ -101,7 +109,8 @@ export const verifyRSATokenWithUri = async (
     {
         jwksUri,
         verifySsl = false,
-        requiredAudiences = []
+        requiredAudiences = [],
+        requiredIssuer = null
     }: IVerifyRSATokenCredentials
 ) => {
     const jwksResource = await fetchJwksWithUri({
@@ -110,6 +119,7 @@ export const verifyRSATokenWithUri = async (
     });
 
     let verified = false;
+    let validFields = false;
     const { kid } = readTokenHeaders(token);
     const keyExists = keyExistsInSet(kid, jwksResource.keys);
 
@@ -122,29 +132,16 @@ export const verifyRSATokenWithUri = async (
             verified = true;
         }
 
-        // if (
-        //     decoded?.aud &&
-        //     typeof decoded?.aud === "string" &&
-        //     requiredAudiences.length > 0
-        // ) {
-        //     if (decoded?.aud !== requiredAudiences[0]) {
-        //         throwJwtError(c.JWT_NON_COMPLIANT_AUDIENCE);
-        //     }
-        // } else if (
-        //     decoded?.aud &&
-        //     Array.isArray(decoded?.aud) &&
-        //     requiredAudiences.length > 0
-        // ) {
-        //     requiredAudiences.map((audience: string) => {
-        //         if (!decoded?.aud.includes(audience)) {
-        //             throwJwtError(c.JWT_NON_COMPLIANT_AUDIENCE);
-        //         }
-        //     });
-        // }
-        // verified = true;
+        // check requiredAudiences and/or requiredIssuer
+        if (requiredAudiences || requiredIssuer) {
+            validFields = checkJwtFields(token, {
+                requiredAudiences,
+                requiredIssuer
+            });
+        }
     } else {
         throwJwtError(c.JWK_MISSING_KEY_ID_FROM_HEADERS);
     }
 
-    return verified;
+    return verified && validFields;
 };

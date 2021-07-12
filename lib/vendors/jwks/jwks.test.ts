@@ -1,7 +1,7 @@
 import { createKeyStore, generateKeyFromStore, keyExistsInSet } from "..";
 import * as nock from "nock";
 
-import { makeKeyExposable, verifyRSATokenWithUri } from "./jwks";
+import { makePublicKey, verifyRSATokenWithUri } from "./jwks";
 import { generateJwtFromPayload } from "../jwt/jwt";
 
 import * as c from "../../constants";
@@ -54,7 +54,7 @@ it("verifies correctly token with public uri", async () => {
         .persist()
         .get(regExpPathAppJwks)
         .reply(200, {
-            keys: [makeKeyExposable(keyGenerated)]
+            keys: [makePublicKey(keyGenerated)]
         });
 
     const payload = {
@@ -64,7 +64,7 @@ it("verifies correctly token with public uri", async () => {
 
     const token = await generateJwtFromPayload(
         {
-            adid: payload?.userId,
+            sub: payload?.userId,
             audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
             issuer: c.AUTHDOG_ID_ISSUER,
             scopes: "user openid",

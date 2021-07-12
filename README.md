@@ -64,7 +64,12 @@ const initializeSession = async () => {
 - [x] Validate HS256 token
 - [x] Validate RS256 token
 - [x] Basic readme validation info
-- [ ] End user Documentation
+- [x] Helpers to check issuer and audiences of a given token
+- [ ] Rate limiting
+- [ ] Documentation End user *Introduction*
+- [ ] Documentation End user *Get Started*
+- [ ] Documentation End user *API*
+
 
 ## Dependencies
 
@@ -75,4 +80,4 @@ const initializeSession = async () => {
 
 ## Credits
 
-@dbrrt
+@dbrrt - David Barrat
