@@ -8,7 +8,7 @@ import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
 import { verifyRSATokenWithUri } from "../jwks";
 import { ICreateSignedJwtOptions } from "./jwt.d";
-import { signJwtWithSecret } from "./jwt-sign";
+import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
 
 /**
  *
@@ -218,44 +218,47 @@ export const checkJwtFields = (
     return validFields;
 };
 
-export const createSignedJwt = (
+export const createSignedJwt = async (
     payload: any,
     { algorithm, claims, signinOptions }: ICreateSignedJwtOptions
-): string => {
+): Promise<string> => {
     const algEnums = enums.JwtAlgorithmsEnum;
     let token;
-    const jwtClaims = {
+    const jwtClaims: JwtTypes.IDecodedJwt = {
         iss: claims.issuer,
         aud: claims.audiences,
-        scp: claims.scopes
+        scp: claims.scopes,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000 + claims.sessionDuration * 60),
+        ...payload
     };
 
     switch (algorithm) {
         case algEnums.HS256:
-            token = signJwtWithSecret(
-                {
-                    ...jwtClaims,
-                    payload
-                },
-                signinOptions?.secret
-            );
+            token = signJwtWithSecret(jwtClaims, signinOptions?.secret);
             break;
 
+        // to be tested
         case algEnums.HS384 || algEnums.HS512:
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
 
-        case algEnums.RS256 || algEnums.RS384 || algEnums.RS512:
+        case algEnums.RS256 ||
+            algEnums.RS384 ||
+            algEnums.RS512 ||
+            algEnums.PS256 ||
+            algEnums.PS384 ||
+            algEnums.PS512:
+            token = await signJwtWithJwk(jwtClaims, signinOptions.jwk);
             break;
 
+        // to be implemented
         case algEnums.ES256 ||
             algEnums.ES384 ||
             algEnums.ES512 ||
-            algEnums.PS256 ||
-            algEnums.PS384 ||
-            algEnums.PS512 ||
             algEnums.ES256K ||
             algEnums.EdDSA:
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
     }
+
     return token;
 };

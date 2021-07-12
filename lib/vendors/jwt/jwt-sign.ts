@@ -17,6 +17,6 @@ export const signJwtWithJwk = async (payload: any, jwk: jwt.Secret) => {
         }),
         jwk
     )
-        .update(payload)
+        .update(JSON.stringify(payload))
         .final();
 };

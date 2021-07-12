@@ -9,6 +9,13 @@ export interface IcheckTokenValidnessCredentials {
     verifySsl?: boolean;
 }
 
+export interface ISignTokenCredentials {
+    // HS256
+    secret?: string;
+    // RS256
+    jwk: any;
+}
+
 export interface IJwtTokenClaims {
     sub: string; // subject id
     issuer: string; // issuer
@@ -27,10 +34,12 @@ export interface IJwtTokenOpts {
 }
 
 export interface IDecodedJwt {
-    aud: string[] | string;
-    sub: string;
+    iss?: string;
+    aud?: string[] | string;
+    sub?: string;
     iat: number;
     exp: number;
+    scp?: string;
 }
 
 export interface ICheckJwtFields {
@@ -41,5 +50,5 @@ export interface ICheckJwtFields {
 export interface ICreateSignedJwtOptions {
     algorithm: JwtAlgorithmsEnum;
     claims: IJwtTokenClaims;
-    signinOptions: IcheckTokenValidnessCredentials;
+    signinOptions: ISignTokenCredentials;
 }
