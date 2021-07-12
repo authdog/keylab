@@ -12,8 +12,8 @@
         "docs:deploy": "NETLIFY_SITE_ID=9b7627a4-3d89-4922-a84f-f1fa4a1b9f3f netlify deploy --dir=docs/build --prod",
         "docs:netlify": "yarn docs:build && yarn docs:deploy",
         "tsdoc:build": "typedoc --out tsdoc lib",
-        "tsdoc:deploy": "yarn tsdoc:build && NETLIFY_SITE_ID=<NETLIFY_SITE> netlify deploy --dir=tsdoc --prod",
-        "tsdoc:netlify": ""
+        "tsdoc:deploy": "NETLIFY_SITE_ID=7a9aa5c4-6218-4d61-b482-999b3a32f38a netlify deploy --dir=tsdoc --prod",
+        "tsdoc:netlify": "yarn tsdoc:build && yarn tsdoc:deploy"
     },
     "repository": {
         "type": "git",
