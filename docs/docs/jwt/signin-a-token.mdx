@@ -7,19 +7,32 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 import hs256Src from '!!raw-loader!./src/hs256.js.source';
+import rs256Src from '!!raw-loader!./src/rs256.js.source';
+import rs384Src from '!!raw-loader!./src/rs384.js.source';
+import rs512Src from '!!raw-loader!./src/rs512.js.source';
 
+
+export const algorithms = [
+    {alg: "hs256", src: hs256Src},
+    {alg: "rs256", src: rs256Src },
+    {alg: "rs384", src: rs384Src },
+    {alg: "rs512", src: rs512Src }
+]
 
 <Tabs
   defaultValue="rs256"
-  values={[
-    {label: 'HS256', value: 'hs256'},
-    {label: 'RS256', value: 'rs256'},
-  ]}>
-  <TabItem value="hs256">
-    <CodeBlock className="language-jsx">
-        {hs256Src}
-    </CodeBlock>
-  </TabItem>
-  <TabItem value="rs256">
-  </TabItem>
+  values={algorithms.map((el) => Object.freeze({
+        label: el.alg.toUpperCase(),
+        value: el.alg
+    }))
+  }>
+  {algorithms.map((el, idx) => {
+      return (
+          <TabItem key={idx} value={el.alg}>
+            <CodeBlock key={idx} className="language-jsx">
+                {el.src}
+            </CodeBlock>
+        </TabItem>
+      )
+  })}
 </Tabs>

@@ -225,11 +225,11 @@ export const createSignedJwt = async (
     const algEnums = enums.JwtAlgorithmsEnum;
     let token;
     const jwtClaims: JwtTypes.IDecodedJwt = {
-        iss: claims.issuer,
-        aud: claims.audiences,
-        scp: claims.scopes,
+        iss: claims?.issuer,
+        aud: claims?.audiences,
+        scp: claims?.scopes,
         iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000 + claims.sessionDuration * 60),
+        exp: Math.floor(Date.now() / 1000 + claims?.sessionDuration * 60),
         ...payload
     };
 

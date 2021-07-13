@@ -39,6 +39,20 @@ export const generateKeyFromStore: any = async (
     return generatedKey.toJSON(exposePrivateFields);
 };
 
+export const generatePrivateJwk: any = async (
+    keyType: string,
+    algorithm: string,
+) => {
+    const store = createKeyStore()
+    const jsonWebKey = await generateKeyFromStore(
+        store,
+        keyType,
+        algorithm,
+        true
+    )
+    return jsonWebKey;
+}
+
 // TODO: add proper type for key parameter
 /**
  * @param privateKey is a JSON Web Key object with private fields

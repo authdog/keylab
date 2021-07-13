@@ -25,7 +25,7 @@ module.exports = {
   themeConfig: {
     navbar: {
       hideOnScroll: true,
-      title: 'Easyjwt',
+      title: 'easyjwt',
       logo: {
         alt: "Authdog",
         src: "img/logo.png",

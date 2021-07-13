@@ -40,3 +40,13 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
     url(/img/bg-hero.png);
   color: #fff !important;
 }
+
+
+.button.button--secondary.button--lg {
+  transition: all 0.5s ease-in-out;
+  box-shadow: 0 3px 3px rgba(0,0,0,.25);
+}
+
+.button.button--secondary.button--lg:hover {
+  box-shadow: 0 17px 17px rgba(0,0,0,.25);
+}

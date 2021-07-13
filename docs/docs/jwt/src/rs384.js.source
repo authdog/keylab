@@ -1,13 +1,16 @@
-import {createSignedJwt} from "@authdog/easyjwt"
+import {generatePrivateJwk, createSignedJwt} from "@authdog/easyjwt"
 
 const main = async () => {
     const payload = {
         userId: "e156b806-2879-4f4b-878d-9426d75dbcbf"
     }
-    
-    const algorithm = "HS256";
-    
-    const secret = "strongSecretPleaseDontShare";
+
+    const algorithm = "RS384"
+
+    const jwk = await generatePrivateJwk(
+        "RSA",
+        algorithm;
+    )
 
     const token = await createSignedJwt(
         payload,
@@ -20,7 +23,7 @@ const main = async () => {
                 sessionDuration: 60 // minutes
             },
             signinOptions: {
-                secret
+                jwk
             }
         }
     )
