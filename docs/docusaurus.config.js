@@ -2,6 +2,7 @@ const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 const eastjwtGithub = 'https://github.com/authdog/easyjwt'
+const introductionPath = 'introduction/installation';
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
@@ -13,7 +14,7 @@ module.exports = {
   tagline: 'JSON Web Token made easy',
   url: 'https://www.authdog.com',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'log',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'authdog', // Usually your GitHub org/user name.
@@ -30,17 +31,17 @@ module.exports = {
       items: [
         {
           type: 'doc',
-          docId: 'intro',
+          docId: introductionPath,
           position: 'left',
           label: 'Documentation',
         },
         {
           type: 'localeDropdown',
+          position: 'right'
         },
         {
           href: eastjwtGithub,
-          label: 'GitHub',
-          position: 'right',
+          label: 'GitHub'
         },
       ],
     },
@@ -52,7 +53,7 @@ module.exports = {
           items: [
             {
               label: 'Tutorial',
-              to: '/docs/intro',
+              to: introductionPath,
             },
           ],
         },
