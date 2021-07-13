@@ -9,15 +9,28 @@ import CodeBlock from '@theme/CodeBlock';
 import hs256Src from '!!raw-loader!./src/hs256.js.source';
 import rs256Src from '!!raw-loader!./src/rs256.js.source';
 import rs384Src from '!!raw-loader!./src/rs384.js.source';
-import rs512Src from '!!raw-loader!./src/rs512.js.source';
+import rs512Src from '!!raw-loader!./src/rs512.js.source'; // TODO create a template (with eta?) and inject dynamically the algorithm in source
 
+import hsSrc from '!!raw-loader!./src/hs.js.source'; // TODO create a template (with eta?) and inject dynamically the algorithm in source
+import rsSrc from '!!raw-loader!./src/rs.js.source'; // TODO create a template (with eta?) and inject dynamically the algorithm in source
+
+
+
+:::info
+
+Useful information.
+
+:::
 
 export const algorithms = [
-    {alg: "hs256", src: hs256Src},
-    {alg: "rs256", src: rs256Src },
-    {alg: "rs384", src: rs384Src },
-    {alg: "rs512", src: rs512Src }
-]
+    {alg: "hs256", src: hsSrc},
+    {alg: "rs256", src: rsSrc },
+    {alg: "rs384", src: rsSrc },
+    {alg: "rs512", src: rsSrc }
+].map((el) => Object.freeze({
+  ...el,
+  src: el.src.replace(/{{algorithm}}/g, el.alg.toUpperCase())
+}))
 
 <Tabs
   defaultValue="rs256"
@@ -26,13 +39,12 @@ export const algorithms = [
         value: el.alg
     }))
   }>
-  {algorithms.map((el, idx) => {
-      return (
+  {algorithms.map((el, idx) => (
           <TabItem key={idx} value={el.alg}>
             <CodeBlock key={idx} className="language-jsx">
                 {el.src}
             </CodeBlock>
         </TabItem>
       )
-  })}
+  )}
 </Tabs>

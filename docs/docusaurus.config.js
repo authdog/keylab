@@ -5,7 +5,7 @@ const eastjwtGithub = 'https://github.com/authdog/easyjwt'
 const typedocLink = 'https://types.easyjwt.org'
 const introductionPath = 'introduction/installation';
 
-const isProduction = process.env.NODE_ENV === 'production'
+// const isProduction = process.env.NODE_ENV === 'production'
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
@@ -38,10 +38,9 @@ module.exports = {
           position: 'left',
           label: 'Documentation',
         },
-        { ...isProduction ? {
+        {
           type: 'localeDropdown',
           position: 'right'
-        } : {}
         },
         {
           href: eastjwtGithub,
@@ -57,7 +56,7 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Quick start',
               to: `/docs/${introductionPath}`,
             },
           ],
@@ -72,14 +71,14 @@ module.exports = {
           ],
         },
         {
-          title: 'More',
+          title: 'Useful Resources',
           items: [
             {
-              label: 'GitHub',
+              label: 'GitHub repo',
               href: eastjwtGithub,
             },
             {
-              label: 'Types',
+              label: 'Typedoc',
               href: typedocLink,
             },
           ],

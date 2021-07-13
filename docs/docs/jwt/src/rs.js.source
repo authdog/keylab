@@ -5,7 +5,7 @@ const main = async () => {
         userId: "e156b806-2879-4f4b-878d-9426d75dbcbf"
     }
 
-    const algorithm = "RS384"
+    const algorithm = "{{algorithm}}"
 
     const jwk = await generatePrivateJwk(
         "RSA",

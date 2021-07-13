@@ -3,8 +3,26 @@ title: 'Validating a token'
 sidebar_label: 'Token validation'
 ---
 
-## Validating a token
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-### HS256
+export const algorithms = [
+    {alg: "hs256"},
+    {alg: "rs256" },
+]
 
-### RS256
+
+<Tabs
+  defaultValue="rs256"
+  values={algorithms.map((el) => Object.freeze({
+        label: el.alg.toUpperCase(),
+        value: el.alg
+    }))
+  }>
+  {algorithms.map((el, idx) => (
+          <TabItem key={idx} value={el.alg}>
+                Hello
+            </TabItem>
+      ))
+    }
+</Tabs>
