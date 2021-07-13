@@ -112,4 +112,4 @@ https://types.easyjwt.org
 
 ## Credits
 
-@dbrrt - David Barrat
+@authdog - Authdog Inc.

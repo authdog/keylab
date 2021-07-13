@@ -1,0 +1,25 @@
+---
+title: 'Creating a token'
+sidebar_label: 'Token creation'
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+import hs256Src from '!!raw-loader!./src/hs256.js.source';
+
+
+<Tabs
+  defaultValue="rs256"
+  values={[
+    {label: 'HS256', value: 'hs256'},
+    {label: 'RS256', value: 'rs256'},
+  ]}>
+  <TabItem value="hs256">
+    <CodeBlock className="language-jsx">
+        {hs256Src}
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="rs256">
+  </TabItem>
+</Tabs>

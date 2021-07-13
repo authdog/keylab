@@ -2,6 +2,7 @@ const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 const eastjwtGithub = 'https://github.com/authdog/easyjwt'
+const typedocLink = 'https://types.easyjwt.org'
 const introductionPath = 'introduction/installation';
 
 const isProduction = process.env.NODE_ENV === 'production'
@@ -44,7 +45,8 @@ module.exports = {
         },
         {
           href: eastjwtGithub,
-          label: 'GitHub'
+          label: 'GitHub',
+          position: 'right'
         },
       ],
     },
@@ -75,6 +77,10 @@ module.exports = {
             {
               label: 'GitHub',
               href: eastjwtGithub,
+            },
+            {
+              label: 'Types',
+              href: typedocLink,
             },
           ],
         },
