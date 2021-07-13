@@ -5,6 +5,10 @@ const eastjwtGithub = 'https://github.com/authdog/easyjwt'
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'fr'],
+  },
   title: 'easyjwt',
   tagline: 'JSON Web Token made easy',
   url: 'https://www.authdog.com',
@@ -17,17 +21,21 @@ module.exports = {
   themeConfig: {
     navbar: {
       hideOnScroll: true,
+      title: 'Easyjwt',
       logo: {
         alt: "Authdog",
-        src: "img/brand/light.svg",
-        srcDark: "img/brand/dark.svg"
+        src: "img/logo.png",
+        srcDark: "img/logo.png"
       },
       items: [
         {
           type: 'doc',
           docId: 'intro',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Documentation',
+        },
+        {
+          type: 'localeDropdown',
         },
         {
           href: eastjwtGithub,
@@ -67,6 +75,10 @@ module.exports = {
           ],
         },
       ],
+      logo: {
+        alt: "Authdog",
+        src: "img/brand/dark.svg"
+      },
       copyright: `Copyright © ${new Date().getFullYear()} Authdog, Inc.`,
     },
     prism: {
