@@ -4,6 +4,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const eastjwtGithub = 'https://github.com/authdog/easyjwt'
 const introductionPath = 'introduction/installation';
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   i18n: {
@@ -35,9 +37,10 @@ module.exports = {
           position: 'left',
           label: 'Documentation',
         },
-        {
+        { ...isProduction ? {
           type: 'localeDropdown',
           position: 'right'
+        } : {}
         },
         {
           href: eastjwtGithub,
@@ -53,7 +56,7 @@ module.exports = {
           items: [
             {
               label: 'Tutorial',
-              to: introductionPath,
+              to: `/docs/${introductionPath}`,
             },
           ],
         },
@@ -102,5 +105,5 @@ module.exports = {
         },
       },
     ],
-  ],
+  ]
 };

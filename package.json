@@ -7,6 +7,7 @@
         "test": "jest",
         "test-with-coverage": "jest --collect-coverage",
         "pretty": "npx prettier --write lib",
+        "docs:dev": "yarn --cwd docs start",
         "docs:build": "yarn --cwd docs build",
         "docs:deploy": "NETLIFY_SITE_ID=9b7627a4-3d89-4922-a84f-f1fa4a1b9f3f netlify deploy --dir=docs/build --prod",
         "docs:netlify": "yarn docs:build && yarn docs:deploy",
