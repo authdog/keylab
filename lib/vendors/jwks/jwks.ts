@@ -41,17 +41,17 @@ export const generateKeyFromStore: any = async (
 
 export const generatePrivateJwk: any = async (
     keyType: string,
-    algorithm: string,
+    algorithm: string
 ) => {
-    const store = createKeyStore()
+    const store = createKeyStore();
     const jsonWebKey = await generateKeyFromStore(
         store,
         keyType,
         algorithm,
         true
-    )
+    );
     return jsonWebKey;
-}
+};
 
 // TODO: add proper type for key parameter
 /**
