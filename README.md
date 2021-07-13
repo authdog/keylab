@@ -100,7 +100,11 @@ const initializeSession = async () => {
 - jwk-to-pem
 - node-fetch
 
-## Documentation
+## References
+
+### documentation
+
+https://www.easyjwt.org
 
 ### typedoc
 
