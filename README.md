@@ -5,7 +5,7 @@
 [![dependencies Status](https://david-dm.org/authdog/easyjwt/status.svg)](https://david-dm.org/authdog/easyjwt)
 [![devDependencies Status](https://david-dm.org/authdog/easyjwt/dev-status.svg)](https://david-dm.org/authdog/easyjwt?type=dev)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/@authdog/easyjwt?label=zipped)]
+![bundle size](https://img.shields.io/bundlephobia/minzip/@authdog/easyjwt?label=zipped)
 
 easyjwt is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.
 
