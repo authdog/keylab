@@ -102,8 +102,8 @@ module.exports = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl:
-            `${eastjwtGithub}/docs/edit/master/website/`,
+          // editUrl:
+          //   `${eastjwtGithub}/docs/edit/master/website/`,
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
