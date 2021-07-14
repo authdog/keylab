@@ -15,7 +15,7 @@ easyjwt is a nodejs library aiming to create and validate JSON Web Tokens withou
 
 ## Usage
 
-Signin a token:
+Creating a token:
 
 - https://www.easyjwt.org/docs/jwt/signin-a-token
 
