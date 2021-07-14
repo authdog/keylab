@@ -1,0 +1,7 @@
+i18n
+└── fr
+    ├── code.json
+    └── docusaurus-plugin-content-docs
+        └── current
+            └── introduction
+                └── installation.mdx

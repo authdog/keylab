@@ -1,0 +1,10 @@
+{
+  "hero-tagline": {
+    "message": "JSON Web Token simplifié",
+    "description": "Hero CTA is used on the homepage, in the hero"
+  },
+    "hero-cta": {
+      "message": "Démarrez en 2 minutes ⏱️",
+      "description": "Hero CTA is used on the homepage, in the hero"
+    }
+}

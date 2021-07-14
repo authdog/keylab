@@ -3673,6 +3673,11 @@ eval@^0.1.4:
   dependencies:
     require-like ">= 0.1.1"
 
+event-state@^0.3.5:
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/event-state/-/event-state-0.3.5.tgz#fae0ec7140f1df734d2b80be1015a90e028d6ca9"
+  integrity sha1-+uDscUDx33NNK4C+EBWpDgKNbKk=
+
 eventemitter3@^4.0.0:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
@@ -5467,6 +5472,13 @@ markdown-escapes@^1.0.0:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/markdown-escapes/-/markdown-escapes-1.0.4.tgz#c95415ef451499d7602b91095f3c8e8975f78535"
   integrity sha512-8z4efJYk43E0upd0NbVXwgSTQs6cT3T06etieCMEg7dRbzCbxUCK/GHlX8mhHRDcp+OLlHkPKsvqQTCvsRl2cg==
+
+md-file-tree@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/md-file-tree/-/md-file-tree-0.2.0.tgz#3bcebcc6276e905d8447cb9aacad5fb22ecc4d96"
+  integrity sha512-dbuE5d6nG0UPbvUBMoJth/AK1154ZvGubUxd391Mc7JvKtVx8YxKD8dv1nOYFSOxGm/xxDUJBLVxnqqwDOhj1Q==
+  dependencies:
+    event-state "^0.3.5"
 
 mdast-squeeze-paragraphs@^4.0.0:
   version "4.0.0"
