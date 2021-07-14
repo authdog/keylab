@@ -1,4 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-yarn test
+if [[ `git status ../lib --porcelain` ]]; then
+  yarn test
+else
+  echo 'nothing changed in lib'
+fi
