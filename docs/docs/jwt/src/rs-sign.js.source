@@ -5,12 +5,12 @@ const main = async () => {
         userId: "e156b806-2879-4f4b-878d-9426d75dbcbf"
     }
 
-    const algorithm = "{{algorithm}}"
+    const algorithm = "{{algorithm}}";
 
     const jwk = await generatePrivateJwk(
         "RSA",
-        algorithm;
-    )
+        algorithm
+    );
 
     const token = await createSignedJwt(
         payload,
@@ -26,7 +26,7 @@ const main = async () => {
                 jwk
             }
         }
-    )
+    );
 
     // ...
     // do something with the token

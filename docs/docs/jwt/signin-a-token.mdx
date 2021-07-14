@@ -7,25 +7,32 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 
-import hsSrc from '!!raw-loader!./src/hs.js.source'; // TODO create a template (with eta?) and inject dynamically the algorithm in source
-import rsSrc from '!!raw-loader!./src/rs.js.source'; // TODO create a template (with eta?) and inject dynamically the algorithm in source
+import hsSrc from '!!raw-loader!./src/hs-sign.js.source';
+import rsSrc from '!!raw-loader!./src/rs-sign.js.source';
+import tokenSrc from '!!raw-loader!./src/token.js.source';
 
+:::note
 
-
-:::info
-
-Useful information.
+When you create a token, you need to ensure that the key used to generate it, is stored in a safe place, to mitigate any jwt based attack.
+Use of HS256 is not recommended as it's using a single string to forge the web token and it can easily be brute-forced compared to more modern algorithms such as RS256.
 
 :::
 
 export const algorithms = [
-    {alg: "hs256", src: hsSrc},
-    {alg: "rs256", src: rsSrc },
-    {alg: "rs384", src: rsSrc },
-    {alg: "rs512", src: rsSrc }
+    {alg: "hs256", src: hsSrc, payload: tokenSrc},
+    {alg: "rs256", src: rsSrc, payload: tokenSrc},
+    {alg: "rs384", src: rsSrc, payload: tokenSrc},
+    {alg: "rs512", src: rsSrc, payload: tokenSrc},
+    {alg: "ps256", src: rsSrc, payload: tokenSrc},
+    {alg: "ps384", src: rsSrc, payload: tokenSrc},
+    {alg: "ps512", src: rsSrc, payload: tokenSrc}
 ].map((el) => Object.freeze({
   ...el,
-  src: el.src.replace(/{{algorithm}}/g, el.alg.toUpperCase())
+  src: el.src.replace(/{{algorithm}}/g, el.alg.toUpperCase()),
+  payload: el.payload
+    .replace(/{{algorithm}}/g, el.alg.toUpperCase())
+    .replace(/{{issuedAt}}/g, parseInt(Number(new Date / 1000)))
+    .replace(/{{expiresAt}}/g, parseInt(Number(new Date(new Date().getTime() + 60*60000) / 1000)))
 }))
 
 <Tabs
@@ -36,9 +43,17 @@ export const algorithms = [
     }))
   }>
   {algorithms.map((el, idx) => (
-          <TabItem key={idx} value={el.alg}>
-            <CodeBlock key={idx} className="language-jsx">
+        <TabItem key={idx} value={el.alg}>
+            Here is below an example to create a JSON Web Token, using {el.alg.toUpperCase()} algorithm: 
+            <br /><br />
+            <CodeBlock key={`${idx}-1`} className="language-jsx">
                 {el.src}
+            </CodeBlock>
+            <br /><br />
+            The token should have respectively headers and payload:
+            <br /><br />
+            <CodeBlock key={`${idx}-2`} className="language-jsx">
+                {el.payload}
             </CodeBlock>
         </TabItem>
       )

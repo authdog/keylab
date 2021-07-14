@@ -5,11 +5,29 @@ sidebar_label: 'Token validation'
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+
+import hsVerifySrc from '!!raw-loader!./src/hs-verify.js.source';
+import rsVerifySrc from '!!raw-loader!./src/rs-verify.js.source';
+
 
 export const algorithms = [
-    {alg: "hs256"},
-    {alg: "rs256" },
+    {alg: "hs256", src: hsVerifySrc},
+    {alg: "rs256", src: rsVerifySrc},
+    {alg: "rs384", src: rsVerifySrc},
+    {alg: "rs512", src: rsVerifySrc},
+    {alg: "ps256", src: rsVerifySrc},
+    {alg: "ps384", src: rsVerifySrc},
+    {alg: "ps512", src: rsVerifySrc}
 ]
+
+:::note
+
+An access token is intended for use with a specific API and should only be validated by that API. In general, you do not need to validate an access token received from an identity provider (IdP). You can hand it over to the issuing IdP such as Authdog IdP, who will do the rest.
+If any of these checks fail, the token is considered invalid, and the request must be rejected with 401 Unauthorized result.
+
+:::
+
 
 
 <Tabs
@@ -20,9 +38,13 @@ export const algorithms = [
     }))
   }>
   {algorithms.map((el, idx) => (
-          <TabItem key={idx} value={el.alg}>
-                Hello
-            </TabItem>
+        <TabItem key={idx} value={el.alg}>
+        Here is below an example to verify a JSON Web Token, using {el.alg.toUpperCase()} algorithm:
+           <br /><br />
+          <CodeBlock key={`${idx}-1`} className="language-jsx">
+              {el.src}
+          </CodeBlock>
+        </TabItem>
       ))
     }
 </Tabs>

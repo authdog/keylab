@@ -1,0 +1,10 @@
+{
+  "alg": "{{algorithm}}",
+  "typ": "JWT"
+}
+
+{
+  "userId": "e156b806-2879-4f4b-878d-9426d75dbcbf",
+  "iat": {{issuedAt}},
+  "exp": {{expiresAt}}
+}

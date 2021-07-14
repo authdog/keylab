@@ -24,7 +24,6 @@
         "dist",
         "docs",
         "tsdoc",
-        "coverage",
-
+        "coverage"
     ]
 }

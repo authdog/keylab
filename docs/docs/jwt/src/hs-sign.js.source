@@ -23,7 +23,7 @@ const main = async () => {
                 secret
             }
         }
-    )
+    );
 
     // ...
     // do something with the token

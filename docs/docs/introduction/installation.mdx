@@ -5,9 +5,14 @@ sidebar_position: 2
 ---
 
 import Link from '@docusaurus/Link';
+import CodeBlock from '@theme/CodeBlock';
 
 
-## How to install
+## Installing on nodejs
+
+
+easyjwt is distributed as a library available publicly on [npm](https://www.npmjs.com).
+
 
 :::note
 
@@ -17,15 +22,23 @@ You can download the version adapted to your system on nodejs website.
 :::
 
 <Link to='https://nodejs.org/en/download/'>
-Go to nodeJS releases website
+    See nodeJS releases
 </Link>
 
 <br />
 <br />
 
-easyjwt can be installed via a package manager.
+easyjwt can be installed via a package manager such as `yarn` or `npm`.
 
-### nodeJS
+### via yarn
 
-- via yarn: `yarn add @authdog/easyjwt`
-- via npm: `npm install @authdog/easyjwt`
+<CodeBlock className="language-shell">
+    yarn add @authdog/easyjwt
+</CodeBlock>
+
+
+### via npm
+
+<CodeBlock className="language-shell">
+    npm install @authdog/easyjwt
+</CodeBlock>

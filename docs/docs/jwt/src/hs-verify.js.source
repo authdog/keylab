@@ -1,0 +1,19 @@
+import { checkTokenValidness } from "@authdog/easyjwt"
+
+const myToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+
+const initializeSession = async () => {
+    let isValid: boolean = false;
+    
+    try {
+        // !!!BEWARE NEVER EVER STORE A SIGNIN SECRET IN THE BROWSER!!!
+        isValid = await checkTokenValidness(myToken, { secret: process.env.JWT_SECRET })
+    } catch(e) {
+        // handle exception
+    }
+
+    if (isValid) {
+        // do something
+    }
+}
+

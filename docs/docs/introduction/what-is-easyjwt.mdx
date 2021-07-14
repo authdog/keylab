@@ -4,6 +4,33 @@ sidebar_label: 'What is easyjwt?'
 sidebar_position: 1
 ---
 
+import Link from '@docusaurus/Link';
 
 
+"*easyjwt*" (ee·zee·jot), is a library wrapping common security tools and libraries to simplify the generation and validation of JSON Web Tokens, also known as JWT.
 
+It has been created to overcome some existing librairies' limitations, historically to support validation of jwt generated with a jwk, hosted locally with a self-signed certificate.
+
+Another motivation of easyjwt was the lack of simplicity felt using other librairies. Its goal is to provide a minimal set of functions to generate a token and validate a token, whatever the algorithm used to create the token was.
+
+:::info
+
+*easyjwt* is a library used to generate and validate web tokens, once a token is generated, you need to ensure its isolation and preventing any exposition.
+Various implementations of easyjwt will be available on Authdog's official GitHub organization.
+
+:::
+
+
+## Useful links
+
+- <Link to='https://jwt.io/introduction'>
+    What's a JSON Web Token?
+</Link>
+
+- <Link to='https://developer.okta.com/blog/2018/06/20/what-happens-if-your-jwt-is-stolen'>
+    What Happens if a JWT is stolen
+</Link>
+
+- <Link to='/docs/contributing/github'>
+    Contributing to easyjwt on GitHub
+</Link>
