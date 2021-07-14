@@ -3,6 +3,4 @@
 
 if [[ `git status lib --porcelain` ]]; then
   yarn test
-else
-  echo 'nothing changed in lib'
 fi
