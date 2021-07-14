@@ -27,5 +27,5 @@ export enum JwtKeyTypes {
     RSA = "RSA", // Require a public / private key pair (of type RSA)
     EC = "EC", // elliptic curve
     OKP = "OKP", // Edwards-curve Octet Key Pair: https://datatracker.ietf.org/doc/html/rfc8032
-    JWT = "JWT" // Require a private key for validation
+    JWT = "JWT" // JSON Web Token key type
 }
