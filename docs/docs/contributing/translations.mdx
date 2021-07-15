@@ -28,7 +28,7 @@ https://phrase.com/blog/posts/i18n-a-simple-definition
 
 ## i18n Translations
 
-There're two ways to translate content in easyjwt documentation
+There's one way to translate content in easyjwt documentation
 
 ### Translating string or specific code block
 
@@ -38,15 +38,5 @@ Update the file i18n/`[language]`/code.json. Here's below an example of `code.js
 {codeJsonSample}
 </CodeBlock>
 
-### Translating an entire markdown file
-
-Update the markdown file located under i18n/`[language]`/docusaurus-plugin-content-docs/`[markdownFile.md(x)]`.
-
-The translated markdown file will be located under the same structure as the original md(x) to be translated.
-
-For instance `installation.mdx` located in `docs/introduction/installations.mdx`, will have its translation located in i18n/`[language]`/docusaurus-plugin-content-docs/introduction/installation.mdx.
-
-If the file doesn't exist, then you'll need to create it for the corresponding language, if it's doesn't exist for the deployed version, the language displayed will be the default one (e.g.: text in english for a french page with missing french translation).
-
-
+Every translation is based on english documentation markdown.x structure.
 

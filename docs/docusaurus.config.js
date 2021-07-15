@@ -5,13 +5,17 @@ const eastjwtGithub = 'https://github.com/authdog/easyjwt'
 const typedocLink = 'https://types.easyjwt.org'
 const introductionPath = 'introduction/installation';
 
+const path = require('path')
+
 // const isProduction = process.env.NODE_ENV === 'production'
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'fr'],
+    locales: ['en',
+    //'fr'
+    ],
   },
   title: 'easyjwt',
   tagline: 'JSON Web Token made easy',

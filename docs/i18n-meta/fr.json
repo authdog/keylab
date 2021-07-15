@@ -1,0 +1,12 @@
+[
+    {
+    "hide_title": true,
+    "sidebar_label": "Qu'est-ce qu'easyjwt?",
+    "in_mdx": "docs/introduction/what-is-easyjwt.mdx"
+    },
+    {
+    "hide_title": true,
+    "sidebar_label": "Comment installer easyjwt?",
+    "in_mdx": "docs/introduction/what-is-easyjwt.mdx"
+    }
+]
