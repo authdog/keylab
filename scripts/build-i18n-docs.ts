@@ -15,9 +15,14 @@
 
 // i18n/[locale]/docusaurus-plugin-content-docs/current/[folder]/[mdxfile]
 
-const generateFrontMatter = (obj: any) => {
-    let frontmatterStr = "---";
+export const generateFrontMatter = (obj: any) => {
+    const fmBlocks = []
+    fmBlocks.push("---");
 
-    frontmatterStr += "---";
-    return frontmatterStr;
+    for (const [key, value] of Object.entries(obj)) {
+        fmBlocks.push(`${key}: ${value}`);
+    }
+
+    fmBlocks.push("---");
+    return fmBlocks.join('\n');
 };

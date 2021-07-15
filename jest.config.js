@@ -8,9 +8,16 @@ module.exports = {
     transform: {
         "^.+\\.(ts)$": "ts-jest",
     },
-    testMatch: ["**/test/**/*.test.(ts|js)", "**/**/*.test.(ts|js)"],
+    testMatch: [
+        "**/test/**/*.test.(ts|js)",
+        "**/__tests__/*.test.(ts|js)",
+        "**/**/*.test.(ts|js)"
+    ],
     testPathIgnorePatterns: ["/node_modules/", "build", "dist", "docs"],
     testEnvironment: "node",
     rootDir: ".",
-    collectCoverageFrom: ["<rootDir>/lib/**/*.ts"],
+    collectCoverageFrom: [
+        "<rootDir>/scripts/**/*.ts",
+        "<rootDir>/lib/**/*.ts"
+    ],
 }
