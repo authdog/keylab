@@ -48,9 +48,9 @@ Verifying a token:
 
 ## Roadmap Documentation
 
-- [ ] Documentation End user *Introduction*
-- [ ] Documentation End user *Get Started*
-- [ ] Documentation End user *API*
+- [x] Documentation End user *Introduction*
+- [ ] Documentation End user *JWT*
+- [x] Translation foundations
 
 
 ## Dependencies
