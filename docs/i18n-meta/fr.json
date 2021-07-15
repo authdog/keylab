@@ -1,12 +1,32 @@
 [
     {
-    "sidebar_label": "Qu'est-ce qu'easyjwt?",
-    "in_mdx": "docs/introduction/what-is-easyjwt.mdx",
-    "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/introduction/what-is-easyjwt.mdx"
+        "sidebar_label": "Qu'est-ce qu'easyjwt?",
+        "in_mdx": "docs/introduction/what-is-easyjwt.mdx",
+        "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/introduction/what-is-easyjwt.mdx"
     },
     {
-    "sidebar_label": "Comment installer easyjwt?",
-    "in_mdx": "docs/introduction/what-is-easyjwt.mdx",
-    "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/introduction/what-is-easyjwt.mdx"
+        "sidebar_label": "Comment installer easyjwt?",
+        "in_mdx": "docs/introduction/installation.mdx",
+        "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/introduction/installation.mdx"
+    },
+    {
+        "sidebar_label": "Créer un Token",
+        "in_mdx": "docs/jwt/signin-a-token.mdx",
+        "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/jwt/signin-a-token.mdx"
+    },
+    {
+        "sidebar_label": "Vérifier un Token",
+        "in_mdx": "docs/jwt/validating-a-token.mdx",
+        "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/jwt/validating-a-token.mdx"
+    },
+    {
+        "sidebar_label": "Contribuer sur GitHub",
+        "in_mdx": "docs/contributing/github.mdx",
+        "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/contributing/github.mdx"
+    },
+    {
+        "sidebar_label": "Participer à la traduction",
+        "in_mdx": "docs/contributing/translations.mdx",
+        "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/contributing/translations.mdx"
     }
 ]

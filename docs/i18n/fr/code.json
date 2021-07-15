@@ -34,5 +34,25 @@
   "introduction.what-is-easyjwt.title": {
     "message": "Qu'est qu'easyjwt ?",
     "description": "introduction.page"
+  },
+  "introduction.what-is-easyjwt.genesis": {
+    "message": "\"*easyjwt*\" (ee·zee·jot), est une bibliothèque englobant des outils de sécurité et des bibliothèques communs pour simplifier la génération et la validation des jetons Web JSON, également connus sous le nom de JWT.",
+    "description": "introduction.page"
+  },
+  "introduction.what-is-easyjwt.why": {
+    "message": "Il a été créé pour surmonter les limitations de certaines librairies existantes, historiquement pour supporter la validation de jwt généré avec un jwk, hébergé localement avec un certificat auto-signé.",
+    "description": "introduction.page"    
+  },
+  "introduction.what-is-easyjwt.another-why": {
+    "message": "Une autre motivation d'easyjwt était le manque de simplicité ressenti avec d'autres librairies. Son objectif est de fournir un ensemble minimal de fonctions pour générer et valider un token, quel que soit l'algorithme utilisé pour créer le token.",
+    "description": "introduction.page"    
+  },
+  "introduction.what-is-easyjwt.note-token": {
+    "message": "*easyjwt* est une bibliothèque utilisée pour générer et valider des tokens web, une fois qu'un token est généré, vous devez vous assurer de son isolation et empêcher toute exposition. Diverses implémentations d'easyjwt seront disponibles sur l'organisation officielle GitHub d'Authdog.",
+    "description": "introduction.page"
+  },
+  "introduction.what-is-a-jwt-label": {
+    "message": "Qu'est-ce qu'un JWT? (Lien en anglais)",
+    "description": "introduction.page.links"
   }
 }

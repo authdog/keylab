@@ -1,4 +1,4 @@
-import {generateFrontMatter} from '../build-i18n-docs'
+import {generateFrontMatter} from '../build-i18n-tools'
 
 it("generate correctly frontmatter config", () => {
     const expectedWithEmptyObject = "---\n---"
