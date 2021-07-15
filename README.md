@@ -66,7 +66,7 @@ If you have found a bug or if you have a feature request, please report them at 
 
 ## Author
 
-[Authdog](https://www.authdog.com)
+[Authdog Inc.](https://www.authdog.com)
 
 
 ## License
