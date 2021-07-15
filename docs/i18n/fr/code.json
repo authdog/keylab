@@ -1,10 +1,34 @@
 {
   "hero-tagline": {
     "message": "JSON Web Token simplifié",
-    "description": "Hero CTA is used on the homepage, in the hero"
+    "description": "hero-title"
   },
-    "hero-cta": {
-      "message": "Démarrez en 2 minutes ⏱️",
-      "description": "Hero CTA is used on the homepage, in the hero"
-    }
+  "hero-cta": {
+    "message": "Démarrez en 2 minutes ⏱️",
+    "description": "hero-cta-tagline"
+  },
+  "features-easy-of-use.title": {
+    "message": "Facile à utiliser",
+    "description": "homepage-features"
+  },
+  "features-easy-of-use.tagline": {
+    "message": "easyjwt a été conçu dans un souci de simplicité et de réutilisation",
+    "description": "homepage-features"
+  },
+  "features-simple-jwt-validation.title": {
+    "message": "Validation JWT simple",
+    "description": "homepage-features"
+  },
+  "features-simple-jwt-validation.tagline": {
+    "message": "easyjwt vous permet de valider votre JWT avec une seule fonction",
+    "description": "homepage-features"
+  },
+  "features-jwt-signin.title": {
+    "message": "Signature JWT simple",
+    "description": "homepage-features"
+  },
+  "features-jwt-signin.tagline": {
+    "message": "easyjwt vous permet de créer des JSON Web token simplement et sans aucune connaissance en cryptographie",
+    "description": "homepage-features"
+  }
 }

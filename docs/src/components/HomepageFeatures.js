@@ -1,33 +1,53 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './HomepageFeatures.module.css';
+import Translate from '@docusaurus/Translate';
+
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
+    title: <Translate
+        id="features-easy-of-use.title"
+        >
+      Easy to Use
+      </Translate>,
     Svg: require('/static/img/undraw_Personal_settings_re_i6w4.svg').default,
     description: (
-      <>
-        easyjwt has been designed with simplicity and reusability in mind 
-      </>
+      <Translate
+        id="features-easy-of-use.tagline"
+        >
+      easyjwt has been designed with simplicity and reusability in mind 
+      </Translate>
     ),
   },
   {
-    title: 'Simple JWT validation',
+    title: <Translate
+    id="features-simple-jwt-validation.title"
+    >
+  Simple JWT Validation
+  </Translate>,
     Svg: require('/static/img/undraw_Safe_re_kiil.svg').default,
     description: (
-      <>
-        easyjwt allows you to validate your JWT with a single function
-      </>
+      <Translate
+        id="features-simple-jwt-validation-tagline"
+        >
+      easyjwt allows you to validate your JWT with a single function
+      </Translate>
     ),
   },
   {
-    title: 'No-brainer JWT signing',
+    title: <Translate
+    id="features-jwt-signin.title"
+    >
+  No-brainer JWT signing
+  </Translate>,
     Svg: require('/static/img/undraw_Security_on_re_e491.svg').default,
     description: (
-      <>
-        easyjwt permits you to create jwt with simple and minimal steps with no crypto knowledge
-      </>
+      <Translate
+      id="features-jwt-signin.tagline"
+      >
+    easyjwt permits you to create jwt with simple and minimal steps with no crypto knowledge
+    </Translate>
     ),
   },
 ];
