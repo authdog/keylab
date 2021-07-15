@@ -6,8 +6,9 @@
     "scripts": {
         "test": "jest",
         "test-with-coverage": "jest --collect-coverage",
-        "pretty": "npx prettier --write lib",
+        "pretty": "npx prettier --write lib scripts",
         "docs:dev": "yarn --cwd docs start",
+        "docs:build-18n": "ts-node scripts/build-i18n-docs",
         "docs:build": "yarn --cwd docs build",
         "docs:deploy": "NETLIFY_SITE_ID=9b7627a4-3d89-4922-a84f-f1fa4a1b9f3f netlify deploy --dir=docs/build --prod",
         "docs:netlify": "yarn docs:build && yarn docs:deploy",
@@ -16,7 +17,7 @@
         "tsdoc:netlify": "yarn tsdoc:build && yarn tsdoc:deploy",
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
         "build": "tsc",
-        "postbuild": "node scripts/copy",
+        "postbuild": "ts-node scripts/copy",
         "lib:build:clean": "rm -rf dist",
         "lib:publish": "yarn lib:build:clean && yarn build && npm adduser && npm publish ./dist --access=public"
     },
@@ -51,7 +52,7 @@
         "nock": "^13.1.1",
         "raw-loader": "^4.0.2",
         "ts-jest": "^27.0.3",
-        "ts-node": "^10.0.0",
+        "ts-node": "^10.1.0",
         "typedoc": "^0.21.3",
         "typescript": "^4.3.5"
     },

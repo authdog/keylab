@@ -1,12 +1,12 @@
 [
     {
-    "hide_title": true,
     "sidebar_label": "Qu'est-ce qu'easyjwt?",
-    "in_mdx": "docs/introduction/what-is-easyjwt.mdx"
+    "in_mdx": "docs/introduction/what-is-easyjwt.mdx",
+    "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/introduction/what-is-easyjwt.mdx"
     },
     {
-    "hide_title": true,
     "sidebar_label": "Comment installer easyjwt?",
-    "in_mdx": "docs/introduction/what-is-easyjwt.mdx"
+    "in_mdx": "docs/introduction/what-is-easyjwt.mdx",
+    "out_mdx": "i18n/fr/docusaurus-plugin-content-docs/current/introduction/what-is-easyjwt.mdx"
     }
 ]
