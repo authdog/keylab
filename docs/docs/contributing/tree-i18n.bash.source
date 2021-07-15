@@ -3,5 +3,5 @@ i18n
     ├── code.json
     └── docusaurus-plugin-content-docs
         └── current
-            └── introduction
-                └── installation.mdx
+            └── [folder]
+                └── [generated].mdx

@@ -54,5 +54,21 @@
   "introduction.what-is-a-jwt-label": {
     "message": "Qu'est-ce qu'un JWT? (Lien en anglais)",
     "description": "introduction.page.links"
+  },
+  "introduction.what-happens-if-a-jwt-is-stolen": {
+    "message": "Que se passe t-il si un JWT est volé (Lien en anglais)",
+    "description": "introduction.page.links"
+  },
+  "introduction.contributing-to-easyjwt-on-github": {
+    "message": "Contribuer au code source d'easyjwt",
+    "description": "introduction.page.links"
+  },
+  "introduction.installation.title": {
+    "message": "Comment installer easyjwt ?",
+    "description": "introduction.page"
+  },
+  "introduction.installation.title-nodejs": {
+    "message": "Installation sur nodeJS",
+    "description": "introduction.page.title2"
   }
 }
