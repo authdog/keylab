@@ -1,6 +1,6 @@
 {
     "name": "@authdog/easyjwt",
-    "version": "0.1.14",
+    "version": "0.1.15",
     "description": "easyjwt is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
     "main": "lib/index.js",
     "scripts": {
@@ -58,7 +58,6 @@
     },
     "dependencies": {
         "jsonwebtoken": "^8.5.1",
-        "jwk-to-pem": "^2.0.5",
         "node-fetch": "^2.6.1",
         "node-jose": "^2.0.0"
     }

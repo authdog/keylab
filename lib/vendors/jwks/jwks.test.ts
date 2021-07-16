@@ -86,9 +86,7 @@ it("verifies correctly token with public uri", async () => {
             jwksUri,
             verifySsl: false
         });
-    } catch (e) {
-        console.log(e);
-    }
+    } catch (e) {}
 
     expect(verified).toBeTruthy();
 

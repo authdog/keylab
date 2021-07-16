@@ -1,13 +1,15 @@
 import { default as fetch } from "node-fetch";
 import * as https from "https";
 import * as jose from "node-jose";
-import { default as jwkToPem } from "jwk-to-pem";
 import * as jwt from "jsonwebtoken";
 
 import { checkJwtFields, readTokenHeaders } from "../jwt";
 import { throwJwtError } from "../../errors";
 import * as enums from "../../enums";
 import * as c from "../../constants";
+
+import {IDecodedJwt} from '../jwt/interfaces'
+
 
 // types
 
@@ -34,14 +36,7 @@ export interface IVerifyRSATokenCredentials {
     requiredIssuer?: string;
 }
 
-export interface IDecodedJwt {
-    iss?: string;
-    aud?: string[] | string;
-    sub?: string;
-    iat: number;
-    exp: number;
-    scp?: string;
-}
+
 
 /**
  *
@@ -177,8 +172,8 @@ export const verifyRSATokenWithUri = async (
 
     if (keyExists && kid) {
         const keyFromStore = getKeyFromSet(kid, jwksResource.keys);
-        const publicKey = jwkToPem(keyFromStore);
-        const decoded = <IDecodedJwt>jwt.verify(token, publicKey);
+        const publicKey = await jose.JWK.asKey(keyFromStore);
+        const decoded = <IDecodedJwt>jwt.verify(token, publicKey.toPEM());
 
         if (decoded?.iat && decoded?.exp) {
             verified = true;
@@ -190,8 +185,10 @@ export const verifyRSATokenWithUri = async (
                 requiredIssuer
             });
         }
-    } else {
+    } else if (!kid) {
         throwJwtError(c.JWK_MISSING_KEY_ID_FROM_HEADERS);
+    } else if (!keyExists) {
+        throwJwtError(c.JWKS_MISSING_KEY_ID);
     }
 
     validationFieldsPassed = requiresFieldsCheck ? validFields : true;

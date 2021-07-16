@@ -7,7 +7,7 @@ import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
 import { verifyRSATokenWithUri } from "../jwks";
 import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
-
+import {IDecodedJwt} from './interfaces'
 
 export interface IcheckTokenValidnessCredentials {
     // HS256
@@ -42,14 +42,6 @@ export interface IJwtTokenOpts {
     };
 }
 
-export interface IDecodedJwt {
-    iss?: string;
-    aud?: string[] | string;
-    sub?: string;
-    iat: number;
-    exp: number;
-    scp?: string;
-}
 
 export interface ICheckJwtFields {
     requiredAudiences?: string[];
