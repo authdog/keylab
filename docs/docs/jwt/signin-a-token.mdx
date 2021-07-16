@@ -11,10 +11,15 @@ import hsSrc from '!!raw-loader!/docs/jwt/src/hs-sign.js.source';
 import rsSrc from '!!raw-loader!/docs/jwt/src/rs-sign.js.source';
 import tokenSrc from '!!raw-loader!/docs/jwt/src/token.js.source';
 
+import Translate from '@docusaurus/Translate';
+
+
 :::note
 
+<Translate id='jwt.signin.note-about-signin-jwt'>
 When you create a token, you need to ensure that the key used to generate it, is stored in a safe place, to mitigate any jwt based attack.
 Use of HS256 is not recommended as it's using a single string to forge the web token and it can easily be brute-forced compared to more modern algorithms such as RS256.
+</Translate>
 
 :::
 
@@ -44,7 +49,9 @@ export const algorithms = [
   }>
   {algorithms.map((el, idx) => (
         <TabItem key={idx} value={el.alg}>
-            Here is below an example to create a JSON Web Token, using {el.alg.toUpperCase()} algorithm: 
+        <Translate id='jwt.signin.note-signin-jwt-example'>
+            Here is below an example to create a JSON Web Token for the selected algorithm: 
+        </Translate>
             <br /><br />
             <CodeBlock key={`${idx}-1`} className="language-jsx">
                 {el.src}

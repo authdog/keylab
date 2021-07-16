@@ -31,10 +31,6 @@
     "message": "easyjwt vous permet de créer des JSON Web token simplement et sans aucune connaissance en cryptographie",
     "description": "homepage-features"
   },
-  "introduction.what-is-easyjwt.title": {
-    "message": "Qu'est qu'easyjwt ?",
-    "description": "introduction.page"
-  },
   "introduction.what-is-easyjwt.genesis": {
     "message": "\"*easyjwt*\" (ee·zee·jot), est une bibliothèque englobant des outils de sécurité et des bibliothèques communs pour simplifier la génération et la validation des jetons Web JSON, également connus sous le nom de JWT.",
     "description": "introduction.page"
@@ -63,10 +59,6 @@
     "message": "Contribuer au code source d'easyjwt",
     "description": "introduction.page.links"
   },
-  "introduction.installation.title": {
-    "message": "Comment installer easyjwt ?",
-    "description": "introduction.page"
-  },
   "introduction.installation.title-nodejs": {
     "message": "Installation sur nodeJS",
     "description": "introduction.page.title2"
@@ -90,5 +82,13 @@
   "introduction.installation.node-js-installation-tip": {
     "message": "easyjwt peut être installé via un gestionnaire de paquets tel que `yarn` ou `npm`.",
     "description": "introduction.page.installation"    
+  },
+  "jwt.signin.note-about-signin-jwt": {
+    "message": "Lorsque vous créez un JWT, vous devez vous assurer que la clé utilisée pour le générer est stockée dans un endroit sûr, afin d'atténuer toute attaque basée sur jwt. L'utilisation de HS256 n'est pas recommandée car elle utilise une seule chaîne pour forger le jeton Web et elle peut facilement être brutalement forcée par rapport aux algorithmes plus modernes tels que RS256.",
+    "description": "jwt.page"
+  },
+  "jwt.signin.note-signin-jwt-example": {
+    "message": "Voici ci-dessous un exemple pour créer un jeton Web JSON pour l'algorithme sélectionné :",
+    "description": "jwt.page"
   }
 }

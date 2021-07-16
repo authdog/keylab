@@ -20,7 +20,7 @@ export const buildI18nDocs = async () => {
             
             const finalFile = [
                 generateFrontMatter({
-                    hide_title: true,
+                    title: meta.title,
                     sidebar_label: meta.sidebar_label
                 }),
                 payloadMdx.substring(indexEndFrontMatter+FRONT_MATTER_SEP.length)
