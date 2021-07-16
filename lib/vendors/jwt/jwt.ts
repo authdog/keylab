@@ -8,7 +8,60 @@ import { throwJwtError } from "../../errors";
 import { verifyRSATokenWithUri } from "../jwks";
 import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
 
-import * as JwtTypes from '../../../typings';
+
+export interface IcheckTokenValidnessCredentials {
+    // HS256
+    secret?: string;
+    // RS256
+    domainUri?: string;
+    jwksUri?: string;
+    verifySsl?: boolean;
+}
+
+export interface ISignTokenCredentials {
+    // HS256
+    secret?: string;
+    // RS256
+    jwk: any;
+}
+
+export interface IJwtTokenClaims {
+    sub: string; // subject id
+    issuer: string; // issuer
+    audiences: string[]; // audiences
+    sessionDuration: number; // minutes
+    scopes: string; // scopes eg: "user openid"
+    data?: any; // payload
+}
+
+export interface IJwtTokenOpts {
+    compact: true;
+    jwk: any;
+    fields: {
+        typ: string;
+    };
+}
+
+export interface IDecodedJwt {
+    iss?: string;
+    aud?: string[] | string;
+    sub?: string;
+    iat: number;
+    exp: number;
+    scp?: string;
+}
+
+export interface ICheckJwtFields {
+    requiredAudiences?: string[];
+    requiredIssuer?: string;
+}
+
+export interface ICreateSignedJwtOptions {
+    algorithm: enums.JwtAlgorithmsEnum;
+    claims: IJwtTokenClaims;
+    signinOptions: ISignTokenCredentials;
+}
+
 
 /**
  *
@@ -72,7 +125,7 @@ export const checkTokenValidness = async (
         secret,
         jwksUri,
         verifySsl = true
-    }: JwtTypes.IcheckTokenValidnessCredentials
+    }: IcheckTokenValidnessCredentials
 ): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
@@ -153,8 +206,8 @@ export const generateJwtFromPayload = async (
         sessionDuration,
         scopes,
         data
-    }: JwtTypes.IJwtTokenClaims,
-    { compact, jwk, fields }: JwtTypes.IJwtTokenOpts
+    }: IJwtTokenClaims,
+    { compact, jwk, fields }: IJwtTokenOpts
 ) => {
     const payload = JSON.stringify({
         iss: issuer,
@@ -181,7 +234,7 @@ export const generateJwtFromPayload = async (
 
 export const checkJwtFields = (
     token: string,
-    { requiredAudiences = [], requiredIssuer = null }: JwtTypes.ICheckJwtFields
+    { requiredAudiences = [], requiredIssuer = null }: ICheckJwtFields
 ) => {
     let validFields = true;
     try {
@@ -220,11 +273,11 @@ export const checkJwtFields = (
 
 export const createSignedJwt = async (
     payload: any,
-    { algorithm, claims, signinOptions }: JwtTypes.ICreateSignedJwtOptions
+    { algorithm, claims, signinOptions }: ICreateSignedJwtOptions
 ): Promise<string> => {
     const algEnums = enums.JwtAlgorithmsEnum;
     let token;
-    const jwtClaims: JwtTypes.IDecodedJwt = {
+    const jwtClaims: IDecodedJwt = {
         iss: claims?.issuer,
         aud: claims?.audiences,
         scp: claims?.scopes,

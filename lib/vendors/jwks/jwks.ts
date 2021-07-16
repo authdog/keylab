@@ -8,7 +8,40 @@ import { checkJwtFields, readTokenHeaders } from "../jwt";
 import { throwJwtError } from "../../errors";
 import * as enums from "../../enums";
 import * as c from "../../constants";
-import { IJwkRecordVisible, IDecodedJwt, IVerifyRSATokenCredentials } from "../../../typings";
+
+// types
+
+export interface IJwksClient {
+    jwksUri?: string; // required for RS256
+    domainUri?: string; // required when domainUri doesn't match jwksUri's host
+    verifySsl?: boolean; // set it to true if you're using self-signed certificate in local environment
+}
+
+// https://datatracker.ietf.org/doc/html/rfc7517
+export interface IJwkRecordVisible {
+    kty: string; // key type
+    kid: string; // key id
+    use: string; // public key use
+    alg: string; // algorithm
+    e: string; // exponent
+    n: string; // modulus
+}
+
+export interface IVerifyRSATokenCredentials {
+    jwksUri: string;
+    verifySsl?: boolean;
+    requiredAudiences?: string[];
+    requiredIssuer?: string;
+}
+
+export interface IDecodedJwt {
+    iss?: string;
+    aud?: string[] | string;
+    sub?: string;
+    iat: number;
+    exp: number;
+    scp?: string;
+}
 
 /**
  *

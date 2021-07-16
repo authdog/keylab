@@ -19,7 +19,7 @@
         "pretty": true,
         "skipLibCheck": true
     },
-    "include": ["lib", "typings/jwt.d.ts", "typings/jwks.d.ts"],
+    "include": ["lib"],
     "exclude": [
         "node_modules",
         "dist",
