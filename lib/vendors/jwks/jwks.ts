@@ -173,6 +173,7 @@ export const verifyRSATokenWithUri = async (
     if (keyExists && kid) {
         const keyFromStore = getKeyFromSet(kid, jwksResource.keys);
         const publicKey = await jose.JWK.asKey(keyFromStore);
+
         const decoded = <IDecodedJwt>jwt.verify(token, publicKey.toPEM());
 
         if (decoded?.iat && decoded?.exp) {

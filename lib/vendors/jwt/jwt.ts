@@ -150,6 +150,7 @@ export const checkTokenValidness = async (
                     jwksUri,
                     verifySsl
                 });
+                break;
             } else {
                 throwJwtError(
                     `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(
