@@ -59,7 +59,6 @@ Verifying a token:
 
 - jsonwebtoken
 - node-jose
-- jwk-to-pem
 - node-fetch
 
 ## Issue Reporting
