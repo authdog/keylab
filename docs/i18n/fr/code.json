@@ -70,5 +70,25 @@
   "introduction.installation.title-nodejs": {
     "message": "Installation sur nodeJS",
     "description": "introduction.page.title2"
+  },
+  "introduction.installation.availability": {
+    "message": "easyjwt est une librairie distribuée sur npm (node package manager).",
+    "description": "introduction.page.title2"    
+  },
+  "introduction.installation.link-npm-website": {
+    "message": "Accéder au site web de npm",
+    "description": "introduction.page.installation"
+  },
+  "introduction.installation.node-js-official-releases": {
+    "message": "Page de téléchargement de nodeJS",
+    "description": "introduction.page.installation"
+  },
+  "introduction.installation.node-js-recommendations": {
+    "message": "nodeJS 12+ est recommandé pour utiliser `@authdog/easyjwt` dans de bonnes conditions. Vous pouvez télécharger la version adaptée à votre système sur le site de node js.",
+    "description": "introduction.page.installation"
+  },
+  "introduction.installation.node-js-installation-tip": {
+    "message": "easyjwt peut être installé via un gestionnaire de paquets tel que `yarn` ou `npm`.",
+    "description": "introduction.page.installation"    
   }
 }
