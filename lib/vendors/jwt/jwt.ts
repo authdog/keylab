@@ -1,14 +1,14 @@
 import * as jwt from "jsonwebtoken";
 import * as jose from "node-jose";
 
-import * as JwtTypes from "./jwt.d";
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
 import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
 import { verifyRSATokenWithUri } from "../jwks";
-import { ICreateSignedJwtOptions } from "./jwt.d";
 import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
+
+import * as JwtTypes from '../../../typings';
 
 /**
  *
@@ -220,7 +220,7 @@ export const checkJwtFields = (
 
 export const createSignedJwt = async (
     payload: any,
-    { algorithm, claims, signinOptions }: ICreateSignedJwtOptions
+    { algorithm, claims, signinOptions }: JwtTypes.ICreateSignedJwtOptions
 ): Promise<string> => {
     const algEnums = enums.JwtAlgorithmsEnum;
     let token;

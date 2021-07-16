@@ -4,12 +4,11 @@ import * as jose from "node-jose";
 import { default as jwkToPem } from "jwk-to-pem";
 import * as jwt from "jsonwebtoken";
 
-import { IJwkRecordVisible, IVerifyRSATokenCredentials } from "./jwks.d";
 import { checkJwtFields, readTokenHeaders } from "../jwt";
 import { throwJwtError } from "../../errors";
 import * as enums from "../../enums";
 import * as c from "../../constants";
-import { IDecodedJwt } from "../jwt/jwt.d";
+import { IJwkRecordVisible, IDecodedJwt, IVerifyRSATokenCredentials } from "../../../typings";
 
 /**
  *

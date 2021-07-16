@@ -1,4 +1,4 @@
-import { JwtAlgorithmsEnum } from "../../enums";
+import { JwtAlgorithmsEnum } from "../lib/enums";
 
 export interface IcheckTokenValidnessCredentials {
     // HS256

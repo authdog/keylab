@@ -1,8 +1,8 @@
 {
     "name": "@authdog/easyjwt",
-    "version": "0.1.2",
+    "version": "0.1.13",
     "description": "easyjwt is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
-    "main": "index.js",
+    "main": "lib/index.js",
     "scripts": {
         "test": "jest",
         "test-with-coverage": "jest --collect-coverage",

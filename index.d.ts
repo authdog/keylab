@@ -1,1 +1,1 @@
-export * from './lib/types.d'
+export * from './typings'

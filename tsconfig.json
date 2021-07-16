@@ -9,6 +9,7 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
         "outDir": "dist",
         "baseUrl": ".",
         "lib": ["es6"],
@@ -18,12 +19,15 @@
         "pretty": true,
         "skipLibCheck": true
     },
-    "include": ["."],
+    "include": ["lib", "typings/jwt.d.ts", "typings/jwks.d.ts"],
     "exclude": [
         "node_modules",
         "dist",
         "docs",
         "tsdoc",
         "coverage"
+    ],
+    "typeRoots": [
+      "index.d.ts"
     ]
 }
