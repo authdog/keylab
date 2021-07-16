@@ -34,6 +34,15 @@ Verifying a token:
 - [x] Sign/Verify PS256 token
 - [x] Sign/Verify PS384 token
 - [x] Sign/Verify PS512 token
+
+## Roadmap Documentation
+
+- [x] Documentation End user *Introduction*
+- [x] Documentation End user *JWT*
+- [x] Translation foundations
+
+### Next features
+
 - [ ] Sign/Verify HS384 token 
 - [ ] Sign/Verify ES256 token 
 - [ ] Sign/Verify ES384 token 
@@ -42,16 +51,9 @@ Verifying a token:
 - [ ] Sign/Verify ES256K token 
 
 
-## Roadmap Security
+### Roadmap Security
 
 - [ ] Rate limiting
-
-## Roadmap Documentation
-
-- [x] Documentation End user *Introduction*
-- [ ] Documentation End user *JWT*
-- [x] Translation foundations
-
 
 ## Dependencies
 
