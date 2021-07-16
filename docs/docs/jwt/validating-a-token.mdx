@@ -10,6 +10,8 @@ import CodeBlock from '@theme/CodeBlock';
 import hsVerifySrc from '!!raw-loader!/docs/jwt/src/hs-verify.js.source';
 import rsVerifySrc from '!!raw-loader!/docs/jwt/src/rs-verify.js.source';
 
+import Translate from '@docusaurus/Translate';
+
 
 export const algorithms = [
     {alg: "hs256", src: hsVerifySrc},
@@ -23,11 +25,12 @@ export const algorithms = [
 
 :::note
 
+<Translate id='jwt.verify.introduction-note'>
 An access token is intended for use with a specific API and should only be validated by that API. In general, you do not need to validate an access token received from an identity provider (IdP). You can hand it over to the issuing IdP such as Authdog IdP, who will do the rest.
 If any of these checks fail, the token is considered invalid, and the request must be rejected with 401 Unauthorized result.
+</Translate>
 
 :::
-
 
 
 <Tabs
@@ -39,7 +42,9 @@ If any of these checks fail, the token is considered invalid, and the request mu
   }>
   {algorithms.map((el, idx) => (
         <TabItem key={idx} value={el.alg}>
-        Here is below an example to verify a JSON Web Token, using {el.alg.toUpperCase()} algorithm:
+        <Translate id='jwt.verify.note-verify-jwt-example'>
+          Here is below an example to verify a JSON Web Token for the selected algorithm:
+        </Translate>
            <br /><br />
           <CodeBlock key={`${idx}-1`} className="language-jsx">
               {el.src}

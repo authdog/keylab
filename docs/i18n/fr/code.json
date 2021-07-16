@@ -32,7 +32,7 @@
     "description": "homepage-features"
   },
   "introduction.what-is-easyjwt.genesis": {
-    "message": "\"*easyjwt*\" (ee·zee·jot), est une bibliothèque englobant des outils de sécurité et des bibliothèques communs pour simplifier la génération et la validation des jetons Web JSON, également connus sous le nom de JWT.",
+    "message": "easyjwt (ee·zee·jot), est une bibliothèque englobant des outils de sécurité et des bibliothèques communs pour simplifier la génération et la validation des jetons Web JSON, également connus sous le nom de JWT.",
     "description": "introduction.page"
   },
   "introduction.what-is-easyjwt.why": {
@@ -89,6 +89,18 @@
   },
   "jwt.signin.note-signin-jwt-example": {
     "message": "Voici ci-dessous un exemple pour créer un jeton Web JSON pour l'algorithme sélectionné :",
-    "description": "jwt.page"
+    "description": "jwt.signin.page"
+  },
+  "jwt.signin.note-payload-jwt-headers": {
+    "message": "Le token peut avoir les en-têtes et champs suivants:",
+    "description": "jwt.signin.page"
+  },
+  "jwt.verify.introduction-note": {
+    "message": "Un jeton d'accès / JWT est destiné à être utilisé avec une API spécifique et ne doit être validé que par cette API. En général, vous n'avez pas besoin de valider un jeton d'accès reçu d'un fournisseur d'identité (IdP). Vous pouvez le remettre à l'IdP émetteur tel que Authdog IdP, qui fera le reste. Si l'une de ces vérifications échoue, le jeton est considéré comme invalide et la demande doit être rejetée avec un résultat 401 Non autorisé.",
+    "description": "jwt.verify.page"
+  },
+  "jwt.verify.note-verify-jwt-example": {
+    "message": "Voici ci-dessous un exemple pour vérifier un jeton Web JSON pour l'algorithme sélectionné :",
+    "description": "jwt.verify.page"    
   }
 }
