@@ -4,7 +4,9 @@ import { EnvironmentError } from "./environment";
 import * as c from "../constants";
 
 export const throwUnauthorized = (message?: string) => {
-    throw new UnauthorizedError(message || c.GENERIC_UNAUTHORIZED_MESSAGE);
+    throw new UnauthorizedError("unauthorized", {
+        message: message || c.GENERIC_UNAUTHORIZED_MESSAGE
+    });
 };
 
 export const throwJwtError = (message?: string) => {

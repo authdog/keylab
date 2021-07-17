@@ -8,8 +8,7 @@ import { throwJwtError } from "../../errors";
 import * as enums from "../../enums";
 import * as c from "../../constants";
 
-import {IDecodedJwt} from '../jwt/interfaces'
-
+import { IDecodedJwt } from "../jwt/interfaces";
 
 // types
 
@@ -35,8 +34,6 @@ export interface IVerifyRSATokenCredentials {
     requiredAudiences?: string[];
     requiredIssuer?: string;
 }
-
-
 
 /**
  *

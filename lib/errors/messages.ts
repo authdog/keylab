@@ -16,3 +16,8 @@ export const GLOBAL_FUNCTION_NOT_IMPLEMENTED = "function not implemented";
 
 export const CODE_NOT_RUNNING_IN_BROWSER =
     "code is not executed in the browser";
+
+export const HEADERS_CREDENTIALS_BAD_SCHEME = "credentials_bad_scheme";
+export const HEADERS_CREDENTIALS_BAD_FORMAT = "credentials_bad_format";
+export const HEADERS_CREDENTIALS_FORMAT =
+    "Format is Authorization: Bearer [token]";
