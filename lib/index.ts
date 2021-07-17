@@ -1,2 +1,6 @@
-export { checkTokenValidness, createSignedJwt } from "./vendors";
+export {
+    checkTokenValidness,
+    createSignedJwt,
+    extractBearerTokenFromHeaders
+} from "./vendors";
 export * from "./enums";

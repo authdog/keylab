@@ -29,8 +29,7 @@ const FeatureList = [
     Svg: require('/static/img/undraw_Safe_re_kiil.svg').default,
     description: (
       <Translate
-        id="features-simple-jwt-validation-tagline"
-        >
+        id="features-simple-jwt-validation.tagline">
       easyjwt allows you to validate your JWT with a single function
       </Translate>
     ),

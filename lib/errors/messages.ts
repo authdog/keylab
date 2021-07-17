@@ -22,5 +22,5 @@ export const HEADERS_CREDENTIALS_BAD_FORMAT = "credentials_bad_format";
 export const HEADERS_CREDENTIALS_FORMAT =
     "Format is Authorization: Bearer [token]";
 
-export const ALLOWED_AUTHORIZATION_HEADER_CAPITALIZED = "Authorization"
-export const ALLOWED_AUTHORIZATION_HEADER_LOWERCASED = "authorization"
+export const ALLOWED_AUTHORIZATION_HEADER_CAPITALIZED = "Authorization";
+export const ALLOWED_AUTHORIZATION_HEADER_LOWERCASED = "authorization";

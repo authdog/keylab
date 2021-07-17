@@ -28,7 +28,7 @@
     "description": "homepage-features"
   },
   "features-jwt-signin.tagline": {
-    "message": "easyjwt vous permet de créer des JSON Web token simplement et sans aucune connaissance en cryptographie",
+    "message": "easyjwt vous permet de créer des JSON Web tokens simplement et sans aucune connaissance en cryptographie",
     "description": "homepage-features"
   },
   "introduction.what-is-easyjwt.genesis": {

@@ -48,7 +48,7 @@ export interface ICheckJwtFields {
 }
 
 export interface ICreateSignedJwtOptions {
-    algorithm: enums.JwtAlgorithmsEnum;
+    algorithm: string | enums.JwtAlgorithmsEnum;
     claims: IJwtTokenClaims;
     signinOptions: ISignTokenCredentials;
 }
