@@ -6,9 +6,9 @@ export const extractBearerTokenFromHeaders = (headers: any) => {
     let fieldCredentials = "";
 
     if (headers?.authorization) {
-        fieldCredentials = "authorization";
+        fieldCredentials = c.ALLOWED_AUTHORIZATION_HEADER_LOWERCASED;
     } else if (headers?.Authorization) {
-        fieldCredentials = "Authorization";
+        fieldCredentials = c.ALLOWED_AUTHORIZATION_HEADER_CAPITALIZED;
     } else {
         throw new UnauthorizedError(c.HEADERS_CREDENTIALS_BAD_SCHEME, {
             message: c.HEADERS_CREDENTIALS_FORMAT

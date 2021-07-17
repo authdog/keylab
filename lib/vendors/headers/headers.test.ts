@@ -15,4 +15,8 @@ it("throws an exception is credentials scheme is incorrect", () => {
             foo: "bar"
         });
     }).toThrowError(c.HEADERS_CREDENTIALS_FORMAT);
+
+    expect(() => {
+        extractBearerTokenFromHeaders({});
+    }).toThrowError(c.HEADERS_CREDENTIALS_FORMAT);
 });
