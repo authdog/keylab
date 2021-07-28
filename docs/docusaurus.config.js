@@ -9,6 +9,9 @@ const path = require('path')
 
 // const isProduction = process.env.NODE_ENV === 'production'
 
+// apiKey: 'b74cf483377dd27a83eff5735fbdc47b',
+// indexName: 'easyjwt',
+
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   i18n: {
@@ -28,6 +31,19 @@ module.exports = {
   organizationName: 'authdog', // Usually your GitHub org/user name.
   projectName: 'easyjwt', // Usually your repo name.
   themeConfig: {
+    algolia: {
+      apiKey: 'b74cf483377dd27a83eff5735fbdc47b',
+      indexName: 'easyjwt',
+      // Optional: see doc section bellow
+      contextualSearch: true,
+
+      // Optional: Algolia search parameters
+      // 
+      //searchParameters: { 'facetFilters': ["type:$TYPE"] }
+      // algoliaOptions: { 'facetFilters': ["type:content"] },
+
+      //... other Algolia params
+    },
     navbar: {
       hideOnScroll: true,
       title: 'easyjwt',
