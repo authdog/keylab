@@ -6,6 +6,6 @@ install:
   - yarn
 script:
   - yarn install --ignore-engines
-  - yarn test
-# after_success:
-#   - codecov
+  - yarn test-with-coverage
+after_success:
+  - codecov -f coverage/*.json

@@ -46,6 +46,7 @@
         "@types/jest": "^26.0.24",
         "@types/jsonwebtoken": "^8.5.4",
         "@types/node": "^16.0.0",
+        "codecov": "^3.8.3",
         "husky": "^7.0.0",
         "jest": "^27.0.6",
         "netlify-cli": "^4.1.18",
@@ -59,7 +60,7 @@
     "jest": {
         "testEnvironment": "node",
         "modulePathIgnorePatterns": [
-          "<rootDir>/build"
+            "<rootDir>/build"
         ]
     },
     "dependencies": {
