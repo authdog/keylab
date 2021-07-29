@@ -11,13 +11,15 @@ module.exports = {
     testMatch: [
         "**/test/**/*.test.(ts|js)",
         "**/__tests__/*.test.(ts|js)",
-        "**/**/*.test.(ts|js)"
+        "**/**/*.test.(ts|js)",
+        "**/**/**/*.test.(ts|js)"
     ],
     testPathIgnorePatterns: ["/node_modules/", "build", "dist", "docs"],
     testEnvironment: "node",
     rootDir: ".",
     collectCoverageFrom: [
         "<rootDir>/scripts/**/*.ts",
-        "<rootDir>/lib/**/*.ts"
+        "<rootDir>/lib/**/*.ts",
+        "<rootDir>/lib/**/**/*.ts"
     ],
 }
