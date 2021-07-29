@@ -16,7 +16,6 @@ module.exports = {
        "<rootDir>/scripts/**/*.test.ts"
     ],
     testEnvironment: "node",
-    rootDir: ".",
     collectCoverageFrom: [
         "<rootDir>/scripts/**/*.ts",
         "<rootDir>/lib/**/*.ts",
