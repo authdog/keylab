@@ -51,11 +51,6 @@ Verifying a token:
 - [ ] Sign/Verify EdDSA token 
 - [ ] Sign/Verify ES256K token 
 
-
-### Roadmap Security
-
-- [ ] Rate limiting
-
 ## Dependencies
 
 - jsonwebtoken
