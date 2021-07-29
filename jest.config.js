@@ -8,13 +8,9 @@ module.exports = {
     transform: {
         "^.+\\.(ts)$": "ts-jest",
     },
-    testMatch: [
-        "**/test/**/*.test.(ts|js)",
-        "**/__tests__/*.test.(ts|js)",
-        "**/**/*.test.(ts|js)",
-        "**/**/**/*.test.(ts|js)"
+    testPathIgnorePatterns: [
+        "/node_modules/", "build", "dist", "docs", "coverage", "tsdoc"
     ],
-    testPathIgnorePatterns: ["/node_modules/", "build", "dist", "docs"],
     testEnvironment: "node",
     rootDir: ".",
     collectCoverageFrom: [
