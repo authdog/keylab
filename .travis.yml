@@ -10,7 +10,7 @@ node_js:
 install:
   - npm install
 script:
-  - npm test-with-coverage
+  - npm run test-with-coverage
   - npm install codecov -g
 after_success:
   - codecov
