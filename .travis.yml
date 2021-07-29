@@ -6,6 +6,6 @@ install:
   - yarn
 script:
   - yarn install --ignore-engines
-  - yarn test
+  - yarn test --passWithNoTests
 # after_success:
 #   - codecov
