@@ -11,6 +11,10 @@ module.exports = {
     testPathIgnorePatterns: [
         "/node_modules/", "build", "dist", "docs", "coverage", "tsdoc"
     ],
+    testMatch: [
+       "<rootDir>/lib/**/*.test.ts",
+       "<rootDir>/scripts/**/*.test.ts"
+    ],
     testEnvironment: "node",
     rootDir: ".",
     collectCoverageFrom: [
