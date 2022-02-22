@@ -10,12 +10,11 @@ export const signJwtWithSecret = (payload: any, secret: string) => {
 
 export const signJwtWithJwk = async (payload: any, jwk: jwt.Secret) => {
     return await jose.JWS.createSign(
-        Object.assign({
+        {
             compact: true,
             jwk,
             fields: { typ: enums.JwtKeyTypes.JWT },
-            ...payload
-        }),
+        },
         jwk
     )
         .update(JSON.stringify(payload))

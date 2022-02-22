@@ -1,9 +1,10 @@
 import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
-import { readTokenHeaders } from "./jwt";
+import { createSignedJwt, readTokenHeaders } from "./jwt";
 import { createKeyStore, generateKeyFromStore } from "../jwks";
 import * as c from "../../constants";
 import * as enums from "../../enums";
 import { parseJwt } from ".";
+import { JwtAlgorithmsEnum } from "../../enums";
 
 it("jwt signin with secret", async () => {
     const token = signJwtWithSecret(
@@ -73,5 +74,41 @@ it("jwt signin with jwk", async () => {
 
 
 it("jwt created has all fields required from payload", async () => {   
-    
+
+    const store = createKeyStore();
+
+    // test RS256
+    const jwk = await generateKeyFromStore(
+        store,
+        enums.JwtKeyTypes.RSA,
+        enums.JwtAlgorithmsEnum.RS256,
+        true
+    );
+
+    const token = await createSignedJwt({
+        adid: "12345",
+    }, {
+        algorithm: JwtAlgorithmsEnum.RS256,
+        claims: {
+          sub: "sub:12345",
+          issuer: "issuer:12345",
+          audiences: ["aud:12345"],
+          scopes: [
+            // [DEFAULT_PROFILE_SCOPES, ...permissionsEnabled].map(
+            //   (el: any) => el.permission?.name
+            // )
+          ].join(" "),
+          sessionDuration: 8 * 60,
+        },
+        signinOptions: {
+          jwk
+        }
+      });
+
+
+    const {iss, aud, sub} = parseJwt(token);
+
+    expect(iss).toEqual("issuer:12345");
+    expect(aud).toEqual(["aud:12345"]);
+    expect(sub).toEqual("sub:12345");
 })

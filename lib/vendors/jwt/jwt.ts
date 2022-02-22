@@ -34,6 +34,7 @@ export interface IJwtTokenClaims {
     sessionDuration: number; // minutes
     scopes: string; // scopes eg: "user openid"
     data?: any; // payload
+    adid?: string; // authdog global identifier
 }
 
 export interface IJwtTokenOpts {
@@ -260,12 +261,16 @@ export const createSignedJwt = async (
 ): Promise<string> => {
     const algEnums = enums.JwtAlgorithmsEnum;
     let token;
+    // TODO: reflect all fields standard JWT
     const jwtClaims: IDecodedJwt = {
         iss: claims?.issuer,
         aud: claims?.audiences,
         scp: claims?.scopes,
+        aid: claims?.adid,
+        sub: claims?.sub,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000 + claims?.sessionDuration * 60),
+        // jti: '', // not used yet,
         ...payload
     };
 
