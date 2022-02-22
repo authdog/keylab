@@ -13,7 +13,8 @@ export const signJwtWithJwk = async (payload: any, jwk: jwt.Secret) => {
         Object.assign({
             compact: true,
             jwk,
-            fields: { typ: enums.JwtKeyTypes.JWT }
+            fields: { typ: enums.JwtKeyTypes.JWT },
+            ...payload
         }),
         jwk
     )

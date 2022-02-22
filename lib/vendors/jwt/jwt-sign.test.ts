@@ -3,6 +3,7 @@ import { readTokenHeaders } from "./jwt";
 import { createKeyStore, generateKeyFromStore } from "../jwks";
 import * as c from "../../constants";
 import * as enums from "../../enums";
+import { parseJwt } from ".";
 
 it("jwt signin with secret", async () => {
     const token = signJwtWithSecret(
@@ -27,8 +28,11 @@ it("jwt signin with jwk", async () => {
     );
 
     const token = await signJwtWithJwk(universalPayload, jwk);
-    const { ["alg"]: alg1 } = readTokenHeaders(token);
+    const { ["alg"]: alg1} = readTokenHeaders(token);
     expect(alg1).toEqual(enums.JwtAlgorithmsEnum.RS256);
+
+    const { ['sub']: sub1  }  = parseJwt(token)
+    expect(sub1).toEqual(universalPayload.sub);
 
     // test PS512
     const jwk2 = await generateKeyFromStore(
@@ -66,3 +70,8 @@ it("jwt signin with jwk", async () => {
     const { ["alg"]: alg4 } = readTokenHeaders(token4);
     expect(alg4).toEqual(enums.JwtAlgorithmsEnum.RS512);
 });
+
+
+it("jwt created has all fields required from payload", async () => {   
+    
+})

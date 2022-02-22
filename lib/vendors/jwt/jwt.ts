@@ -138,7 +138,7 @@ export const checkTokenValidness = async (
                 );
             }
         case algEnums.RS256 || algEnums.RS384 || algEnums.RS512:
-            if (!jwksUri) {
+            if (!adhoc && !jwksUri) {
                 missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
