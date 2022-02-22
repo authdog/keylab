@@ -50,11 +50,13 @@ it("verifies correctly token with public uri", async () => {
         `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
     );
 
+    const keys = [makePublicKey(keyGenerated)];
+
     const scopeNock = nock(AUTHDOG_API_ROOT)
         .persist()
         .get(regExpPathAppJwks)
         .reply(200, {
-            keys: [makePublicKey(keyGenerated)]
+            keys
         });
 
     const payload = {
@@ -83,8 +85,7 @@ it("verifies correctly token with public uri", async () => {
 
     try {
         verified = await verifyRSAToken(token, {
-            jwksUri,
-            verifySsl: false
+            jwksUri
         });
     } catch (e) {}
 
@@ -93,9 +94,7 @@ it("verifies correctly token with public uri", async () => {
     scopeNock.persist(false);
 });
 
-
 it("verifies token with adhoc jwk store", async () => {
-
     const store = createKeyStore();
     const exposeJwkPrivateFields = true;
     const keyGenerated = await generateKeyFromStore(
@@ -125,21 +124,14 @@ it("verifies token with adhoc jwk store", async () => {
         }
     );
 
-
     let verified = false;
 
     try {
-
-        const keys: any = [makePublicKey(keyGenerated)]
-
+        const keys: any = [makePublicKey(keyGenerated)];
         verified = await verifyRSAToken(token, {
-            jwksUri: null,
-            adhoc: {keys}
+            adhoc: { keys }
         });
-    } catch (e) {
-        console.log(e);
-    }
+    } catch (e) {}
 
     expect(verified).toBeTruthy();
-
-})
+});

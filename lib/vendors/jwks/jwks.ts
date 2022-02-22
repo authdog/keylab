@@ -1,16 +1,15 @@
 import { default as fetch } from "node-fetch";
 import * as https from "https";
 import * as jose from "node-jose";
-import * as jwt from "jsonwebtoken";
 
-import { checkJwtFields, readTokenHeaders } from "../jwt";
 import { throwJwtError } from "../../errors";
 import * as enums from "../../enums";
 import * as c from "../../constants";
 
-import { IDecodedJwt } from "../jwt/interfaces";
+import * as jwt from "jsonwebtoken";
 
-// types
+import { checkJwtFields, readTokenHeaders } from "../jwt";
+import { IDecodedJwt } from "../jwt/interfaces";
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -29,17 +28,17 @@ export interface IJwkRecordVisible {
 }
 
 export interface IVerifyRSATokenCredentials {
-    jwksUri: string;
+    jwksUri?: string;
     verifySsl?: boolean;
     requiredAudiences?: string[];
     requiredIssuer?: string;
-    adhoc?: IRSAKeyStore
+    adhoc?: IRSAKeyStore;
 }
 
 export interface IRSAKeyStore {
-    keys: [IJwkRecordVisible]
+    keys: [IJwkRecordVisible];
 }
- 
+
 /**
  *
  * @returns new JWK store
@@ -102,6 +101,13 @@ export const makePublicKey = (privateKey: any) => {
         e: privateKey.e,
         key_id: privateKey.key_id
     };
+
+    Object.keys(publicKey).forEach((key) => {
+        if (publicKey[key] === undefined) {
+            delete publicKey[key];
+        }
+    });
+
     return publicKey;
 };
 
@@ -111,7 +117,10 @@ export const makePublicKey = (privateKey: any) => {
  * @param verifySsl can be used in a context where self-signed certificates are being used
  * @returns return an array with keys objects
  */
-export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }): Promise<IRSAKeyStore> => {
+export const fetchJwksWithUri = async ({
+    jwksUri,
+    verifySsl = true
+}): Promise<IRSAKeyStore> => {
     const httpsAgent = new https.Agent({
         rejectUnauthorized: verifySsl
     });
@@ -161,21 +170,24 @@ export const verifyRSAToken = async (
         adhoc
     }: IVerifyRSATokenCredentials
 ) => {
-    const jwksResource = adhoc ? adhoc
+    const jwksResource = !!adhoc
+        ? adhoc
         : await fetchJwksWithUri({
-        jwksUri,
-        verifySsl
-    });
+              jwksUri,
+              verifySsl
+          });
 
     let verified = false;
     let validFields = false;
     let validationFieldsPassed = false;
     let requiresFieldsCheck = requiredAudiences || requiredIssuer;
     const { kid } = readTokenHeaders(token);
+
     const keyExists = keyExistsInSet(kid, jwksResource.keys);
 
     if (keyExists && kid) {
         const keyFromStore = getKeyFromSet(kid, jwksResource.keys);
+
         const publicKey = await jose.JWK.asKey(keyFromStore);
 
         const decoded = <IDecodedJwt>jwt.verify(token, publicKey.toPEM());
