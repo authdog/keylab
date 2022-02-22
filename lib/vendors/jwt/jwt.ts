@@ -5,7 +5,7 @@ import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
 import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
-import { verifyRSATokenWithUri } from "../jwks";
+import { verifyRSAToken } from "../jwks";
 import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
 import { IDecodedJwt } from "./interfaces";
 
@@ -140,7 +140,7 @@ export const checkTokenValidness = async (
                 missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
-                isValid = await verifyRSATokenWithUri(token, {
+                isValid = await verifyRSAToken(token, {
                     jwksUri,
                     verifySsl
                 });

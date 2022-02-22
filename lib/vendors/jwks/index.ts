@@ -5,5 +5,5 @@ export {
     generateKeyFromStore,
     getKeyFromSet,
     keyExistsInSet,
-    verifyRSATokenWithUri
+    verifyRSAToken
 } from "./jwks";

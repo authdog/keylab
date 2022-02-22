@@ -33,8 +33,13 @@ export interface IVerifyRSATokenCredentials {
     verifySsl?: boolean;
     requiredAudiences?: string[];
     requiredIssuer?: string;
+    adhoc?: IRSAKeyStore
 }
 
+export interface IRSAKeyStore {
+    keys: [IJwkRecordVisible]
+}
+ 
 /**
  *
  * @returns new JWK store
@@ -106,7 +111,7 @@ export const makePublicKey = (privateKey: any) => {
  * @param verifySsl can be used in a context where self-signed certificates are being used
  * @returns return an array with keys objects
  */
-export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }) => {
+export const fetchJwksWithUri = async ({ jwksUri, verifySsl = true }): Promise<IRSAKeyStore> => {
     const httpsAgent = new https.Agent({
         rejectUnauthorized: verifySsl
     });
@@ -146,16 +151,18 @@ export const getKeyFromSet = (keyId: string, jwks: IJwkRecordVisible[]) => {
     }
 };
 
-export const verifyRSATokenWithUri = async (
+export const verifyRSAToken = async (
     token: string,
     {
         jwksUri,
         verifySsl = false,
         requiredAudiences = [],
-        requiredIssuer = null
+        requiredIssuer = null,
+        adhoc
     }: IVerifyRSATokenCredentials
 ) => {
-    const jwksResource = await fetchJwksWithUri({
+    const jwksResource = adhoc ? adhoc
+        : await fetchJwksWithUri({
         jwksUri,
         verifySsl
     });

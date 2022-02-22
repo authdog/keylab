@@ -1,7 +1,7 @@
 import { createKeyStore, generateKeyFromStore, keyExistsInSet } from "..";
 import { default as nock } from "nock";
 
-import { makePublicKey, verifyRSATokenWithUri } from "./jwks";
+import { makePublicKey, verifyRSAToken } from "./jwks";
 import { generateJwtFromPayload } from "../jwt/jwt";
 
 import * as c from "../../constants";
@@ -82,7 +82,7 @@ it("verifies correctly token with public uri", async () => {
     let verified = false;
 
     try {
-        verified = await verifyRSATokenWithUri(token, {
+        verified = await verifyRSAToken(token, {
             jwksUri,
             verifySsl: false
         });
@@ -92,3 +92,54 @@ it("verifies correctly token with public uri", async () => {
 
     scopeNock.persist(false);
 });
+
+
+it("verifies token with adhoc jwk store", async () => {
+
+    const store = createKeyStore();
+    const exposeJwkPrivateFields = true;
+    const keyGenerated = await generateKeyFromStore(
+        store,
+        enums.JwtKeyTypes.RSA,
+        enums.JwtAlgorithmsEnum.RS256,
+        exposeJwkPrivateFields
+    );
+
+    const payload = {
+        userId: "eb13a135-b84a-400c-b590-0c44febf6c4e",
+        userName: "dbrrt"
+    };
+
+    const token = await generateJwtFromPayload(
+        {
+            sub: payload?.userId,
+            audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
+            issuer: c.AUTHDOG_ID_ISSUER,
+            scopes: "user openid",
+            sessionDuration: 8 * 60 // 8 hours
+        },
+        {
+            compact: true,
+            fields: { typ: enums.JwtKeyTypes.JWT },
+            jwk: keyGenerated
+        }
+    );
+
+
+    let verified = false;
+
+    try {
+
+        const keys: any = [makePublicKey(keyGenerated)]
+
+        verified = await verifyRSAToken(token, {
+            jwksUri: null,
+            adhoc: {keys}
+        });
+    } catch (e) {
+        console.log(e);
+    }
+
+    expect(verified).toBeTruthy();
+
+})

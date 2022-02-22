@@ -58,13 +58,18 @@ Verifying a token:
 - node-jose
 - node-fetch
 
+## Changelog
+
+- (22.FEB.22) `verifyRSATokenWithUri` has been replaced with `verifyRSAToken`
+
+
 ## Issue Reporting
 
 If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://authdog.com/whitehat) details the procedure for disclosing security issues.
 
 ## Author
 
-[Authdog Inc.](https://www.authdog.com)
+[Authdog](https://www.authdog.com)
 
 
 ## License
