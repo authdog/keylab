@@ -8,6 +8,7 @@ import { throwJwtError } from "../../errors";
 import { verifyRSAToken } from "../jwks";
 import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
 import { IDecodedJwt } from "./interfaces";
+import { IRSAKeyStore } from "../jwks/jwks";
 
 export interface IcheckTokenValidnessCredentials {
     // HS256
@@ -16,6 +17,7 @@ export interface IcheckTokenValidnessCredentials {
     domainUri?: string;
     jwksUri?: string;
     verifySsl?: boolean;
+    adhoc?: IRSAKeyStore;
 }
 
 export interface ISignTokenCredentials {
@@ -111,7 +113,7 @@ export const parseJwt = (token: string) => {
 
 export const checkTokenValidness = async (
     token: string,
-    { secret, jwksUri, verifySsl = true }: IcheckTokenValidnessCredentials
+    { secret, jwksUri, verifySsl = true, adhoc }: IcheckTokenValidnessCredentials
 ): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
@@ -142,7 +144,8 @@ export const checkTokenValidness = async (
             if (missingCredentials.length === 0) {
                 isValid = await verifyRSAToken(token, {
                     jwksUri,
-                    verifySsl
+                    verifySsl,
+                    adhoc
                 });
                 break;
             } else {

@@ -60,7 +60,8 @@ Verifying a token:
 
 ## Changelog
 
-- (22.FEB.22) `verifyRSATokenWithUri` has been replaced with `verifyRSAToken`
+- JWT signed with a JSON Web Key can be "ad-hoc" validated
+  - (22.FEB.22) `verifyRSATokenWithUri` has been replaced with `verifyRSAToken`
 
 
 ## Issue Reporting
