@@ -93,10 +93,11 @@ it("jwt created has all fields required from payload", async () => {
           sub: "sub:12345",
           issuer: "issuer:12345",
           audiences: ["aud:12345"],
+          adid: "adid:12345",
           scopes: [
-            // [DEFAULT_PROFILE_SCOPES, ...permissionsEnabled].map(
-            //   (el: any) => el.permission?.name
-            // )
+            ['a', 'b:c', 'd'].map(
+              (el: any) => el.permission?.name
+            )
           ].join(" "),
           sessionDuration: 8 * 60,
         },
@@ -106,9 +107,10 @@ it("jwt created has all fields required from payload", async () => {
       });
 
 
-    const {iss, aud, sub} = parseJwt(token);
+    const {iss, aud, sub, adid} = parseJwt(token);
 
     expect(iss).toEqual("issuer:12345");
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
+    expect(adid).toEqual("adid:12345");
 })
