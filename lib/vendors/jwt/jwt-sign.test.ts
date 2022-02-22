@@ -93,7 +93,7 @@ it("jwt created has all fields required from payload", async () => {
           sub: "sub:12345",
           issuer: "issuer:12345",
           audiences: ["aud:12345"],
-          adid: "adid:12345",
+        //   adid: "adid:12345",
           scopes: [
             ['a', 'b:c', 'd'].map(
               (el: any) => el.permission?.name
@@ -112,5 +112,5 @@ it("jwt created has all fields required from payload", async () => {
     expect(iss).toEqual("issuer:12345");
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
-    expect(adid).toEqual("adid:12345");
+    expect(adid).toEqual("12345");
 })
