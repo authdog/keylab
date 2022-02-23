@@ -67,15 +67,15 @@ it("verifies correctly token with public uri", async () => {
     const token = await generateJwtFromPayload(
         {
             sub: payload?.userId,
-            audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
-            issuer: c.AUTHDOG_ID_ISSUER,
-            scopes: "user openid",
-            sessionDuration: 8 * 60 // 8 hours
+            aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
+            iss: c.AUTHDOG_ID_ISSUER,
+            scp: "user openid",
         },
         {
             compact: true,
             fields: { typ: enums.JwtKeyTypes.JWT },
-            jwk: keyGenerated
+            jwk: keyGenerated,
+            sessionDuration: 8 * 60 // 8 hours
         }
     );
 
@@ -112,15 +112,16 @@ it("verifies token with adhoc jwk store", async () => {
     const token = await generateJwtFromPayload(
         {
             sub: payload?.userId,
-            audiences: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
-            issuer: c.AUTHDOG_ID_ISSUER,
-            scopes: "user openid",
-            sessionDuration: 8 * 60 // 8 hours
+            iss: c.AUTHDOG_ID_ISSUER,
+            scp: "user openid",
+            aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
+
         },
         {
             compact: true,
             fields: { typ: enums.JwtKeyTypes.JWT },
-            jwk: keyGenerated
+            jwk: keyGenerated,
+            sessionDuration: 8 * 60 // 8 hours
         }
     );
 

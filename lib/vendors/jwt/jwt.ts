@@ -25,24 +25,25 @@ export interface ISignTokenCredentials {
     secret?: string;
     // RS256
     jwk: any;
+    sessionDuration: number;
 }
 
 export interface IJwtTokenClaims {
     sub: string; // subject id
-    issuer: string; // issuer
-    audiences: string[]; // audiences
-    sessionDuration: number; // minutes
-    scopes: string; // scopes eg: "user openid"
-    data?: any; // payload
-    adid?: string; // authdog global identifier
+    iss: string; // issuer
+    aud: string[]; // audiences
+    scp: string; // scopes eg: "user openid"
+    pld?: any; // payload
+    aid?: string; // authdog global identifier
 }
 
 export interface IJwtTokenOpts {
-    compact: true;
+    compact?: true;
     jwk: any;
-    fields: {
+    fields?: {
         typ: string;
     };
+    sessionDuration: number;
 }
 
 export interface ICheckJwtFields {
@@ -190,20 +191,20 @@ export const verifyHSTokenWithSecretString = async (
 };
 
 export const generateJwtFromPayload = async (
-    { sub, issuer, audiences, sessionDuration, scopes, data }: IJwtTokenClaims,
-    { compact, jwk, fields }: IJwtTokenOpts
+    { sub, iss, aud, scp, pld }: IJwtTokenClaims,
+    { compact, jwk, fields, sessionDuration }: IJwtTokenOpts
 ) => {
     const payload = JSON.stringify({
-        iss: issuer,
+        iss,
         sub,
-        aud: [...audiences],
-        ...data,
+        aud,
+        ...pld,
         exp: Math.floor(Date.now() / 1000 + sessionDuration * 60),
         iat: Math.floor(Date.now() / 1000),
-        azp: issuer,
+        azp: iss,
         // https://stackoverflow.com/a/49492971/8483084
         gzp: "client-credentials",
-        scp: scopes
+        scp
     });
 
     const token = await jose.JWS.createSign(
@@ -263,14 +264,13 @@ export const createSignedJwt = async (
     let token;
     // TODO: reflect all fields standard JWT
     const jwtClaims: IDecodedJwt = {
-        iss: claims?.issuer,
-        aud: claims?.audiences,
-        scp: claims?.scopes,
-        aid: claims?.adid,
+        iss: claims?.iss,
+        aud: claims?.aud,
+        scp: claims?.scp,
+        aid: claims?.aid,
         sub: claims?.sub,
         iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000 + claims?.sessionDuration * 60),
-        // jti: '', // not used yet,
+        exp: Math.floor(Date.now() / 1000 + signinOptions?.sessionDuration * 60),
         ...payload
     };
 
