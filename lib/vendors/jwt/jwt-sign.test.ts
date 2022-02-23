@@ -103,7 +103,6 @@ it("jwt created has all fields required from payload", async () => {
         signinOptions: {
           jwk,
           sessionDuration: 8 * 60,
-
         }
       });
 
