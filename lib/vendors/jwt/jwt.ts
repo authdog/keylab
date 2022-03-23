@@ -18,6 +18,7 @@ export interface IcheckTokenValidnessCredentials {
     jwksUri?: string;
     verifySsl?: boolean;
     adhoc?: IRSAKeyStore;
+    requiredScopes?: string[];
 }
 
 export interface ISignTokenCredentials {
@@ -49,6 +50,7 @@ export interface IJwtTokenOpts {
 export interface ICheckJwtFields {
     requiredAudiences?: string[];
     requiredIssuer?: string;
+    requiredScopes?: string[];
 }
 
 export interface ICreateSignedJwtOptions {
@@ -219,7 +221,7 @@ export const generateJwtFromPayload = async (
 
 export const checkJwtFields = (
     token: string,
-    { requiredAudiences = [], requiredIssuer = null }: ICheckJwtFields
+    { requiredAudiences = [], requiredIssuer = null, requiredScopes = [] }: ICheckJwtFields
 ) => {
     let validFields = true;
     try {
@@ -250,6 +252,40 @@ export const checkJwtFields = (
         ) {
             validFields = parsedToken?.iss === requiredIssuer;
         }
+
+        // scopes
+        if (
+            parsedToken?.scp &&
+            requiredScopes?.length > 0
+        ) {
+
+            let scopes =  []
+            if (typeof parsedToken?.scp === "string") {
+
+                if (parsedToken?.scp.includes(" ")) {
+                    scopes = parsedToken?.scp.split(" ")
+                }
+                else if (parsedToken?.scp.includes(",")) {
+                    scopes = parsedToken?.scp.split(",")
+                }
+                else {
+                    scopes = [parsedToken?.scp]
+                }
+            } else if (Array.isArray(parsedToken?.scp)) {
+                scopes = parsedToken?.scp;
+            } else {
+                throw new Error("Invalid scp field type");
+            }
+            
+            requiredScopes.map((el: string) => {
+                console.log(el);
+                if (!scopes.includes(el)) {
+                    validFields = false;
+                }
+            });
+        }
+
+
     } catch (e) {
         validFields = false;
     }
