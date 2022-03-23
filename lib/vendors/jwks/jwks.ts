@@ -32,6 +32,7 @@ export interface IVerifyRSATokenCredentials {
     verifySsl?: boolean;
     requiredAudiences?: string[];
     requiredIssuer?: string;
+    requiredScopes?: string[];
     adhoc?: IRSAKeyStore;
 }
 
@@ -167,6 +168,7 @@ export const verifyRSAToken = async (
         verifySsl = false,
         requiredAudiences = [],
         requiredIssuer = null,
+        requiredScopes = [],
         adhoc
     }: IVerifyRSATokenCredentials
 ) => {
@@ -199,7 +201,8 @@ export const verifyRSAToken = async (
         if (requiresFieldsCheck) {
             validFields = checkJwtFields(token, {
                 requiredAudiences,
-                requiredIssuer
+                requiredIssuer,
+                requiredScopes
             });
         }
     } else if (!kid) {

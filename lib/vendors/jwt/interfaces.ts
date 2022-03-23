@@ -4,5 +4,5 @@ export interface IDecodedJwt {
     sub?: string;
     iat: number;
     exp: number;
-    scp?: string;
+    scp?: string[] | string; // scopes can be separated by space or comma
 }

@@ -117,7 +117,7 @@ export const parseJwt = (token: string) => {
 
 export const checkTokenValidness = async (
     token: string,
-    { secret, jwksUri, verifySsl = true, adhoc }: IcheckTokenValidnessCredentials
+    { secret, jwksUri, verifySsl = true, adhoc, requiredScopes }: IcheckTokenValidnessCredentials
 ): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
@@ -149,7 +149,8 @@ export const checkTokenValidness = async (
                 isValid = await verifyRSAToken(token, {
                     jwksUri,
                     verifySsl,
-                    adhoc
+                    adhoc,
+                    requiredScopes
                 });
                 break;
             } else {
