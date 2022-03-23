@@ -36,6 +36,7 @@ Verifying a token:
 - [x] Sign/Verify PS256 token
 - [x] Sign/Verify PS384 token
 - [x] Sign/Verify PS512 token
+- [x] JWT scopes validation
 
 ## Roadmap Documentation
 
