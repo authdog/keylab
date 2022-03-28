@@ -1,4 +1,4 @@
-import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
+import { signJwtWithSecret, signJwtWithJwk, uint8Array2str, str2ToUint8Array } from "./jwt-sign";
 import { createSignedJwt, readTokenHeaders } from "./jwt";
 import { createKeyStore, generateKeyFromStore } from "../jwks";
 import * as c from "../../constants";
@@ -7,7 +7,7 @@ import { parseJwt } from ".";
 import { JwtAlgorithmsEnum } from "../../enums";
 
 it("jwt signin with secret", async () => {
-    const token = signJwtWithSecret(
+    const token = await signJwtWithSecret(
         { sub: "12345", aud: [c.AUTHDOG_ID_ISSUER] },
         "secret"
     );
@@ -114,4 +114,11 @@ it("jwt created has all fields required from payload", async () => {
     expect(sub).toEqual("sub:12345");
     expect(adid).toEqual("12345");
     expect(aid).toEqual("12345");
+})
+
+it("it converts string to uint8 and vice versa", async () => {
+    const superSecret = "Lapsus$";
+    const buffer: Uint8Array = str2ToUint8Array(superSecret);
+    const debufferedString: string = uint8Array2str(buffer);
+    expect(debufferedString).toEqual(superSecret);
 })
