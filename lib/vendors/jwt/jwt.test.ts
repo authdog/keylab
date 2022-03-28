@@ -126,53 +126,53 @@ it("verifies token audience", async () => {
         requiredIssuer: c.AUTHDOG_ID_ISSUER
     });
     expect(valid7).toBeTruthy();
-
 });
 
-
 it("verifies token scopes", async () => {
-        const tokenWithOneScopeFoo = jwt.sign(
-            { aud: [c.AUTHDOG_ID_ISSUER], iss: c.AUTHDOG_ID_ISSUER, scp: ["foo"] },
-            "secret"
-        );
-    
-        const tokenHasRequiredScopes = checkJwtFields(tokenWithOneScopeFoo, {
-            requiredScopes: ["foo"]
-        });
-        expect(tokenHasRequiredScopes).toBeTruthy();
-    
-        const tokenHasNotRightScope = checkJwtFields(tokenWithOneScopeFoo, {
-            requiredScopes: ["bar"]
-        });
-        expect(tokenHasNotRightScope).toBeFalsy();
-    
-        const tokenMissesAScope = checkJwtFields(tokenWithOneScopeFoo, {
-            requiredScopes: ["foo", "bar"]
-        });
-        expect(tokenMissesAScope).toBeFalsy();
+    const tokenWithOneScopeFoo = jwt.sign(
+        { aud: [c.AUTHDOG_ID_ISSUER], iss: c.AUTHDOG_ID_ISSUER, scp: ["foo"] },
+        "secret"
+    );
 
+    const tokenHasRequiredScopes = checkJwtFields(tokenWithOneScopeFoo, {
+        requiredScopes: ["foo"]
+    });
+    expect(tokenHasRequiredScopes).toBeTruthy();
 
-        const tokenWithMoreThanOneScope = jwt.sign(
-            { aud: [c.AUTHDOG_ID_ISSUER], iss: c.AUTHDOG_ID_ISSUER, scp: ["foo", "bar"] }
-            , "secret"
-        );
+    const tokenHasNotRightScope = checkJwtFields(tokenWithOneScopeFoo, {
+        requiredScopes: ["bar"]
+    });
+    expect(tokenHasNotRightScope).toBeFalsy();
 
-        const tokenHasRequiredScopes2 = checkJwtFields(tokenWithMoreThanOneScope, {
-            requiredScopes: ["foo", "bar"]
-        });
+    const tokenMissesAScope = checkJwtFields(tokenWithOneScopeFoo, {
+        requiredScopes: ["foo", "bar"]
+    });
+    expect(tokenMissesAScope).toBeFalsy();
 
-        expect(tokenHasRequiredScopes2).toBeTruthy();
+    const tokenWithMoreThanOneScope = jwt.sign(
+        {
+            aud: [c.AUTHDOG_ID_ISSUER],
+            iss: c.AUTHDOG_ID_ISSUER,
+            scp: ["foo", "bar"]
+        },
+        "secret"
+    );
 
+    const tokenHasRequiredScopes2 = checkJwtFields(tokenWithMoreThanOneScope, {
+        requiredScopes: ["foo", "bar"]
+    });
 
-        const tokenHasNotRightScope2 = checkJwtFields(tokenWithMoreThanOneScope, {
-            requiredScopes: ["foo", "baz"]
-        });
+    expect(tokenHasRequiredScopes2).toBeTruthy();
 
-        expect(tokenHasNotRightScope2).toBeFalsy();
+    const tokenHasNotRightScope2 = checkJwtFields(tokenWithMoreThanOneScope, {
+        requiredScopes: ["foo", "baz"]
+    });
 
-        const tokenMissesAScope2 = checkJwtFields(tokenWithMoreThanOneScope, {
-            requiredScopes: ["foo", "bar", "baz"]
-        });
+    expect(tokenHasNotRightScope2).toBeFalsy();
 
-        expect(tokenMissesAScope2).toBeFalsy();
+    const tokenMissesAScope2 = checkJwtFields(tokenWithMoreThanOneScope, {
+        requiredScopes: ["foo", "bar", "baz"]
+    });
+
+    expect(tokenMissesAScope2).toBeFalsy();
 });

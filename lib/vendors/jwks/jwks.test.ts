@@ -69,7 +69,7 @@ it("verifies correctly token with public uri", async () => {
             sub: payload?.userId,
             aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
             iss: c.AUTHDOG_ID_ISSUER,
-            scp: "user openid",
+            scp: "user openid"
         },
         {
             compact: true,
@@ -114,8 +114,7 @@ it("verifies token with adhoc jwk store", async () => {
             sub: payload?.userId,
             iss: c.AUTHDOG_ID_ISSUER,
             scp: "user openid",
-            aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
-
+            aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"]
         },
         {
             compact: true,

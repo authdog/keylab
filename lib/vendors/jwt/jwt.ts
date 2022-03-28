@@ -117,7 +117,13 @@ export const parseJwt = (token: string) => {
 
 export const checkTokenValidness = async (
     token: string,
-    { secret, jwksUri, verifySsl = true, adhoc, requiredScopes }: IcheckTokenValidnessCredentials
+    {
+        secret,
+        jwksUri,
+        verifySsl = true,
+        adhoc,
+        requiredScopes
+    }: IcheckTokenValidnessCredentials
 ): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
@@ -222,7 +228,11 @@ export const generateJwtFromPayload = async (
 
 export const checkJwtFields = (
     token: string,
-    { requiredAudiences = [], requiredIssuer = null, requiredScopes = [] }: ICheckJwtFields
+    {
+        requiredAudiences = [],
+        requiredIssuer = null,
+        requiredScopes = []
+    }: ICheckJwtFields
 ) => {
     let validFields = true;
     try {
@@ -255,37 +265,28 @@ export const checkJwtFields = (
         }
 
         // scopes
-        if (
-            parsedToken?.scp &&
-            requiredScopes?.length > 0
-        ) {
-
-            let scopes =  []
+        if (parsedToken?.scp && requiredScopes?.length > 0) {
+            let scopes = [];
             if (typeof parsedToken?.scp === "string") {
-
                 if (parsedToken?.scp.includes(" ")) {
-                    scopes = parsedToken?.scp.split(" ")
-                }
-                else if (parsedToken?.scp.includes(",")) {
-                    scopes = parsedToken?.scp.split(",")
-                }
-                else {
-                    scopes = [parsedToken?.scp]
+                    scopes = parsedToken?.scp.split(" ");
+                } else if (parsedToken?.scp.includes(",")) {
+                    scopes = parsedToken?.scp.split(",");
+                } else {
+                    scopes = [parsedToken?.scp];
                 }
             } else if (Array.isArray(parsedToken?.scp)) {
                 scopes = parsedToken?.scp;
             } else {
                 throw new Error("Invalid scp field type");
             }
-            
+
             requiredScopes.map((el: string) => {
                 if (!scopes.includes(el)) {
                     validFields = false;
                 }
             });
         }
-
-
     } catch (e) {
         validFields = false;
     }
@@ -306,7 +307,9 @@ export const createSignedJwt = async (
         aid: claims?.aid,
         sub: claims?.sub,
         iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000 + signinOptions?.sessionDuration * 60),
+        exp: Math.floor(
+            Date.now() / 1000 + signinOptions?.sessionDuration * 60
+        ),
         ...payload
     };
 

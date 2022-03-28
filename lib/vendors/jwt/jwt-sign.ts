@@ -2,33 +2,21 @@ import * as enums from "../../enums";
 import * as jwt from "jsonwebtoken";
 import * as jose from "node-jose";
 
-import * as jose_ from 'jose'
-const {SignJWT} = jose_
+import * as jose_ from "jose";
+const { SignJWT } = jose_;
 
 export const signJwtWithSecret = async (payload: any, secret: string) => {
-    // return jwt.sign({ ...payload }, secret, {
-    //     algorithm: enums.JwtAlgorithmsEnum.HS256
-    // });
     return await new SignJWT({ ...payload })
         .setProtectedHeader({ alg: enums.JwtAlgorithmsEnum.HS256 })
-        .sign(str2ToUint8Array(secret))
+        .sign(str2ToUint8Array(secret));
 };
 
 export const signJwtWithJwk = async (payload: any, jwk: jwt.Secret) => {
-    // const {SignJWT} = jose_
-
-    // const encrypted  = await new SignJWT({ 'urn:example:claim': true })
-    // .setProtectedHeader({ alg: 'HS256' })
-    // .sign(str2ab("safeS3cret"))
-
-
-    // console.log(encrypted)
-
     return await jose.JWS.createSign(
         {
             compact: true,
             jwk,
-            fields: { typ: enums.JwtKeyTypes.JWT },
+            fields: { typ: enums.JwtKeyTypes.JWT }
         },
         jwk
     )
@@ -42,7 +30,7 @@ export const str2ToUint8Array = (str: string) => {
         buf[i] = str.charCodeAt(i);
     }
     return buf;
-}
+};
 
-export const uint8Array2str = (buf: Uint8Array) => String
-    .fromCharCode.apply(null, buf);
+export const uint8Array2str = (buf: Uint8Array) =>
+    String.fromCharCode.apply(null, buf);

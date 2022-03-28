@@ -48,6 +48,7 @@
         "jest": "^27.0.6",
         "netlify-cli": "^4.1.18",
         "nock": "^13.1.1",
+        "prettier": "2.3.2",
         "raw-loader": "^4.0.2",
         "ts-jest": "^27.0.3",
         "ts-node": "^10.1.0",
