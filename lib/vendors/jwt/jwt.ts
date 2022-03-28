@@ -279,7 +279,6 @@ export const checkJwtFields = (
             }
             
             requiredScopes.map((el: string) => {
-                console.log(el);
                 if (!scopes.includes(el)) {
                     validFields = false;
                 }
