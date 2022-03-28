@@ -2,7 +2,8 @@ import {
     signJwtWithSecret,
     signJwtWithJwk,
     uint8Array2str,
-    str2ToUint8Array
+    str2ToUint8Array,
+    signWithJose
 } from "./jwt-sign";
 import { createSignedJwt, readTokenHeaders } from "./jwt";
 import { createKeyStore, generateKeyFromStore } from "../jwks";
@@ -125,3 +126,10 @@ it("it converts string to uint8 and vice versa", async () => {
     const debufferedString: string = uint8Array2str(buffer);
     expect(debufferedString).toEqual(superSecret);
 });
+
+
+it("sign with jose", async () => {
+   const token = await signWithJose();
+   console.log(token)
+    expect(token).toBeTruthy();
+})
