@@ -127,9 +127,8 @@ it("it converts string to uint8 and vice versa", async () => {
     expect(debufferedString).toEqual(superSecret);
 });
 
-
 it("sign with jose", async () => {
-   const token = await signWithJose();
-   console.log(token)
+    const token = await signWithJose();
+    console.log(token);
     expect(token).toBeTruthy();
-})
+});
