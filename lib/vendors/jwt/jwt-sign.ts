@@ -265,10 +265,10 @@ export const signWithJose = async () => {
                 format: "pem"
             }
         },
-        (err, publicKey, privateKey) => {
+        () => {
             // sign String
 
-            console.log(publicKey);
+            // console.log(publicKey);
             // var signerObject = createSign("RSA-SHA256");
             // signerObject.update(str);
             // var signature = signerObject.sign({key:privateKey,padding:crypto.constants.RSA_PKCS1_PSS_PADDING}, "base64");
