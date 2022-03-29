@@ -10,7 +10,7 @@ import {
     SignJWT
 } from "jose";
 
-import { generateKeyPair } from "crypto";
+import { generateKeyPair, randomBytes } from "crypto";
 
 // import * as crypto from 'crypto'
 // import { generateKey, generateKeyPairSync } from "crypto";
@@ -49,6 +49,36 @@ export const str2ToUint8Array = (str: string) => {
 
 export const uint8Array2str = (buf: Uint8Array) =>
     String.fromCharCode.apply(null, buf);
+
+export interface IKeyPair {
+    publicKey: string;
+    privateKey: string;
+}
+
+export const getKeyPair = async (): Promise<IKeyPair> => {
+    return new Promise((resolve, reject) => {
+        generateKeyPair(
+            "rsa",
+            {
+                modulusLength: 4096,
+                publicKeyEncoding: {
+                    type: "spki",
+                    format: "pem"
+                },
+                privateKeyEncoding: {
+                    type: "pkcs8",
+                    format: "pem",
+                    cipher: "aes-256-cbc",
+                    passphrase: randomBytes(20).toString("hex")
+                }
+            },
+            (err, publicKey, privateKey) => {
+                if (err) return reject(err);
+                resolve({ publicKey, privateKey });
+            }
+        );
+    });
+};
 
 export const signWithJose = async () => {
     // generate key pair RSA512
@@ -267,7 +297,6 @@ export const signWithJose = async () => {
         },
         () => {
             // sign String
-
             // console.log(publicKey);
             // var signerObject = createSign("RSA-SHA256");
             // signerObject.update(str);

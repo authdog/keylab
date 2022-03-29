@@ -3,7 +3,8 @@ import {
     signJwtWithJwk,
     uint8Array2str,
     str2ToUint8Array,
-    signWithJose
+    signWithJose,
+    getKeyPair
 } from "./jwt-sign";
 import { createSignedJwt, readTokenHeaders } from "./jwt";
 import { createKeyStore, generateKeyFromStore } from "../jwks";
@@ -131,4 +132,10 @@ it("sign with jose", async () => {
     const token = await signWithJose();
     console.log(token);
     expect(token).toBeTruthy();
+});
+
+it("generate promisified key pair", async () => {
+    const keyPair = await getKeyPair();
+    expect(keyPair?.publicKey).toBeTruthy();
+    expect(keyPair?.privateKey).toBeTruthy();
 });
