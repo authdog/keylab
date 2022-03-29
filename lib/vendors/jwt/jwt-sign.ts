@@ -252,7 +252,7 @@ export const signWithJose = async () => {
         () => {}
     );
 
-    generateKeyPair(
+    await generateKeyPair(
         "rsa",
         {
             modulusLength: 1024,
