@@ -69,21 +69,21 @@ export const signWithJose = async () => {
     );
 
     // generate key pair ES256K
-    await generateKeyPair(
-        "ec",
-        {
-            namedCurve: "P-256K",
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
+    // await generateKeyPair(
+    //     "ec",
+    //     {
+    //         namedCurve: "P-256K",
+    //         publicKeyEncoding: {
+    //             type: "spki",
+    //             format: "pem"
+    //         },
+    //         privateKeyEncoding: {
+    //             type: "pkcs8",
+    //             format: "pem"
+    //         }
+    //     },
+    //     () => {}
+    // );
 
     // generate key pair ES256
     await generateKeyPair(
