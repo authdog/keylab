@@ -51,165 +51,206 @@ export const uint8Array2str = (buf: Uint8Array) =>
     String.fromCharCode.apply(null, buf);
 
 export const signWithJose = async () => {
+    // generate key pair RSA512
+    await generateKeyPair(
+        "rsa",
+        {
+            modulusLength: 2048,
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair RSA512
-  await generateKeyPair("rsa", {
-    modulusLength: 2048,
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair ES256K
+    await generateKeyPair(
+        "ec",
+        {
+            namedCurve: "P-256K",
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair ES256K
-  await generateKeyPair("ec", {
-    namedCurve: "P-256K",
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair ES256
+    await generateKeyPair(
+        "ec",
+        {
+            namedCurve: "P-256",
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair ES256
-  await generateKeyPair("ec", {
-    namedCurve: "P-256",
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair ES384
+    await generateKeyPair(
+        "ec",
+        {
+            namedCurve: "P-384",
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair ES384
-  await generateKeyPair("ec", {
-    namedCurve: "P-384",
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair ES512
+    await generateKeyPair(
+        "ec",
+        {
+            namedCurve: "P-521",
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair ES512
-  await generateKeyPair("ec", {
-    namedCurve: "P-521",
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair RSA256
+    await generateKeyPair(
+        "rsa",
+        {
+            modulusLength: 2048,
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
+    // generate key pair RSA384
+    await generateKeyPair(
+        "rsa",
+        {
+            modulusLength: 2048,
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair RSA256
-  await generateKeyPair("rsa", {
-    modulusLength: 2048,
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair RSA512
+    await generateKeyPair(
+        "rsa",
+        {
+            modulusLength: 2048,
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair RSA384
-  await generateKeyPair("rsa", {
-    modulusLength: 2048,
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair Ed25519
+    await generateKeyPair(
+        "ed25519",
+        {
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair RSA512
-  await generateKeyPair("rsa", {
-    modulusLength: 2048,
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair Ed448
+    await generateKeyPair(
+        "ed448",
+        {
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair Ed25519
-  await generateKeyPair("ed25519", {
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair X25519
+    await generateKeyPair(
+        "x25519",
+        {
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
-  // generate key pair Ed448
-  await generateKeyPair("ed448", {
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
+    // generate key pair X448
+    await generateKeyPair(
+        "x448",
+        {
+            publicKeyEncoding: {
+                type: "spki",
+                format: "pem"
+            },
 
-  // generate key pair X25519
-  await generateKeyPair("x25519", {
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
-
-  // generate key pair X448
-  await generateKeyPair("x448", {
-    publicKeyEncoding: {
-      type: "spki",
-      format: "pem"
-    },
-
-    privateKeyEncoding: {
-      type: "pkcs8",
-      format: "pem"
-    }
-  }, () => {})
-
-
-
-
-
+            privateKeyEncoding: {
+                type: "pkcs8",
+                format: "pem"
+            }
+        },
+        () => {}
+    );
 
     generateKeyPair(
         "rsa",
