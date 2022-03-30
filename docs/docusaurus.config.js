@@ -109,7 +109,7 @@ module.exports = {
         alt: "Authdog",
         src: "img/brand/dark.svg"
       },
-      copyright: `Copyright © ${new Date().getFullYear()} Authdog, Inc.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Authdog`,
     },
     prism: {
       theme: lightCodeTheme,

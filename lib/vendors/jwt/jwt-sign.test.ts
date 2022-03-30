@@ -130,12 +130,101 @@ it("it converts string to uint8 and vice versa", async () => {
 
 it("sign with jose", async () => {
     const token = await signWithJose();
-    console.log(token);
     expect(token).toBeTruthy();
 });
 
-it("generate promisified key pair", async () => {
-    const keyPair = await getKeyPair();
+it("generate promisified key pair - rsa", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa256",
+        keySize: 4096
+    });
+    expect(keyPair?.publicKey).toBeTruthy();
+    expect(keyPair?.privateKey).toBeTruthy();
+
+    const keyPairRsa384 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa384",
+        keySize: 4096
+    });
+
+    expect(keyPairRsa384?.publicKey).toBeTruthy();
+    expect(keyPairRsa384?.privateKey).toBeTruthy();
+
+    const keyPairRsa512 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa512",
+        keySize: 4096
+    });
+
+    expect(keyPairRsa512?.publicKey).toBeTruthy();
+    expect(keyPairRsa512?.privateKey).toBeTruthy();
+});
+
+it("generate promisified key pair - ec", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "es256",
+        keySize: 4096
+    });
+    expect(keyPair?.publicKey).toBeTruthy();
+    expect(keyPair?.privateKey).toBeTruthy();
+
+    const keyPairEs384 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "es384",
+        keySize: 4096
+    });
+
+    expect(keyPairEs384?.publicKey).toBeTruthy();
+    expect(keyPairEs384?.privateKey).toBeTruthy();
+
+    const keyPairEs512 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "es512",
+        keySize: 4096
+    });
+
+    expect(keyPairEs512?.publicKey).toBeTruthy();
+    expect(keyPairEs512?.privateKey).toBeTruthy();
+});
+
+it("generate key pair - ed25519", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "ed25519",
+        keySize: 4096
+    });
+    expect(keyPair?.publicKey).toBeTruthy();
+    expect(keyPair?.privateKey).toBeTruthy();
+});
+
+it("generate key pair - ed448", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "ed448",
+        keySize: 4096
+    });
+    expect(keyPair?.publicKey).toBeTruthy();
+    expect(keyPair?.privateKey).toBeTruthy();
+});
+
+it("generate key pair - x25519", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "x25519",
+        keySize: 4096
+    });
+    expect(keyPair?.publicKey).toBeTruthy();
+    expect(keyPair?.privateKey).toBeTruthy();
+});
+
+it("generate key pair - x448", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "x448",
+        keySize: 4096
+    });
     expect(keyPair?.publicKey).toBeTruthy();
     expect(keyPair?.privateKey).toBeTruthy();
 });

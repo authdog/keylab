@@ -7,6 +7,9 @@ import {
     // generateSecret,
     //FlattenedSign,
     importJWK,
+    importPKCS8,
+    // importPKCS8,
+    // importSPKI,
     SignJWT
 } from "jose";
 
@@ -50,26 +53,135 @@ export const str2ToUint8Array = (str: string) => {
 export const uint8Array2str = (buf: Uint8Array) =>
     String.fromCharCode.apply(null, buf);
 
+// keys
+type AlgorithmIdentifier =
+    | "rsa256"
+    | "rsa384"
+    | "rsa512"
+    | "es256"
+    | "es384"
+    | "es512"
+    | "p256"
+    | "p384"
+    | "p521"
+    // | "secp256k1"
+    // | "rsassa-pss-sha256"
+    // | "rsassa-pss-sha384"
+    // | "rsassa-pss-sha512"
+    // | "rsassa-pss-sha256-mgf1"
+    // | "rsassa-pss-sha384-mgf1"
+    // | "rsassa-pss-sha512-mgf1"
+    // | "ecdsa-sha256"
+    // | "ecdsa-sha384"
+    // | "ecdsa-sha512"
+    // | "ecdsa-secp256k1"
+    // | "ecdsa-secp256k1-sha256"
+    // | "ecdsa-secp256k1-sha384"
+    // | "ecdsa-secp256k1-sha512"
+    // | "ecdsa-secp256k1-sha256-mgf1"
+    // | "ecdsa-secp256k1-sha384-mgf1"
+    // | "ecdsa-secp256k1-sha512-mgf1"
+    // | "aes128-cbc"
+    // | "aes192-cbc"
+    // | "aes256-cbc"
+    // | "aes128-ctr"
+    // | "aes192-ctr"
+
+    | "rsa-pss"
+    | "ecdsa"
+    | "ecdsa-pss"
+    | "ed25519"
+    | "ed448"
+    | "x25519"
+    | "x448";
+
+const algorithmsDict = [
+    {
+        algType: "rsa",
+        algIds: ["rsa256", "rsa384", "rsa512", "rsa-pss"]
+    },
+    {
+        algType: "ec",
+        algIds: ["es256", "es384", "es512", "ecdsa", "ecdsa-pss"]
+    },
+    {
+        algType: "ed25519",
+        algIds: ["ed25519"]
+    },
+    {
+        algType: "ed448",
+        algIds: ["ed448"]
+    },
+    {
+        algType: "x25519",
+        algIds: ["x25519"]
+    },
+    {
+        algType: "x448",
+        algIds: ["x448"]
+    }
+];
+
+export interface IGetKeyPair {
+    algorithmIdentifier: AlgorithmIdentifier;
+    keySize: number;
+    keyFormat: "pem";
+    passphrase?: string;
+}
+
 export interface IKeyPair {
     publicKey: string;
     privateKey: string;
 }
 
-export const getKeyPair = async (): Promise<IKeyPair> => {
-    return new Promise((resolve, reject) => {
+const publicKeyEncodingPem = {
+    type: "spki",
+    format: "pem"
+};
+
+// const publicKeyEncodingJwk = {
+//     type: "jwk",
+//     format: "pem"
+// }
+
+
+const privateKeyEncodingPem = {
+    type: "pkcs8",
+    format: "pem"
+};
+
+const namedCurves = {
+    es256: "P-256",
+    es384: "P-384",
+    es512: "P-521"
+}
+
+export const getKeyPair = async ({
+    algorithmIdentifier,
+    keySize,
+    passphrase
+}: IGetKeyPair): Promise<IKeyPair> => {
+    return new Promise((resolve: Function, reject: Function) => {
+        let alg: any;
+
+        algorithmsDict.map((el) => {
+            if (el.algIds.includes(algorithmIdentifier)) {
+                alg = el.algType;
+            }
+        });
+
         generateKeyPair(
-            "rsa",
+            alg,
             {
-                modulusLength: 4096,
+                namedCurve: alg === "ec" ? namedCurves?.[algorithmIdentifier]: undefined,
+                modulusLength: keySize,
                 publicKeyEncoding: {
-                    type: "spki",
-                    format: "pem"
+                    ...publicKeyEncodingPem
                 },
                 privateKeyEncoding: {
-                    type: "pkcs8",
-                    format: "pem",
+                    ...privateKeyEncodingPem,
                     cipher: "aes-256-cbc",
-                    passphrase: randomBytes(20).toString("hex")
+                    passphrase: passphrase || randomBytes(20).toString("hex")
                 }
             },
             (err, publicKey, privateKey) => {
@@ -81,234 +193,37 @@ export const getKeyPair = async (): Promise<IKeyPair> => {
 };
 
 export const signWithJose = async () => {
-    // generate key pair RSA512
-    await generateKeyPair(
-        "rsa",
-        {
-            modulusLength: 2048,
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
 
-    // generate key pair ES256K
-    // await generateKeyPair(
-    //     "ec",
-    //     {
-    //         namedCurve: "P-256K",
-    //         publicKeyEncoding: {
-    //             type: "spki",
-    //             format: "pem"
-    //         },
-    //         privateKeyEncoding: {
-    //             type: "pkcs8",
-    //             format: "pem"
-    //         }
-    //     },
-    //     () => {}
-    // );
+    // generate key pair jwk
 
-    // generate key pair ES256
-    await generateKeyPair(
-        "ec",
-        {
-            namedCurve: "P-256",
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
 
-    // generate key pair ES384
-    await generateKeyPair(
-        "ec",
-        {
-            namedCurve: "P-384",
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
+    // const keyPair = await getKeyPair({
+    //     keyFormat: "pem",
+    //     algorithmIdentifier: "es512",
+    //     keySize: 4096
+    // });
 
-    // generate key pair ES512
-    await generateKeyPair(
-        "ec",
-        {
-            namedCurve: "P-521",
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
 
-    // generate key pair RSA256
-    await generateKeyPair(
-        "rsa",
-        {
-            modulusLength: 2048,
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
+    // const importedPublic = await importSPKI(keyPair?.publicKey, "es512");
+    // console.log(importedPublic)
 
-    // generate key pair RSA384
-    await generateKeyPair(
-        "rsa",
-        {
-            modulusLength: 2048,
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
+    // console.log(keyPair?.privateKey)
 
-    // generate key pair RSA512
-    await generateKeyPair(
-        "rsa",
-        {
-            modulusLength: 2048,
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
+    // TODO: use not encrypted private key
+    const importedPrivate = await importPKCS8(`-----BEGIN ENCRYPTED PRIVATE KEY-----
+    MIIBrzBJBgkqhkiG9w0BBQ0wPDAbBgkqhkiG9w0BBQwwDgQImQO8S8BJYNACAggA
+    MB0GCWCGSAFlAwQBKgQQ398SY1Y6moXTJCO0PSahKgSCAWDeobyqIkAb9XmxjMmi
+    hABtlIJBsybBymdIrtPjtRBTmz+ga40KFNfKgTrtHO/3qf0wSHpWmKlQotRh6Ufk
+    0VBh4QjbcNFQLzqJqblW4E3v853PK1G4OpQNpFLDLaPZLIyzxWOom9c9GXNm+ddG
+    LbdeQRsPoolIdL61lYB505K/SXJCpemb1RCHO/dzsp/kRyLMQNsWiaJABkSyskcr
+    eDJBZWOGQ/WJKl1CMHC8XgjqvmpXXas47G5sMSgFs+NUqVSkMSrsWMa+XkH/oT/x
+    P8ze1v0RDu0AIqaxdZhZ389h09BKFvCAFnLKK0tadIRkZHtNahVWnFUks5EP3C1k
+    2cQQtWBkaZnRrEkB3H0/ty++WB0owHe7Pd9GKSnTMIo8gmQzT2dfZP3+flUFHTBs
+    RZ9L8UWp2zt5hNDtc82hyNs70SETaSsaiygYNbBGlVAWVR9Mp8SMNYr1kdeGRgc3
+    7r5E
+    -----END ENCRYPTED PRIVATE KEY-----`, "es512");
+    console.log(importedPrivate)
 
-    // generate key pair Ed25519
-    await generateKeyPair(
-        "ed25519",
-        {
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
-
-    // generate key pair Ed448
-    await generateKeyPair(
-        "ed448",
-        {
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
-
-    // generate key pair X25519
-    await generateKeyPair(
-        "x25519",
-        {
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
-
-    // generate key pair X448
-    await generateKeyPair(
-        "x448",
-        {
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {}
-    );
-
-    await generateKeyPair(
-        "rsa",
-        {
-            modulusLength: 1024,
-            publicKeyEncoding: {
-                type: "spki",
-                format: "pem"
-            },
-            privateKeyEncoding: {
-                type: "pkcs8",
-                format: "pem"
-            }
-        },
-        () => {
-            // sign String
-            // console.log(publicKey);
-            // var signerObject = createSign("RSA-SHA256");
-            // signerObject.update(str);
-            // var signature = signerObject.sign({key:privateKey,padding:crypto.constants.RSA_PKCS1_PSS_PADDING}, "base64");
-            // console.info("signature: %s", signature);
-            // //verify String
-            // var verifierObject = crypto.createVerify("RSA-SHA256");
-            // verifierObject.update(str);
-            // var verified = verifierObject.verify({key:publicKey, padding:crypto.constants.RSA_PKCS1_PSS_PADDING}, signature, "base64");
-            // console.info("is signature ok?: %s", verified);
-        }
-    );
 
     const pKey = {
         crv: "P-256",

@@ -1,14 +1,14 @@
 import { UnauthorizedError } from "../../errors/unauthorized";
 import * as c from "../../constants";
 
-export const extractBearerTokenFromHeaders = (headers: any) => {
+export const extractBearerTokenFromHeaders = (headers: any, keyAuthorization: string = "Authorization") => {
     let token;
     let fieldCredentials = "";
 
-    if (headers?.authorization) {
-        fieldCredentials = c.ALLOWED_AUTHORIZATION_HEADER_LOWERCASED;
-    } else if (headers?.Authorization) {
-        fieldCredentials = c.ALLOWED_AUTHORIZATION_HEADER_CAPITALIZED;
+    if (headers?.[keyAuthorization.toLowerCase()]) {
+        fieldCredentials = keyAuthorization.toLowerCase();
+    } else if (headers?.[keyAuthorization]) {
+        fieldCredentials = keyAuthorization;
     } else {
         throw new UnauthorizedError(c.HEADERS_CREDENTIALS_BAD_SCHEME, {
             message: c.HEADERS_CREDENTIALS_FORMAT

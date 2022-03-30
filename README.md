@@ -73,6 +73,10 @@ If you have found a bug or if you have a feature request, please report them at 
 
 [Authdog](https://www.authdog.com)
 
+## References
+
+- https://w3c.github.io/webcrypto/
+
 
 ## License
 

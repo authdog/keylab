@@ -9,6 +9,14 @@ it("extracts properly Bearer token from req", () => {
     ).toEqual("eyJ0eXAiOiJK");
 });
 
+it("extracts properly Bearer token from req with custom header name", () => {
+    expect(
+        extractBearerTokenFromHeaders({
+            "x-authorization-zzz": "Bearer eyJ0eXAiOiJK"
+        }, "x-authorization-zzz")
+    ).toEqual("eyJ0eXAiOiJK");
+});
+
 it("throws an exception is credentials scheme is incorrect", () => {
     expect(() => {
         extractBearerTokenFromHeaders({
