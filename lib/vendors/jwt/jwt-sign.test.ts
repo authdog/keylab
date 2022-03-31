@@ -16,6 +16,12 @@ import * as enums from "../../enums";
 import { parseJwt, signJwtWithPrivateKey } from ".";
 import { JwtAlgorithmsEnum } from "../../enums";
 
+// import {generateSecret, jwtVerify} from 'jose'
+
+// import {convertPemToJwk} from './jwt-sign'
+
+
+
 it("jwt signin with secret", async () => {
     const token = await signJwtWithSecret(
         { sub: "12345", aud: [c.AUTHDOG_ID_ISSUER] },
@@ -119,75 +125,75 @@ it("generate promisified key pair - ec", async () => {
     expect(keyPairEs512?.privateKey).toBeTruthy();
 });
 
-it("generate key pair - ps", async () => {
-    const keyPair = await getKeyPair({
-        keyFormat: "pem",
-        algorithmIdentifier: "ps256",
-        keySize: 4096
-    });
+// it("generate key pair - ps", async () => {
+//     const keyPair = await getKeyPair({
+//         keyFormat: "pem",
+//         algorithmIdentifier: "ps256",
+//         keySize: 4096
+//     });
 
-    expect(keyPair?.publicKey).toBeTruthy();
-    expect(keyPair?.privateKey).toBeTruthy();
+//     expect(keyPair?.publicKey).toBeTruthy();
+//     expect(keyPair?.privateKey).toBeTruthy();
 
-    const keyPairPs384 = await getKeyPair({
-        keyFormat: "pem",
-        algorithmIdentifier: "ps384",
-        keySize: 4096
-    });
+//     const keyPairPs384 = await getKeyPair({
+//         keyFormat: "pem",
+//         algorithmIdentifier: "ps384",
+//         keySize: 4096
+//     });
 
-    expect(keyPairPs384?.publicKey).toBeTruthy();
-    expect(keyPairPs384?.privateKey).toBeTruthy();
+//     expect(keyPairPs384?.publicKey).toBeTruthy();
+//     expect(keyPairPs384?.privateKey).toBeTruthy();
 
-    const keyPairPs512 = await getKeyPair({
-        keyFormat: "pem",
-        algorithmIdentifier: "ps521",
-        keySize: 4096
-    });
+//     const keyPairPs512 = await getKeyPair({
+//         keyFormat: "pem",
+//         algorithmIdentifier: "ps521",
+//         keySize: 4096
+//     });
 
-    expect(keyPairPs512?.publicKey).toBeTruthy();
-    expect(keyPairPs512?.privateKey).toBeTruthy();
-});
+//     expect(keyPairPs512?.publicKey).toBeTruthy();
+//     expect(keyPairPs512?.privateKey).toBeTruthy();
+// });
 
-it("generate key pair - ed25519", async () => {
-    const keyPair = await getKeyPair({
-        keyFormat: "pem",
-        algorithmIdentifier: "ed25519",
-        keySize: 4096
-    });
-    expect(keyPair?.publicKey).toBeTruthy();
-    expect(keyPair?.privateKey).toBeTruthy();
-});
+// it("generate key pair - EdDSA", async () => {
+//     const keyPair = await getKeyPair({
+//         keyFormat: "pem",
+//         algorithmIdentifier: "eddsa",
+//         keySize: 4096
+//     });
+//     expect(keyPair?.publicKey).toBeTruthy();
+//     expect(keyPair?.privateKey).toBeTruthy();
+// });
 
-it("generate key pair - ed448", async () => {
-    const keyPair = await getKeyPair({
-        keyFormat: "pem",
-        algorithmIdentifier: "ed448",
-        keySize: 4096
-    });
-    expect(keyPair?.publicKey).toBeTruthy();
-    expect(keyPair?.privateKey).toBeTruthy();
-});
+// it("generate key pair - ed448", async () => {
+//     const keyPair = await getKeyPair({
+//         keyFormat: "pem",
+//         algorithmIdentifier: "ed448",
+//         keySize: 4096
+//     });
+//     expect(keyPair?.publicKey).toBeTruthy();
+//     expect(keyPair?.privateKey).toBeTruthy();
+// });
 
-it("generate key pair - x25519", async () => {
-    const keyPair = await getKeyPair({
-        keyFormat: "pem",
-        algorithmIdentifier: "x25519",
-        keySize: 4096
-    });
-    expect(keyPair?.publicKey).toBeTruthy();
-    expect(keyPair?.privateKey).toBeTruthy();
-});
+// it("generate key pair - x25519", async () => {
+//     const keyPair = await getKeyPair({
+//         keyFormat: "pem",
+//         algorithmIdentifier: "x25519",
+//         keySize: 4096
+//     });
+//     expect(keyPair?.publicKey).toBeTruthy();
+//     expect(keyPair?.privateKey).toBeTruthy();
+// });
 
-it("generate key pair - x448", async () => {
-    const keyPair = await getKeyPair({
-        keyFormat: "pem",
-        algorithmIdentifier: "x448",
-        keySize: 4096
-    });
+// it("generate key pair - x448", async () => {
+//     const keyPair = await getKeyPair({
+//         keyFormat: "pem",
+//         algorithmIdentifier: "x448",
+//         keySize: 4096
+//     });
 
-    expect(keyPair?.publicKey).toBeTruthy();
-    expect(keyPair?.privateKey).toBeTruthy();
-});
+//     expect(keyPair?.publicKey).toBeTruthy();
+//     expect(keyPair?.privateKey).toBeTruthy();
+// });
 
 it("signs payload with pkcs8 private key", async () => {
     // RS256
@@ -303,7 +309,7 @@ it("signs payload with pkcs8 private key", async () => {
     // });
 });
 
-it("signs payload with pkcs8 private key - PS*", async () => {
+it("signs payload with pkcs8 private key - RSA-PSS", async () => {
     // PS256
     const keyPairPS256 = await getKeyPair({
         keyFormat: "pem",
@@ -363,3 +369,27 @@ it("signs payload with pkcs8 private key - PS*", async () => {
 
     // expect(signedPayloadX25519).toBeTruthy();
 });
+
+
+
+it("convert PEM to jwk", async () => {
+ 
+    // const secret = await generateSecret('HS256');
+
+    // const keyPairPS256 = await getKeyPair({
+    //     keyFormat: "pem",
+    //     algorithmIdentifier: "rsa-pss",
+    //     keySize: 4096
+    // });
+
+    // const jwk = pem2jwk(keyPairPS256.privateKey);
+
+    // expect(jwk).toBeTruthy();
+
+    // const privateKeyPem = await convertPemToJwk(keyPairPS256?.privateKey, "private");
+
+
+    // console.log(privateKeyPem)
+
+    
+})

@@ -9,12 +9,12 @@ type AlgorithmIdentifier =
     | "ps384"
     | "ps521"
     | "rsa-pss"
-    | "ecdsa"
-    | "ecdsa-pss"
-    | "ed25519"
-    | "ed448"
-    | "x25519"
-    | "x448";
+    | "eddsa"
+    // | "ecdsa-pss"
+    // | "ed25519"
+    // | "ed448"
+    // | "x25519"
+    // | "x448";
 
 export interface IDecodedJwt {
     iss?: string;
@@ -29,7 +29,7 @@ export interface IGetKeyPair {
     algorithmIdentifier: AlgorithmIdentifier;
     keySize: number;
     keyFormat: "pem";
-    passphrase?: string;
+    // passphrase?: string;
 }
 
 export interface IKeyPair {

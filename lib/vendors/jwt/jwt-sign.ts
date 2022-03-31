@@ -1,9 +1,8 @@
 import * as enums from "../../enums";
-
 import { importPKCS8, SignJWT } from "jose";
-
 import { generateKeyPair } from "crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
+
 
 export const signJwtWithSecret = async (payload: any, secret: string) => {
     return await new SignJWT({ ...payload })
@@ -44,33 +43,30 @@ const algorithmsDict = [
             "es256",
             "es384",
             "es512",
-            "ecdsa",
-            "ecdsa-pss",
-            "ps256",
-            "ps384",
-            "ps521"
+            "eddsa"
         ]
     },
+    {
+        algType: "oct",
+        algIds: ["H256", "H384", "H512"]
+    },
+    {
+        algType: "okp",
+        algIds: ["EdDSA"]
+    },
+    // TODO: handle these algorithms
     // {
-    //     algType: "ed",
-    //     algIds: ["ed25519", "ed448", "x25519", "x448"]
+    //     algType: "ed448",
+    //     algIds: ["ed448"]
     // },
-    {
-        algType: "ed25519",
-        algIds: ["ed25519"]
-    },
-    {
-        algType: "ed448",
-        algIds: ["ed448"]
-    },
-    {
-        algType: "x25519",
-        algIds: ["x25519"]
-    },
-    {
-        algType: "x448",
-        algIds: ["x448"]
-    }
+    // {
+    //     algType: "x25519",
+    //     algIds: ["x25519"]
+    // },
+    // {
+    //     algType: "x448",
+    //     algIds: ["x448"]
+    // }
 ];
 
 const publicKeyEncodingPem = {
@@ -87,9 +83,7 @@ const namedCurves = {
     es256: "P-256",
     es384: "P-384",
     es512: "P-521",
-    ps256: "P-256",
-    ps384: "P-384",
-    ps521: "P-521"
+    eddsa: "Ed25519"
 };
 
 export const getKeyPair = async ({
@@ -97,20 +91,22 @@ export const getKeyPair = async ({
     keySize
 }: IGetKeyPair): Promise<IKeyPair> => {
     return new Promise((resolve: Function, reject: Function) => {
-        let alg: any;
+        let algType: any;
 
         algorithmsDict.map((el) => {
-            if (el.algIds.includes(algorithmIdentifier)) {
-                alg = el.algType;
+            if (el.algIds.includes(algorithmIdentifier.toLowerCase())) {
+                algType = el.algType;
             }
         });
 
+        const useCurve = algType === "ec"
+
         generateKeyPair(
-            alg,
+            algType,
             {
                 namedCurve:
-                    alg === "ec"
-                        ? namedCurves?.[algorithmIdentifier]
+                useCurve
+                        ? namedCurves?.[algorithmIdentifier.toLowerCase()]
                         : undefined,
                 modulusLength: keySize,
                 publicKeyEncoding: {

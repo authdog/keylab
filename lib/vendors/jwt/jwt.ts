@@ -167,15 +167,20 @@ export const checkTokenValidness = async (
                 );
             }
 
+        // wip    
         case algEnums.ES256 ||
             algEnums.ES384 ||
             algEnums.ES512 ||
             algEnums.PS256 ||
             algEnums.PS384 ||
-            algEnums.PS512 ||
+            algEnums.PS512:
+            throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
+
+        
+        case
             algEnums.ES256K ||
             algEnums.EdDSA:
-            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
+            throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
 
         default:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
