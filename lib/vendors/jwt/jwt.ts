@@ -11,9 +11,11 @@ import { IDecodedJwt } from "./interfaces";
 import { IRSAKeyStore } from "../jwks/jwks";
 
 export interface IcheckTokenValidnessCredentials {
-    // HS256
+    // can be verified with a private key
+    // HS256 | HS384 | HS512
     secret?: string;
-    // RS256
+    // can be verified with assymetric keys
+    // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA
     domainUri?: string;
     jwksUri?: string;
     verifySsl?: boolean;
@@ -167,19 +169,17 @@ export const checkTokenValidness = async (
                 );
             }
 
-        // wip    
+        // wip
         case algEnums.ES256 ||
             algEnums.ES384 ||
             algEnums.ES512 ||
             algEnums.PS256 ||
             algEnums.PS384 ||
+            algEnums.EdDSA ||
             algEnums.PS512:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
 
-        
-        case
-            algEnums.ES256K ||
-            algEnums.EdDSA:
+        case algEnums.ES256K:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
 
         default:
@@ -319,14 +319,11 @@ export const createSignedJwt = async (
     };
 
     switch (algorithm) {
-        case algEnums.HS256:
-            token = signJwtWithSecret(jwtClaims, signinOptions?.secret);
+        case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
+            token = signJwtWithSecret(jwtClaims, algorithm, signinOptions?.secret);
             break;
 
-        // to be tested
-        case algEnums.HS384 || algEnums.HS512:
-            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
-
+        // TODO: use PEM in signin options
         // case algEnums.RS256 ||
         //     algEnums.RS384 ||
         //     algEnums.RS512 ||

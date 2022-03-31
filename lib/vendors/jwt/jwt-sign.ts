@@ -1,12 +1,11 @@
-import * as enums from "../../enums";
+import {JwtAlgorithmsEnum as Algs, JwtKeyTypes} from "../../enums";
 import { importPKCS8, SignJWT } from "jose";
 import { generateKeyPair } from "crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 
-
-export const signJwtWithSecret = async (payload: any, secret: string) => {
+export const signJwtWithSecret = async (payload: any, alg: Algs.HS256 | Algs.HS384 | Algs.HS512, secret: string) => {
     return await new SignJWT({ ...payload })
-        .setProtectedHeader({ alg: enums.JwtAlgorithmsEnum.HS256 })
+        .setProtectedHeader({ alg })
         .sign(str2ToUint8Array(secret));
 };
 
@@ -17,7 +16,7 @@ export const signJwtWithPrivateKey = async (
 ) => {
     const privateKeyObj = await importPKCS8(privateKey, algorithm);
     return await new SignJWT({ ...payload })
-        .setProtectedHeader({ alg: algorithm })
+        .setProtectedHeader({ alg: algorithm, type: JwtKeyTypes?.JWT })
         .sign(privateKeyObj);
 };
 
@@ -34,26 +33,21 @@ export const uint8Array2str = (buf: Uint8Array) =>
 
 const algorithmsDict = [
     {
-        algType: "rsa",
-        algIds: ["rsa256", "rsa384", "rsa512", "rsa-pss"]
+        algType: JwtKeyTypes.RSA,
+        algIds: Object.values([Algs?.RS256, Algs?.RS384, Algs?.RS512, Algs?.RSAPSS])
     },
     {
-        algType: "ec",
-        algIds: [
-            "es256",
-            "es384",
-            "es512",
-            "eddsa"
-        ]
+        algType: JwtKeyTypes.EC,
+        algIds: Object.values([Algs?.ES256, Algs?.ES384, Algs?.ES512, Algs?.EdDSA])
     },
     {
-        algType: "oct",
-        algIds: ["H256", "H384", "H512"]
+        algType: JwtKeyTypes.OCTET,
+        algIds: Object.values([Algs?.HS256, Algs?.HS384, Algs?.HS512])
     },
     {
-        algType: "okp",
-        algIds: ["EdDSA"]
-    },
+        algType: JwtKeyTypes.OKP,
+        algIds: Object.values([Algs?.EdDSA])
+    }
     // TODO: handle these algorithms
     // {
     //     algType: "ed448",
@@ -83,7 +77,7 @@ const namedCurves = {
     es256: "P-256",
     es384: "P-384",
     es512: "P-521",
-    eddsa: "Ed25519"
+    eddsa: "ED25519"
 };
 
 export const getKeyPair = async ({
@@ -94,20 +88,19 @@ export const getKeyPair = async ({
         let algType: any;
 
         algorithmsDict.map((el) => {
-            if (el.algIds.includes(algorithmIdentifier.toLowerCase())) {
+            if (el.algIds.includes(algorithmIdentifier)) {
                 algType = el.algType;
             }
         });
 
-        const useCurve = algType === "ec"
+        const useCurve = algType === JwtKeyTypes.EC;
 
         generateKeyPair(
             algType,
             {
-                namedCurve:
-                useCurve
-                        ? namedCurves?.[algorithmIdentifier.toLowerCase()]
-                        : undefined,
+                namedCurve: useCurve
+                    ? namedCurves?.[algorithmIdentifier.toLowerCase()]
+                    : undefined,
                 modulusLength: keySize,
                 publicKeyEncoding: {
                     ...publicKeyEncodingPem
