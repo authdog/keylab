@@ -1,16 +1,19 @@
 import {
     signJwtWithSecret,
-    signJwtWithJwk,
+    // signJwtWithJwk,
     uint8Array2str,
     str2ToUint8Array,
-    signWithJose,
+    // signWithJose,
     getKeyPair
 } from "./jwt-sign";
-import { createSignedJwt, readTokenHeaders } from "./jwt";
-import { createKeyStore, generateKeyFromStore } from "../jwks";
+import {
+    //createSignedJwt,
+    readTokenHeaders
+} from "./jwt";
+// import { createKeyStore, generateKeyFromStore } from "../jwks";
 import * as c from "../../constants";
 import * as enums from "../../enums";
-import { parseJwt } from ".";
+import { parseJwt, signJwtWithPrivateKey } from ".";
 import { JwtAlgorithmsEnum } from "../../enums";
 
 it("jwt signin with secret", async () => {
@@ -23,101 +26,33 @@ it("jwt signin with secret", async () => {
     expect(alg).toEqual(enums.JwtAlgorithmsEnum.HS256);
 });
 
-it("jwt signin with jwk", async () => {
-    const universalPayload = { sub: "12345", aud: [c.AUTHDOG_ID_ISSUER] };
-    const store = createKeyStore();
-
-    // test RS256
-    const jwk = await generateKeyFromStore(
-        store,
-        enums.JwtKeyTypes.RSA,
-        enums.JwtAlgorithmsEnum.RS256,
-        true
-    );
-
-    const token = await signJwtWithJwk(universalPayload, jwk);
-    const { ["alg"]: alg1 } = readTokenHeaders(token);
-    expect(alg1).toEqual(enums.JwtAlgorithmsEnum.RS256);
-
-    const { ["sub"]: sub1 } = parseJwt(token);
-    expect(sub1).toEqual(universalPayload.sub);
-
-    // test PS512
-    const jwk2 = await generateKeyFromStore(
-        store,
-        enums.JwtKeyTypes.RSA,
-        enums.JwtAlgorithmsEnum.PS512,
-        true
-    );
-
-    const token2 = await signJwtWithJwk(universalPayload, jwk2);
-    const { ["alg"]: alg2 } = readTokenHeaders(token2);
-    expect(alg2).toEqual(enums.JwtAlgorithmsEnum.PS512);
-
-    // test PS384
-    const jwk3 = await generateKeyFromStore(
-        store,
-        enums.JwtKeyTypes.RSA,
-        enums.JwtAlgorithmsEnum.PS384,
-        true
-    );
-
-    const token3 = await signJwtWithJwk(universalPayload, jwk3);
-    const { ["alg"]: alg3 } = readTokenHeaders(token3);
-    expect(alg3).toEqual(enums.JwtAlgorithmsEnum.PS384);
-
-    // test RS512
-    const jwk4 = await generateKeyFromStore(
-        store,
-        enums.JwtKeyTypes.RSA,
-        enums.JwtAlgorithmsEnum.RS512,
-        true
-    );
-
-    const token4 = await signJwtWithJwk(universalPayload, jwk4);
-    const { ["alg"]: alg4 } = readTokenHeaders(token4);
-    expect(alg4).toEqual(enums.JwtAlgorithmsEnum.RS512);
-});
-
 it("jwt created has all fields required from payload", async () => {
-    const store = createKeyStore();
+    // RS256
+    const keyPairRS256 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa256",
+        keySize: 4096
+    });
 
-    // test RS256
-    const jwk = await generateKeyFromStore(
-        store,
-        enums.JwtKeyTypes.RSA,
-        enums.JwtAlgorithmsEnum.RS256,
-        true
-    );
-
-    const token = await createSignedJwt(
+    const signedPayloadRs256 = await signJwtWithPrivateKey(
         {
-            adid: "12345"
+            aid: "12345",
+            sub: "sub:12345",
+            iss: "issuer:12345",
+            aud: ["aud:12345"],
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
+                " "
+            )
         },
-        {
-            algorithm: JwtAlgorithmsEnum.RS256,
-            claims: {
-                aid: "12345",
-                sub: "sub:12345",
-                iss: "issuer:12345",
-                aud: ["aud:12345"],
-                scp: [
-                    ["a", "b:c", "d"].map((el: any) => el.permission?.name)
-                ].join(" ")
-            },
-            signinOptions: {
-                jwk,
-                sessionDuration: 8 * 60
-            }
-        }
+        JwtAlgorithmsEnum.RS256,
+        keyPairRS256.privateKey
     );
 
-    const { iss, aud, sub, adid, aid } = parseJwt(token);
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs256);
 
     expect(iss).toEqual("issuer:12345");
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
-    expect(adid).toEqual("12345");
     expect(aid).toEqual("12345");
 });
 
@@ -126,11 +61,6 @@ it("it converts string to uint8 and vice versa", async () => {
     const buffer: Uint8Array = str2ToUint8Array(superSecret);
     const debufferedString: string = uint8Array2str(buffer);
     expect(debufferedString).toEqual(superSecret);
-});
-
-it("sign with jose", async () => {
-    const token = await signWithJose();
-    expect(token).toBeTruthy();
 });
 
 it("generate promisified key pair - rsa", async () => {
@@ -189,6 +119,35 @@ it("generate promisified key pair - ec", async () => {
     expect(keyPairEs512?.privateKey).toBeTruthy();
 });
 
+it("generate key pair - ps", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "ps256",
+        keySize: 4096
+    });
+
+    expect(keyPair?.publicKey).toBeTruthy();
+    expect(keyPair?.privateKey).toBeTruthy();
+
+    const keyPairPs384 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "ps384",
+        keySize: 4096
+    });
+
+    expect(keyPairPs384?.publicKey).toBeTruthy();
+    expect(keyPairPs384?.privateKey).toBeTruthy();
+
+    const keyPairPs512 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "ps521",
+        keySize: 4096
+    });
+
+    expect(keyPairPs512?.publicKey).toBeTruthy();
+    expect(keyPairPs512?.privateKey).toBeTruthy();
+});
+
 it("generate key pair - ed25519", async () => {
     const keyPair = await getKeyPair({
         keyFormat: "pem",
@@ -225,6 +184,182 @@ it("generate key pair - x448", async () => {
         algorithmIdentifier: "x448",
         keySize: 4096
     });
+
     expect(keyPair?.publicKey).toBeTruthy();
     expect(keyPair?.privateKey).toBeTruthy();
+});
+
+it("signs payload with pkcs8 private key", async () => {
+    // RS256
+    const keyPairRS256 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa256",
+        keySize: 4096
+    });
+
+    const signedPayloadRs256 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "RS256",
+        keyPairRS256.privateKey
+    );
+
+    expect(signedPayloadRs256).toBeTruthy();
+
+    // RS384
+    const keyPairRS384 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa384",
+        keySize: 4096
+    });
+
+    const signedPayloadRs384 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "RS384",
+        keyPairRS384.privateKey
+    );
+
+    expect(signedPayloadRs384).toBeTruthy();
+
+    // RS512
+    const keyPairRS512 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa512",
+        keySize: 4096
+    });
+
+    const signedPayloadRs512 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "RS512",
+        keyPairRS512.privateKey
+    );
+
+    expect(signedPayloadRs512).toBeTruthy();
+
+    // ES256
+    const keyPairES256 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "es256",
+        keySize: 4096
+    });
+
+    const signedPayloadEs256 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "ES256",
+        keyPairES256.privateKey
+    );
+
+    expect(signedPayloadEs256).toBeTruthy();
+
+    // ES384
+    const keyPairES384 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "es384",
+        keySize: 4096
+    });
+
+    const signedPayloadEs384 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "ES384",
+        keyPairES384.privateKey
+    );
+
+    expect(signedPayloadEs384).toBeTruthy();
+
+    // ES512
+    const keyPairES512 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "es512",
+        keySize: 4096
+    });
+
+    const signedPayloadEs512 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "ES512",
+        keyPairES512.privateKey
+    );
+
+    expect(signedPayloadEs512).toBeTruthy();
+
+    // expect(signedPayloadP256).toBeTruthy();
+
+    // Ed25519
+    // const keyPairEd25519 = await getKeyPair({
+    //     keyFormat: "pem",
+    //     algorithmIdentifier: "ed25519",
+    //     keySize: 4096
+    // });
+
+    // const signedPayloadEd25519 = await signJwtWithPrivateKey({ urn: "urn:test:test" }, "ED25519", keyPairEd25519.privateKey);
+
+    // console.log(signedPayloadEd25519)
+
+    // expect(signedPayloadEd25519).toBeTruthy();
+
+    // PS256
+    // const keyPairPS256 = await getKeyPair({
+    //     keyFormat: "pem",
+    //     algorithmIdentifier: "ps256",
+    //     keySize: 4096
+    // });
+});
+
+it("signs payload with pkcs8 private key - PS*", async () => {
+    // PS256
+    const keyPairPS256 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa-pss",
+        keySize: 4096
+    });
+
+    const signedPayloadPs256 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "PS256",
+        keyPairPS256.privateKey
+    );
+
+    expect(signedPayloadPs256).toBeTruthy();
+
+    // PS384
+    const keyPairPS384 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa-pss",
+        keySize: 4096
+    });
+
+    const signedPayloadPs384 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "PS384",
+        keyPairPS384.privateKey
+    );
+
+    expect(signedPayloadPs384).toBeTruthy();
+
+    // PS512
+
+    const keyPairPS512 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: "rsa-pss",
+        keySize: 4096
+    });
+
+    const signedPayloadPs512 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        "PS512",
+        keyPairPS512.privateKey
+    );
+
+    expect(signedPayloadPs512).toBeTruthy();
+
+    // x25519: does not work
+    // const keyPairX25519 = await getKeyPair({
+    //     keyFormat: "pem",
+    //     algorithmIdentifier: "x25519",
+    //     keySize: 4096
+    // });
+
+    // const signedPayloadX25519 = await signJwtWithPrivateKey({ urn: "urn:test:test" }, "X25519", keyPairX25519.privateKey);
+
+    // const signedPayloadX25519 = await signJwtWithPrivateKey({ urn: "urn:test:test" }, "ECDH-ES", keyPairX25519.privateKey);
+
+    // expect(signedPayloadX25519).toBeTruthy();
 });

@@ -1,6 +1,6 @@
 {
-    "name": "@authdog/easyjwt",
-    "version": "0.1.30",
+    "name": "keylab",
+    "version": "0.1.0",
     "description": "easyjwt is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
     "scripts": {
         "test": "jest",

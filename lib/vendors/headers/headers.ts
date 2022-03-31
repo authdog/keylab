@@ -1,7 +1,10 @@
 import { UnauthorizedError } from "../../errors/unauthorized";
 import * as c from "../../constants";
 
-export const extractBearerTokenFromHeaders = (headers: any, keyAuthorization: string = "Authorization") => {
+export const extractBearerTokenFromHeaders = (
+    headers: any,
+    keyAuthorization: string = "Authorization"
+) => {
     let token;
     let fieldCredentials = "";
 

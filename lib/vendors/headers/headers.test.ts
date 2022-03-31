@@ -11,9 +11,12 @@ it("extracts properly Bearer token from req", () => {
 
 it("extracts properly Bearer token from req with custom header name", () => {
     expect(
-        extractBearerTokenFromHeaders({
-            "x-authorization-zzz": "Bearer eyJ0eXAiOiJK"
-        }, "x-authorization-zzz")
+        extractBearerTokenFromHeaders(
+            {
+                "x-authorization-zzz": "Bearer eyJ0eXAiOiJK"
+            },
+            "x-authorization-zzz"
+        )
     ).toEqual("eyJ0eXAiOiJK");
 });
 

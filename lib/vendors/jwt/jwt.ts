@@ -6,7 +6,7 @@ import * as c from "../../constants";
 import * as enums from "../../enums";
 import { throwJwtError } from "../../errors";
 import { verifyRSAToken } from "../jwks";
-import { signJwtWithSecret, signJwtWithJwk } from "./jwt-sign";
+import { signJwtWithSecret } from "./jwt-sign";
 import { IDecodedJwt } from "./interfaces";
 import { IRSAKeyStore } from "../jwks/jwks";
 
@@ -322,14 +322,14 @@ export const createSignedJwt = async (
         case algEnums.HS384 || algEnums.HS512:
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
 
-        case algEnums.RS256 ||
-            algEnums.RS384 ||
-            algEnums.RS512 ||
-            algEnums.PS256 ||
-            algEnums.PS384 ||
-            algEnums.PS512:
-            token = await signJwtWithJwk(jwtClaims, signinOptions.jwk);
-            break;
+        // case algEnums.RS256 ||
+        //     algEnums.RS384 ||
+        //     algEnums.RS512 ||
+        //     algEnums.PS256 ||
+        //     algEnums.PS384 ||
+        //     algEnums.PS512:
+        //     token = await signJwtWithJwk(jwtClaims, signinOptions.jwk);
+        //     break;
 
         // to be implemented
         case algEnums.ES256 ||
