@@ -50,27 +50,27 @@ const algorithmsDict = [
             "ps384",
             "ps521"
         ]
-    }
+    },
     // {
     //     algType: "ed",
     //     algIds: ["ed25519", "ed448", "x25519", "x448"]
     // },
-    // {
-    //     algType: "ed25519",
-    //     algIds: ["ed25519"]
-    // },
-    // {
-    //     algType: "ed448",
-    //     algIds: ["ed448"]
-    // },
-    // {
-    //     algType: "x25519",
-    //     algIds: ["x25519"]
-    // },
-    // {
-    //     algType: "x448",
-    //     algIds: ["x448"]
-    // }
+    {
+        algType: "ed25519",
+        algIds: ["ed25519"]
+    },
+    {
+        algType: "ed448",
+        algIds: ["ed448"]
+    },
+    {
+        algType: "x25519",
+        algIds: ["x25519"]
+    },
+    {
+        algType: "x448",
+        algIds: ["x448"]
+    }
 ];
 
 const publicKeyEncodingPem = {
