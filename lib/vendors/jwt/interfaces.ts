@@ -1,4 +1,4 @@
-import {JwtAlgorithmsEnum as Algs} from '../../enums'
+import { JwtAlgorithmsEnum as Algs } from "../../enums";
 
 type AlgorithmIdentifier =
     | Algs.RS256
@@ -11,8 +11,8 @@ type AlgorithmIdentifier =
     | Algs.PS384
     | Algs.PS512
     | Algs.EdDSA
-    | Algs.RSAPSS
-    // | Algs.ES256K
+    | Algs.RSAPSS;
+// | Algs.ES256K
 // | "ecdsa-pss"
 // | "ed25519"
 // | "ed448"

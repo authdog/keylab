@@ -1,9 +1,13 @@
-import {JwtAlgorithmsEnum as Algs, JwtKeyTypes} from "../../enums";
+import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
 import { importPKCS8, SignJWT } from "jose";
 import { generateKeyPair } from "crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 
-export const signJwtWithSecret = async (payload: any, alg: Algs.HS256 | Algs.HS384 | Algs.HS512, secret: string) => {
+export const signJwtWithSecret = async (
+    payload: any,
+    alg: Algs.HS256 | Algs.HS384 | Algs.HS512,
+    secret: string
+) => {
     return await new SignJWT({ ...payload })
         .setProtectedHeader({ alg })
         .sign(str2ToUint8Array(secret));
@@ -34,11 +38,21 @@ export const uint8Array2str = (buf: Uint8Array) =>
 const algorithmsDict = [
     {
         algType: JwtKeyTypes.RSA,
-        algIds: Object.values([Algs?.RS256, Algs?.RS384, Algs?.RS512, Algs?.RSAPSS])
+        algIds: Object.values([
+            Algs?.RS256,
+            Algs?.RS384,
+            Algs?.RS512,
+            Algs?.RSAPSS
+        ])
     },
     {
         algType: JwtKeyTypes.EC,
-        algIds: Object.values([Algs?.ES256, Algs?.ES384, Algs?.ES512, Algs?.EdDSA])
+        algIds: Object.values([
+            Algs?.ES256,
+            Algs?.ES384,
+            Algs?.ES512,
+            Algs?.EdDSA
+        ])
     },
     {
         algType: JwtKeyTypes.OCTET,

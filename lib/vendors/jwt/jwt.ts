@@ -320,7 +320,11 @@ export const createSignedJwt = async (
 
     switch (algorithm) {
         case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
-            token = signJwtWithSecret(jwtClaims, algorithm, signinOptions?.secret);
+            token = signJwtWithSecret(
+                jwtClaims,
+                algorithm,
+                signinOptions?.secret
+            );
             break;
 
         // TODO: use PEM in signin options

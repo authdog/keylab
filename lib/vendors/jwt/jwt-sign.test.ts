@@ -12,7 +12,7 @@ import {
 } from "./jwt";
 // import { createKeyStore, generateKeyFromStore } from "../jwks";
 import * as c from "../../constants";
-import {JwtAlgorithmsEnum as Algs} from "../../enums";
+import { JwtAlgorithmsEnum as Algs } from "../../enums";
 import { parseJwt, signJwtWithPrivateKey } from ".";
 
 it("jwt signin with secret", async () => {
@@ -119,7 +119,6 @@ it("generate promisified key pair - ec", async () => {
     expect(keyPairEs512?.privateKey).toBeTruthy();
 });
 
-
 it("signs payload with pkcs8 private key", async () => {
     // RS256
     const keyPairRS256 = await getKeyPair({
@@ -210,7 +209,6 @@ it("signs payload with pkcs8 private key", async () => {
     );
 
     expect(signedPayloadEs512).toBeTruthy();
-
 });
 
 it("signs payload with pkcs8 private key - RSA-PSS", async () => {
@@ -289,8 +287,7 @@ it("signs payload with pkcs8 private key - okp", async () => {
         keyPairEddsa.privateKey
     );
 
-    console.log(signedPayloadEddsa)
+    console.log(signedPayloadEddsa);
 
     expect(signedPayloadEddsa).toBeTruthy();
-
 });
