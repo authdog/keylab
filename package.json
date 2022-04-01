@@ -65,6 +65,7 @@
         "jose": "^4.6.0",
         "js-base64": "^3.7.2",
         "jsonwebtoken": "^8.5.1",
+        "jwk-to-pem": "^2.0.5",
         "node-fetch": "^2.6.1",
         "node-jose": "^2.0.0",
         "pem-jwk": "^2.0.0"
