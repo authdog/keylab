@@ -23,7 +23,7 @@ export const isValidPemString = (pem: string): boolean => {
             validPem = true;
         }
     } catch(e) {
-        console.log(e)
+        //console.log(e)
     }
     return validPem;
 }

@@ -44,7 +44,7 @@ it("test isValidPem", async () => {
     
     const privKeyObj = createPrivateKey(privRs256);
 
-    console.log(privKeyObj)
+    expect(privKeyObj).toBeTruthy();
 
 
 
