@@ -8,9 +8,9 @@ module.exports = {
       'jwt/signin-a-token',
       'jwt/validating-a-token'
     ],
-    'Contributing': [
-      'contributing/github',
-      'contributing/translations'
-    ]
+    // 'Contributing': [
+    //   'contributing/github',
+    //   'contributing/translations'
+    // ]
   }
 };

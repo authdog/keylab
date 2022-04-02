@@ -25,8 +25,8 @@ export enum JwtPublicKeyUse {
 }
 
 export enum JwtKeyTypes {
-    OCTET = "oct",
-    RSA = "rsa", // Require a public / private key pair (of type RSA)
+    OCTET = "oct", // utilized by HS algorithms, use a simple binary for its key
+    RSA = "rsa", // Rivest–Shamir–Adleman
     EC = "ec", // elliptic curve
     OKP = "ed25519", // Edwards-curve Octet Key Pair: https://datatracker.ietf.org/doc/html/rfc8032
     JWT = "jwt" // JSON Web Token key type

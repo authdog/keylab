@@ -26,7 +26,58 @@ it("jwt signin with secret", async () => {
     expect(alg).toEqual(Algs.HS256);
 });
 
-it("jwt created has all fields required from payload", async () => {
+
+it("jwt sign with payload fields - HS256", async () => {
+    const payload = {
+        sub: "12345",
+        aud: [c.AUTHDOG_ID_ISSUER]
+    };
+    const token = await signJwtWithSecret(
+        payload,
+        Algs.HS256,
+        "secret"
+    );
+    expect(token).toBeTruthy();
+    const { alg } = readTokenHeaders(token);
+    expect(alg).toEqual(Algs.HS256); 
+})
+
+it("jwt sign with payload fields - HS384", async () => {
+    const payload = {
+        sub: "12345",
+        aud: [c.AUTHDOG_ID_ISSUER]
+    };
+    const token = await signJwtWithSecret(
+        payload,
+        Algs.HS384,
+        "secret"
+    );
+    expect(token).toBeTruthy();
+    const { alg } = readTokenHeaders(token);
+    expect(alg).toEqual(Algs.HS384); 
+})
+
+
+it("jwt sign with payload fields - HS512", async () => {
+    const payload = {
+        sub: "12345",
+        aud: [c.AUTHDOG_ID_ISSUER]
+    };
+    const token = await signJwtWithSecret(
+        payload,
+        Algs.HS512,
+        "secret"
+    );
+    expect(token).toBeTruthy();
+    const { alg } = readTokenHeaders(token);
+    expect(alg).toEqual(Algs.HS512);
+})
+
+
+
+
+
+it("jwt sign with payload fields - RS256", async () => {
     // RS256
     const keyPairRS256 = await getKeyPair({
         keyFormat: "pem",
@@ -54,7 +105,140 @@ it("jwt created has all fields required from payload", async () => {
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
     expect(aid).toEqual("12345");
+
 });
+
+
+it("jwt sign with payload fields - RS384", async () => {
+
+    const keyPairRS384 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs?.RS384,
+        keySize: 4096
+    });
+
+    const signedPayloadRs384 = await signJwtWithPrivateKey(
+        {
+            aid: "12345",
+            sub: "sub:12345",
+            iss: "issuer:12345",
+            aud: ["aud:12345"],
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
+                " "
+            )
+        },
+        Algs.RS384,
+        keyPairRS384.privateKey
+    );
+
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs384);
+
+    expect(iss).toEqual("issuer:12345");
+    expect(aud).toEqual(["aud:12345"]);
+    expect(sub).toEqual("sub:12345");
+    expect(aid).toEqual("12345");
+
+
+})
+
+
+it("jwt sign with payload fields - RS512", async () => {
+
+    const keyPairRS512 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs?.RS512,
+        keySize: 4096
+    });
+
+    const signedPayloadRs512 = await signJwtWithPrivateKey(
+        {
+            aid: "12345",
+            sub: "sub:12345",
+            iss: "issuer:12345",
+            aud: ["aud:12345"],
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
+                " "
+            )
+        },
+        Algs.RS512,
+        keyPairRS512.privateKey
+    );
+
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs512);
+
+    expect(iss).toEqual("issuer:12345");
+    expect(aud).toEqual(["aud:12345"]);
+    expect(sub).toEqual("sub:12345");
+    expect(aid).toEqual("12345");
+
+
+
+})
+
+
+
+it("jwt sign with payload fields - ES256", async () => {
+    // ES256
+    const keyPairES256 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs?.ES256,
+        keySize: 4096
+        });
+
+    const signedPayloadEs256 = await signJwtWithPrivateKey(
+        {
+            aid: "12345",
+            sub: "sub:12345",
+            iss: "issuer:12345",
+            aud: ["aud:12345"],
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
+                " "
+            )
+        },
+        Algs.ES256,
+        keyPairES256.privateKey
+    );
+
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadEs256);
+
+    expect(iss).toEqual("issuer:12345");
+    expect(aud).toEqual(["aud:12345"]);
+    expect(sub).toEqual("sub:12345");
+    expect(aid).toEqual("12345");
+
+})
+
+it("jwt sign with payload fields - EDDSA", async () => {
+    // EDDSA
+    const keyPairEDDSA = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs?.EdDSA,
+        keySize: 256
+        });
+
+    const signedPayloadEdDSA = await signJwtWithPrivateKey(
+        {
+            aid: "12345",
+            sub: "sub:12345",
+            iss: "issuer:12345",
+            aud: ["aud:12345"],
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
+                " "
+            )
+        },
+        Algs.EdDSA,
+        keyPairEDDSA.privateKey
+    );
+
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadEdDSA);
+
+    expect(iss).toEqual("issuer:12345");
+    expect(aud).toEqual(["aud:12345"]);
+    expect(sub).toEqual("sub:12345");
+    expect(aid).toEqual("12345");
+
+})
+
 
 it("it converts string to uint8 and vice versa", async () => {
     const superSecret = "Lapsus$";

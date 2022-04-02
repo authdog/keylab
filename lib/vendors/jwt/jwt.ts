@@ -4,7 +4,7 @@ import * as jose from "node-jose";
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
 import * as enums from "../../enums";
-import { throwJwtError } from "../../errors";
+import { msg, throwJwtError } from "../../errors";
 import { verifyRSAToken } from "../jwks";
 import { signJwtWithSecret } from "./jwt-sign";
 import { IDecodedJwt } from "./interfaces";
@@ -274,17 +274,17 @@ export const checkJwtFields = (
         if (parsedToken?.scp && requiredScopes?.length > 0) {
             let scopes = [];
             if (typeof parsedToken?.scp === "string") {
-                if (parsedToken?.scp.includes(" ")) {
-                    scopes = parsedToken?.scp.split(" ");
-                } else if (parsedToken?.scp.includes(",")) {
-                    scopes = parsedToken?.scp.split(",");
+                if (parsedToken?.scp.includes(c.CHARS.SPACE)) {
+                    scopes = parsedToken?.scp.split(c.CHARS.SPACE);
+                } else if (parsedToken?.scp.includes(c.CHARS.COMMA)) {
+                    scopes = parsedToken?.scp.split(c.CHARS.COMMA);
                 } else {
                     scopes = [parsedToken?.scp];
                 }
             } else if (Array.isArray(parsedToken?.scp)) {
                 scopes = parsedToken?.scp;
             } else {
-                throw new Error("Invalid scp field type");
+                throw new Error(msg.INVALID_SCOPE_FIELD_TYPE);
             }
 
             requiredScopes.map((el: string) => {
@@ -339,11 +339,22 @@ export const createSignedJwt = async (
             algEnums.ES384 ||
             algEnums.ES512 ||
             algEnums.EdDSA:
-            token = await signJwtWithPrivateKey(
-                jwtClaims,
-                algorithm,
-                signinOptions.pemPrivateKey
-            );
+
+            if (signinOptions?.pemPrivateKey) {
+                token = await signJwtWithPrivateKey(
+                    jwtClaims,
+                    algorithm,
+                    signinOptions.pemPrivateKey
+                );
+            } 
+            // else if (signinOptions?.jwkPrivateKey) {
+            //     token = await signJwtWithPrivateKey(
+            //         jwtClaims,
+            //         algorithm,
+            //         signinOptions.jwkPrivateKey
+            //     );
+            // }
+
             break;
 
         // to be implemented
