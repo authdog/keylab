@@ -1,6 +1,4 @@
 import * as jwt from "jsonwebtoken";
-import * as jose from "node-jose";
-
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
 import * as enums from "../../enums";
@@ -181,7 +179,7 @@ export const checkTokenValidness = async (
             }
 
         case algEnums.ES256K:
-            throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
+            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
 
         default:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
@@ -190,7 +188,6 @@ export const checkTokenValidness = async (
     return isValid;
 };
 
-// TODO: replace implementation with jose
 export const verifyHSTokenWithSecretString = async (
     token: string,
     secret: string
@@ -205,32 +202,32 @@ export const verifyHSTokenWithSecretString = async (
     return isVerified;
 };
 
-export const generateJwtFromPayload = async (
-    { sub, iss, aud, scp, pld }: IJwtTokenClaims,
-    { compact, jwk, fields, sessionDuration }: IJwtTokenOpts
-) => {
-    const payload = JSON.stringify({
-        iss,
-        sub,
-        aud,
-        ...pld,
-        exp: Math.floor(Date.now() / 1000 + sessionDuration * 60),
-        iat: Math.floor(Date.now() / 1000),
-        azp: iss,
-        // https://stackoverflow.com/a/49492971/8483084
-        gzp: "client-credentials",
-        scp
-    });
+// export const generateJwtFromPayload = async (
+//     { sub, iss, aud, scp, pld }: IJwtTokenClaims,
+//     { compact, jwk, fields, sessionDuration }: IJwtTokenOpts
+// ) => {
+//     const payload = JSON.stringify({
+//         iss,
+//         sub,
+//         aud,
+//         ...pld,
+//         exp: Math.floor(Date.now() / 1000 + sessionDuration * 60),
+//         iat: Math.floor(Date.now() / 1000),
+//         azp: iss,
+//         // https://stackoverflow.com/a/49492971/8483084
+//         gzp: "client-credentials",
+//         scp
+//     });
 
-    const token = await jose.JWS.createSign(
-        Object.assign({ compact, jwk, fields }),
-        jwk
-    )
-        .update(payload)
-        .final();
+//     const token = await jose.JWS.createSign(
+//         Object.assign({ compact, jwk, fields }),
+//         jwk
+//     )
+//         .update(payload)
+//         .final();
 
-    return token;
-};
+//     return token;
+// };
 
 export const checkJwtFields = (
     token: string,

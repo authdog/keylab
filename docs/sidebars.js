@@ -7,10 +7,6 @@ module.exports = {
     'Usage': [
       'jwt/signin-a-token',
       'jwt/validating-a-token'
-    ],
-    // 'Contributing': [
-    //   'contributing/github',
-    //   'contributing/translations'
-    // ]
+    ]
   }
 };
