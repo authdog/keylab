@@ -3,12 +3,18 @@ import * as https from "https";
 import * as jose from "node-jose";
 
 import { throwJwtError } from "../../errors";
-import * as enums from "../../enums";
+// import * as enums from "../../enums";
+import {JwtAlgorithmsEnum as Algs} from '../../enums'
 import * as c from "../../constants";
 
 import * as jwt from "jsonwebtoken";
 
-import { checkJwtFields, IJwtTokenClaims, IJwtTokenOpts, readTokenHeaders } from "../jwt";
+import {
+    checkJwtFields,
+    IJwtTokenClaims,
+    IJwtTokenOpts,
+    readTokenHeaders
+} from "../jwt";
 import { IDecodedJwt } from "../jwt/interfaces";
 
 export interface IJwksClient {
@@ -48,23 +54,64 @@ export const createKeyStore = () => {
     return jose.JWK.createKeyStore();
 };
 
+const defaultKeyOptions = (algorithm: any) => {
+    return Object.freeze({
+        alg: algorithm,
+        use: "sig",
+    })
+}
+
 export const generateKeyFromStore: any = async (
     store: jose.JWK.KeyStore,
     keyType: string,
     algorithm: string,
     exposePrivateFields: boolean = false
 ) => {
-    const generatedKey = await store.generate(
-        enums.JwtKeyTypes[keyType],
-        2048,
-        {
-            // jwa: https://datatracker.ietf.org/doc/html/rfc7518
-            alg: enums.JwtAlgorithmsEnum[algorithm],
-            // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
-            // The "use" and "key_ops" JWK members SHOULD NOT be used together;
-            use: enums.JwtPublicKeyUse.SIGNATURE
-        }
-    );
+    let generatedKey = null;
+
+    switch (algorithm) {
+        // RSA
+        case Algs.RS256:
+        case Algs.RS384:
+        case Algs.RS512:
+            generatedKey = await store.generate(
+                keyType.toUpperCase(),
+                2048,
+                {
+                    ...defaultKeyOptions(algorithm),
+                }
+            );
+            break;
+        
+        // EC
+        case Algs.ES256:
+        case Algs.ES384:
+        case Algs.ES512:
+            generatedKey = await store.generate(
+                keyType.toUpperCase(),
+                c.namedCurves[algorithm.toLowerCase()],
+                {
+                    ...defaultKeyOptions(algorithm),
+                }                    
+            ); 
+            break;
+        default:
+            throw new Error(`Unsupported algorithm: ${algorithm}`); 
+    }
+
+    
+    //     await store.generate(
+    //     // enums.JwtKeyTypes[keyType],
+    //     keyType,
+    //     2048,
+    //     {
+    //         // jwa: https://datatracker.ietf.org/doc/html/rfc7518
+    //         alg: algorithm, //enums.JwtAlgorithmsEnum[algorithm],
+    //         // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
+    //         // The "use" and "key_ops" JWK members SHOULD NOT be used together;
+    //         use: enums.JwtPublicKeyUse.SIGNATURE
+    //     }
+    // );
     return generatedKey.toJSON(exposePrivateFields);
 };
 

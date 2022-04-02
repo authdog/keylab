@@ -2,11 +2,8 @@ import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
 import { importPKCS8, SignJWT } from "jose";
 import { generateKeyPair } from "crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
-import * as c from '../../constants'
-import { 
-    strToUint8Array
-} from "./utils";
-
+import * as c from "../../constants";
+import { strToUint8Array } from "./utils";
 
 export const signJwtWithPrivateKey = async (
     payload: any,
@@ -15,12 +12,12 @@ export const signJwtWithPrivateKey = async (
 ) => {
     let privateKeyObj;
     try {
-        privateKeyObj = await importPKCS8(privateKey, alg)
+        privateKeyObj = await importPKCS8(privateKey, alg);
     } catch (e) {
         if ([Algs.HS256, Algs.HS384, Algs.HS512].includes(alg)) {
             privateKeyObj = strToUint8Array(privateKey);
         } else {
-            throw new Error(`Invalid private key for algorithm ${alg}`)
+            throw new Error(`Invalid private key for algorithm ${alg}`);
         }
     }
 
@@ -28,7 +25,6 @@ export const signJwtWithPrivateKey = async (
         .setProtectedHeader({ alg, type: JwtKeyTypes?.JWT })
         .sign(privateKeyObj);
 };
-
 
 const algorithmsDict = [
     {
@@ -71,7 +67,6 @@ const algorithmsDict = [
     //     algIds: ["x448"]
     // }
 ];
-
 
 export const getKeyPair = async ({
     algorithmIdentifier,

@@ -17,4 +17,4 @@ export const throwEnvironmentError = (message?: string) => {
     throw new EnvironmentError(message || c.CODE_NOT_RUNNING_IN_BROWSER);
 };
 
-export * as msg from './messages'
+export * as msg from "./messages";

@@ -16,7 +16,7 @@ export const CHARS = {
     NEW_LINE: "\n",
     TAB: "\t",
     CARRIAGE_RETURN: "\r",
-    COMMA: ",",
+    COMMA: ","
     // COLON: ":",
     // SEMICOLON: ";",
     // DOT: ".",
@@ -35,8 +35,7 @@ export const CHARS = {
     // CLOSE_PARENTHESIS: ")",
     // OPEN_ANGLE_BRACKET: "<",
     // CLOSE_ANGLE_BRACKET: ">",
-
-}
+};
 
 export const publicKeyEncodingPem = {
     type: "spki",
@@ -58,5 +57,5 @@ export const namedCurves = {
 
 export const PEM_CHARS = {
     start: "-----BEGIN",
-    end: "-----",
+    end: "-----"
 };

@@ -1,13 +1,17 @@
 import { 
-    //createKeyStore, generateKeyFromStore, 
-    keyExistsInSet } from "..";
-// import { default as nock } from "nock";
+    createKeyStore,
+    generateKeyFromStore, 
+    keyExistsInSet
+} from "..";
 
-// import { makePublicKey, verifyRSAToken, generateJwtFromPayload } from "./jwks";
+import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
+import { default as nock } from "nock";
 
-// import * as c from "../../constants";
-// import * as enums from "../../enums";
-// const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
+import { makePublicKey, verifyRSAToken, generateJwtFromPayload } from "./jwks";
+
+import * as c from "../../constants";
+import * as enums from "../../enums";
+const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
 it("check if key exists in set", () => {
     const jwks = [
@@ -36,103 +40,301 @@ it("check if key exists in set", () => {
     expect(shouldNotExist).toBeFalsy();
 });
 
-// it("verifies correctly token with public uri", async () => {
-//     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
-//     const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
-//     const store = createKeyStore();
-//     const exposeJwkPrivateFields = true;
-//     const keyGenerated = await generateKeyFromStore(
-//         store,
-//         enums.JwtKeyTypes.RSA,
-//         enums.JwtAlgorithmsEnum.RS256,
-//         exposeJwkPrivateFields
-//     );
-//     const regExpPathAppJwks = new RegExp(
-//         `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
-//     );
-
-//     const keys = [makePublicKey(keyGenerated)];
-
-//     const scopeNock = nock(AUTHDOG_API_ROOT)
-//         .persist()
-//         .get(regExpPathAppJwks)
-//         .reply(200, {
-//             keys
-//         });
-
-//     const payload = {
-//         userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
-//         userName: "dbrrt"
-//     };
-
-//     const token = await generateJwtFromPayload(
+// export const generateKeyFromStore: any = async (
+//     store: jose.JWK.KeyStore,
+//     keyType: string,
+//     algorithm: string,
+//     exposePrivateFields: boolean = false
+// ) => {
+//     const generatedKey = await store.generate(
+//         enums.JwtKeyTypes[keyType],
+//         2048,
 //         {
-//             sub: payload?.userId,
-//             aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
-//             iss: c.AUTHDOG_ID_ISSUER,
-//             scp: "user openid"
-//         },
-//         {
-//             compact: true,
-//             fields: { typ: enums.JwtKeyTypes.JWT },
-//             jwk: keyGenerated,
-//             sessionDuration: 8 * 60 // 8 hours
+//             // jwa: https://datatracker.ietf.org/doc/html/rfc7518
+//             alg: enums.JwtAlgorithmsEnum[algorithm],
+//             // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
+//             // The "use" and "key_ops" JWK members SHOULD NOT be used together;
+//             use: enums.JwtPublicKeyUse.SIGNATURE
 //         }
 //     );
+//     return generatedKey.toJSON(exposePrivateFields);
+// };
+it("verifies correctly token with public uri", async () => {
+    const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
+    const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
+    const store = createKeyStore();
+    const exposeJwkPrivateFields = true;
+    const keyGenerated = await generateKeyFromStore(
+        store,
+        Kty["RSA"].toUpperCase(),
+        Algs.RS256,
+        exposeJwkPrivateFields
+    );
+    const regExpPathAppJwks = new RegExp(
+        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
+    );
 
-//     const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
+    const keys = [makePublicKey(keyGenerated)];
 
-//     let verified = false;
+    const scopeNock = nock(AUTHDOG_API_ROOT)
+        .persist()
+        .get(regExpPathAppJwks)
+        .reply(200, {
+            keys
+        });
 
-//     try {
-//         verified = await verifyRSAToken(token, {
-//             jwksUri
-//         });
-//     } catch (e) {}
+    const payload = {
+        userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
+        userName: "dbrrt"
+    };
 
-//     expect(verified).toBeTruthy();
+    const token = await generateJwtFromPayload(
+        {
+            sub: payload?.userId,
+            aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
+            iss: c.AUTHDOG_ID_ISSUER,
+            scp: "user openid"
+        },
+        {
+            compact: true,
+            fields: { typ: Kty.JWT },
+            jwk: keyGenerated,
+            sessionDuration: 8 * 60 // 8 hours
+        }
+    );
 
-//     scopeNock.persist(false);
-// });
+    const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
 
-// it("verifies token with adhoc jwk store", async () => {
-//     const store = createKeyStore();
-//     const exposeJwkPrivateFields = true;
-//     const keyGenerated = await generateKeyFromStore(
-//         store,
-//         enums.JwtKeyTypes.RSA,
-//         enums.JwtAlgorithmsEnum.RS256,
-//         exposeJwkPrivateFields
-//     );
+    let verified = false;
 
-//     const payload = {
-//         userId: "eb13a135-b84a-400c-b590-0c44febf6c4e",
-//         userName: "dbrrt"
-//     };
+    try {
+        verified = await verifyRSAToken(token, {
+            jwksUri
+        });
+    } catch (e) {}
 
-//     const token = await generateJwtFromPayload(
-//         {
-//             sub: payload?.userId,
-//             iss: c.AUTHDOG_ID_ISSUER,
-//             scp: "user openid",
-//             aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"]
-//         },
-//         {
-//             compact: true,
-//             fields: { typ: enums.JwtKeyTypes.JWT },
-//             jwk: keyGenerated,
-//             sessionDuration: 8 * 60 // 8 hours
-//         }
-//     );
+    expect(verified).toBeTruthy();
 
-//     let verified = false;
+    scopeNock.persist(false);
+});
 
-//     try {
-//         const keys: any = [makePublicKey(keyGenerated)];
-//         verified = await verifyRSAToken(token, {
-//             adhoc: { keys }
-//         });
-//     } catch (e) {}
+it("verifies token with adhoc jwk store", async () => {
+    const store = createKeyStore();
+    const exposeJwkPrivateFields = true;
+    const keyGenerated = await generateKeyFromStore(
+        store,
+        Kty.RSA.toUpperCase(),
+        Algs.RS256,
+        exposeJwkPrivateFields
+    );
 
-//     expect(verified).toBeTruthy();
-// });
+    const payload = {
+        userId: "eb13a135-b84a-400c-b590-0c44febf6c4e",
+        userName: "dbrrt"
+    };
+
+    const token = await generateJwtFromPayload(
+        {
+            sub: payload?.userId,
+            iss: c.AUTHDOG_ID_ISSUER,
+            scp: "user openid",
+            aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"]
+        },
+        {
+            compact: true,
+            fields: { typ: enums.JwtKeyTypes.JWT },
+            jwk: keyGenerated,
+            sessionDuration: 8 * 60 // 8 hours
+        }
+    );
+
+    let verified = false;
+
+    try {
+        const keys: any = [makePublicKey(keyGenerated)];
+        verified = await verifyRSAToken(token, {
+            adhoc: { keys }
+        });
+    } catch (e) {}
+
+    expect(verified).toBeTruthy();
+});
+
+
+
+
+
+it ("generates jwk with generateSecret", async () => {
+
+    const store = createKeyStore();
+
+    const keyRsa256 = await generateKeyFromStore(
+        store,
+        Kty["RSA"].toUpperCase(),
+        Algs.RS256,
+        true
+    );
+
+    console.log(keyRsa256);
+
+    expect(keyRsa256).toBeTruthy();
+
+
+    const keyRsa384 = await generateKeyFromStore(
+        store,
+        Kty.RSA,
+        Algs.RS384,
+        true
+    );
+
+    expect(keyRsa384).toBeTruthy();
+
+
+    const keyRsa512 = await generateKeyFromStore(
+        store,
+        Kty.RSA,
+        Algs.RS512,
+        true
+    );
+
+    expect(keyRsa512).toBeTruthy();
+
+    const keyEs256 = await generateKeyFromStore(
+        store,
+        Kty.EC,
+        Algs.ES256,
+        true
+    );
+
+    // console.log(keyEs256);
+
+    expect(keyEs256).toBeTruthy();
+
+    const keyEs384 = await generateKeyFromStore(
+        store,
+        Kty.EC,
+        Algs.ES384,
+        true
+    );
+
+    expect(keyEs384).toBeTruthy();
+
+    const keyEs512 = await generateKeyFromStore(
+        store,
+        Kty.EC,
+        Algs.ES512,
+        true
+    );
+
+    expect(keyEs512).toBeTruthy();
+
+
+    
+
+
+
+
+
+
+
+
+
+    // const canBeExtracted = true;
+
+    // // HS256
+    // const secretHS256 = await generateSecret(Algs.HS256, {
+    //     extractable: canBeExtracted
+    // });
+    // expect(secretHS256).toBeTruthy();
+
+    // // HS384
+    // const secretHS384 = await generateSecret(Algs.HS384, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretHS384).toBeTruthy();
+
+    // // HS512
+
+    // const secretHS512 = await generateSecret(Algs.HS512, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretHS512).toBeTruthy();
+
+    // // RS256
+    // const secretRS256 = await generateSecret("RS256", {
+    //     extractable: canBeExtracted
+    // });
+
+
+    // expect(secretRS256).toBeTruthy();
+
+    // // RS384
+    // const secretRS384 = await generateSecret(Algs.RS384, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretRS384).toBeTruthy();
+
+    // // RS512
+    // const secretRS512 = await generateSecret(Algs.RS512, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretRS512).toBeTruthy();
+
+    // // ES256
+    // const secretES256 = await generateSecret(Algs.ES256, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretES256).toBeTruthy();
+
+    // // ES384
+    // const secretES384 = await generateSecret(Algs.ES384, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretES384).toBeTruthy();
+
+    // // ES512
+    // const secretES512 = await generateSecret(Algs.ES512, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretES512).toBeTruthy();
+
+    // // PS256
+    // const secretPS256 = await generateSecret(Algs.PS256, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretPS256).toBeTruthy();
+
+    // // PS384
+    // const secretPS384 = await generateSecret(Algs.PS384, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretPS384).toBeTruthy();
+
+    // // PS512
+
+    // const secretPS512 = await generateSecret(Algs.PS512, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretPS512).toBeTruthy();
+
+    // // EdDSA
+    // const secretEdDSA = await generateSecret(Algs.EdDSA, {
+    //     extractable: canBeExtracted
+    // });
+
+    // expect(secretEdDSA).toBeTruthy();
+
+
+
+
+})

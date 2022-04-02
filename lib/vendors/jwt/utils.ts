@@ -8,22 +8,19 @@ export const strToUint8Array = (str: string) => {
     return buf;
 };
 
-
-
 export const uint8ArrayToStr = (buf: Uint8Array) =>
     String.fromCharCode.apply(null, buf);
 
-
 // fails with PKCS#8
 export const isValidPemString = (pem: string): boolean => {
-    let validPem = false
+    let validPem = false;
     try {
         let converted = convertPemToJwk(pem);
         if (converted) {
             validPem = true;
         }
-    } catch(e) {
+    } catch (e) {
         //console.log(e)
     }
     return validPem;
-}
+};

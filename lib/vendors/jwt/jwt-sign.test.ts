@@ -1,64 +1,42 @@
-import {
-    getKeyPair
-} from "./jwt-sign";
-import {
-    readTokenHeaders
-} from "./jwt";
+import { getKeyPair } from "./jwt-sign";
+import { readTokenHeaders } from "./jwt";
 import * as c from "../../constants";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
 import { parseJwt, signJwtWithPrivateKey } from ".";
 import { strToUint8Array, uint8ArrayToStr } from "./utils";
-
 
 it("jwt sign with payload fields - HS256", async () => {
     const payload = {
         sub: "12345",
         aud: [c.AUTHDOG_ID_ISSUER]
     };
-    const token = await signJwtWithPrivateKey(
-        payload,
-        Algs.HS256,
-        "secret"
-    );
+    const token = await signJwtWithPrivateKey(payload, Algs.HS256, "secret");
     expect(token).toBeTruthy();
     const { alg } = readTokenHeaders(token);
-    expect(alg).toEqual(Algs.HS256); 
-})
+    expect(alg).toEqual(Algs.HS256);
+});
 
 it("jwt sign with payload fields - HS384", async () => {
     const payload = {
         sub: "12345",
         aud: [c.AUTHDOG_ID_ISSUER]
     };
-    const token = await signJwtWithPrivateKey(
-        payload,
-        Algs.HS384,
-        "secret"
-    );
+    const token = await signJwtWithPrivateKey(payload, Algs.HS384, "secret");
     expect(token).toBeTruthy();
     const { alg } = readTokenHeaders(token);
-    expect(alg).toEqual(Algs.HS384); 
-})
-
+    expect(alg).toEqual(Algs.HS384);
+});
 
 it("jwt sign with payload fields - HS512", async () => {
     const payload = {
         sub: "12345",
         aud: [c.AUTHDOG_ID_ISSUER]
     };
-    const token = await signJwtWithPrivateKey(
-        payload,
-        Algs.HS512,
-        "secret"
-    );
+    const token = await signJwtWithPrivateKey(payload, Algs.HS512, "secret");
     expect(token).toBeTruthy();
     const { alg } = readTokenHeaders(token);
     expect(alg).toEqual(Algs.HS512);
-})
-
-
-
-
+});
 
 it("jwt sign with payload fields - RS256", async () => {
     // RS256
@@ -88,12 +66,9 @@ it("jwt sign with payload fields - RS256", async () => {
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
     expect(aid).toEqual("12345");
-
 });
 
-
 it("jwt sign with payload fields - RS384", async () => {
-
     const keyPairRS384 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS384,
@@ -120,13 +95,9 @@ it("jwt sign with payload fields - RS384", async () => {
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
     expect(aid).toEqual("12345");
-
-
-})
-
+});
 
 it("jwt sign with payload fields - RS512", async () => {
-
     const keyPairRS512 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS512,
@@ -153,12 +124,7 @@ it("jwt sign with payload fields - RS512", async () => {
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
     expect(aid).toEqual("12345");
-
-
-
-})
-
-
+});
 
 it("jwt sign with payload fields - ES256", async () => {
     // ES256
@@ -166,7 +132,7 @@ it("jwt sign with payload fields - ES256", async () => {
         keyFormat: "pem",
         algorithmIdentifier: Algs?.ES256,
         keySize: 4096
-        });
+    });
 
     const signedPayloadEs256 = await signJwtWithPrivateKey(
         {
@@ -188,8 +154,7 @@ it("jwt sign with payload fields - ES256", async () => {
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
     expect(aid).toEqual("12345");
-
-})
+});
 
 it("jwt sign with payload fields - EDDSA", async () => {
     // EDDSA
@@ -197,7 +162,7 @@ it("jwt sign with payload fields - EDDSA", async () => {
         keyFormat: "pem",
         algorithmIdentifier: Algs?.EdDSA,
         keySize: 256
-        });
+    });
 
     const signedPayloadEdDSA = await signJwtWithPrivateKey(
         {
@@ -219,9 +184,7 @@ it("jwt sign with payload fields - EDDSA", async () => {
     expect(aud).toEqual(["aud:12345"]);
     expect(sub).toEqual("sub:12345");
     expect(aid).toEqual("12345");
-
-})
-
+});
 
 it("it converts string to uint8 and vice versa", async () => {
     const superSecret = "Lapsus$";

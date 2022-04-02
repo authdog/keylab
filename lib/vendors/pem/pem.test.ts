@@ -26,5 +26,3 @@ it("converts jwk to PEM", () => {
     expect(pem.startsWith("-----BEGIN PUBLIC KEY-----"));
     expect(pem.endsWith("-----END PUBLIC KEY-----"));
 });
-
-

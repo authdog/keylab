@@ -13,11 +13,6 @@ type AlgorithmIdentifier =
     | Algs.EdDSA
     | Algs.RSAPSS;
 // | Algs.ES256K
-// | "ecdsa-pss"
-// | "ed25519"
-// | "ed448"
-// | "x25519"
-// | "x448";
 
 export interface IDecodedJwt {
     iss?: string;

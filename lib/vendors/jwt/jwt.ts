@@ -21,11 +21,12 @@ export interface IcheckTokenValidnessCredentials {
 }
 
 export interface ISignTokenCredentials {
-    // HS256
+    // HS256 | HS384 | HS512
     secret?: string;
-    // RS256
-    // jwk?: any;
+    // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA
     pemPrivateKey?: string;
+    jwkPrivateKey?: any;
+    // any algorithm supported by jwt
     sessionDuration: number;
 }
 
@@ -288,7 +289,9 @@ export const createSignedJwt = async (
     };
 
     switch (algorithm) {
-        case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
+        case algEnums.HS256:
+        case algEnums.HS384:
+        case algEnums.HS512:
             token = signJwtWithPrivateKey(
                 jwtClaims,
                 algorithm,
@@ -297,32 +300,29 @@ export const createSignedJwt = async (
             break;
 
         // TODO: use PEM in signin options
-        case algEnums.RS256 ||
-            algEnums.RS384 ||
-            algEnums.RS512 ||
-            algEnums.PS256 ||
-            algEnums.PS384 ||
-            algEnums.PS512 ||
-            algEnums.ES256 ||
-            algEnums.ES384 ||
-            algEnums.ES512 ||
-            algEnums.EdDSA:
-
+        case algEnums.RS256:
+        case algEnums.RS384:
+        case algEnums.RS512:
+        case algEnums.PS256:
+        case algEnums.PS384:
+        case algEnums.PS512:
+        case algEnums.ES256:
+        case algEnums.ES384:
+        case algEnums.ES512:
+        case algEnums.EdDSA:
             if (signinOptions?.pemPrivateKey) {
                 token = await signJwtWithPrivateKey(
                     jwtClaims,
                     algorithm,
                     signinOptions.pemPrivateKey
                 );
+            } else if (signinOptions?.jwkPrivateKey) {
+                token = await signJwtWithPrivateKey(
+                    jwtClaims,
+                    algorithm,
+                    signinOptions.jwkPrivateKey
+                );
             }
-            // TODO
-            // else if (signinOptions?.jwkPrivateKey) {
-            //     token = await signJwtWithPrivateKey(
-            //         jwtClaims,
-            //         algorithm,
-            //         signinOptions.jwkPrivateKey
-            //     );
-            // }
 
             break;
 
