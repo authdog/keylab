@@ -1,30 +1,13 @@
 import {
-    signJwtWithSecret,
-    // signJwtWithJwk,
-    uint8Array2str,
-    str2ToUint8Array,
-    // signWithJose,
     getKeyPair
 } from "./jwt-sign";
 import {
-    //createSignedJwt,
     readTokenHeaders
 } from "./jwt";
-// import { createKeyStore, generateKeyFromStore } from "../jwks";
 import * as c from "../../constants";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
 import { parseJwt, signJwtWithPrivateKey } from ".";
-
-it("jwt signin with secret", async () => {
-    const token = await signJwtWithSecret(
-        { sub: "12345", aud: [c.AUTHDOG_ID_ISSUER] },
-        Algs.HS256,
-        "secret"
-    );
-    expect(token).toBeTruthy();
-    const { alg } = readTokenHeaders(token);
-    expect(alg).toEqual(Algs.HS256);
-});
+import { strToUint8Array, uint8ArrayToStr } from "./utils";
 
 
 it("jwt sign with payload fields - HS256", async () => {
@@ -32,7 +15,7 @@ it("jwt sign with payload fields - HS256", async () => {
         sub: "12345",
         aud: [c.AUTHDOG_ID_ISSUER]
     };
-    const token = await signJwtWithSecret(
+    const token = await signJwtWithPrivateKey(
         payload,
         Algs.HS256,
         "secret"
@@ -47,7 +30,7 @@ it("jwt sign with payload fields - HS384", async () => {
         sub: "12345",
         aud: [c.AUTHDOG_ID_ISSUER]
     };
-    const token = await signJwtWithSecret(
+    const token = await signJwtWithPrivateKey(
         payload,
         Algs.HS384,
         "secret"
@@ -63,7 +46,7 @@ it("jwt sign with payload fields - HS512", async () => {
         sub: "12345",
         aud: [c.AUTHDOG_ID_ISSUER]
     };
-    const token = await signJwtWithSecret(
+    const token = await signJwtWithPrivateKey(
         payload,
         Algs.HS512,
         "secret"
@@ -242,8 +225,8 @@ it("jwt sign with payload fields - EDDSA", async () => {
 
 it("it converts string to uint8 and vice versa", async () => {
     const superSecret = "Lapsus$";
-    const buffer: Uint8Array = str2ToUint8Array(superSecret);
-    const debufferedString: string = uint8Array2str(buffer);
+    const buffer: Uint8Array = strToUint8Array(superSecret);
+    const debufferedString: string = uint8ArrayToStr(buffer);
     expect(debufferedString).toEqual(superSecret);
 });
 

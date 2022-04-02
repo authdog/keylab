@@ -37,3 +37,26 @@ export const CHARS = {
     // CLOSE_ANGLE_BRACKET: ">",
 
 }
+
+export const publicKeyEncodingPem = {
+    type: "spki",
+    format: "pem"
+};
+
+export const privateKeyEncodingPem = {
+    type: "pkcs8",
+    // type: "pkcs1",
+    format: "pem"
+};
+
+export const namedCurves = {
+    es256: "P-256",
+    es384: "P-384",
+    es512: "P-521",
+    eddsa: "ED25519"
+};
+
+export const PEM_CHARS = {
+    start: "-----BEGIN",
+    end: "-----",
+};

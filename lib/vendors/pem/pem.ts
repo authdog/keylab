@@ -1,4 +1,4 @@
-import { pem2jwk } from "pem-jwk";
+import { pem2jwk } from "./pem-jwk"
 import { default as jwkToPem } from "jwk-to-pem";
 
 export const convertPemToJwk = (pem: string) => {

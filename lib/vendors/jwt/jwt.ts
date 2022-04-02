@@ -4,21 +4,19 @@ import * as c from "../../constants";
 import * as enums from "../../enums";
 import { msg, throwJwtError } from "../../errors";
 import { verifyRSAToken } from "../jwks";
-import { signJwtWithSecret } from "./jwt-sign";
 import { IDecodedJwt } from "./interfaces";
 import { IRSAKeyStore } from "../jwks/jwks";
-import { signJwtWithPrivateKey } from ".";
+import { signJwtWithPrivateKey } from "./jwt-sign";
 
 export interface IcheckTokenValidnessCredentials {
-    // can be verified with a private key
     // HS256 | HS384 | HS512
     secret?: string;
-    // can be verified with assymetric keys
     // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA
     domainUri?: string;
     jwksUri?: string;
     verifySsl?: boolean;
     adhoc?: IRSAKeyStore;
+    // scopes
     requiredScopes?: string[];
 }
 
@@ -202,33 +200,6 @@ export const verifyHSTokenWithSecretString = async (
     return isVerified;
 };
 
-// export const generateJwtFromPayload = async (
-//     { sub, iss, aud, scp, pld }: IJwtTokenClaims,
-//     { compact, jwk, fields, sessionDuration }: IJwtTokenOpts
-// ) => {
-//     const payload = JSON.stringify({
-//         iss,
-//         sub,
-//         aud,
-//         ...pld,
-//         exp: Math.floor(Date.now() / 1000 + sessionDuration * 60),
-//         iat: Math.floor(Date.now() / 1000),
-//         azp: iss,
-//         // https://stackoverflow.com/a/49492971/8483084
-//         gzp: "client-credentials",
-//         scp
-//     });
-
-//     const token = await jose.JWS.createSign(
-//         Object.assign({ compact, jwk, fields }),
-//         jwk
-//     )
-//         .update(payload)
-//         .final();
-
-//     return token;
-// };
-
 export const checkJwtFields = (
     token: string,
     {
@@ -318,7 +289,7 @@ export const createSignedJwt = async (
 
     switch (algorithm) {
         case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
-            token = signJwtWithSecret(
+            token = signJwtWithPrivateKey(
                 jwtClaims,
                 algorithm,
                 signinOptions?.secret
@@ -343,7 +314,8 @@ export const createSignedJwt = async (
                     algorithm,
                     signinOptions.pemPrivateKey
                 );
-            } 
+            }
+            // TODO
             // else if (signinOptions?.jwkPrivateKey) {
             //     token = await signJwtWithPrivateKey(
             //         jwtClaims,
@@ -355,7 +327,7 @@ export const createSignedJwt = async (
             break;
 
         // to be implemented
-        case algEnums.ES256K || algEnums.EdDSA:
+        case algEnums.ES256K:
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
     }
 

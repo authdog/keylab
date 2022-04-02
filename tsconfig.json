@@ -25,7 +25,8 @@
         "dist",
         "docs",
         "tsdoc",
-        "coverage"
+        "coverage",
+        "**/*.test.ts"
     ],
     "typeRoots": [
       "index.d.ts"

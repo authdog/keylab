@@ -27,3 +27,5 @@ export const ALLOWED_AUTHORIZATION_HEADER_LOWERCASED =
     ALLOWED_AUTHORIZATION_HEADER_CAPITALIZED.toLowerCase();
 
 export const INVALID_SCOPE_FIELD_TYPE = "Invalid scp field type";
+
+export const INVALID_PEM_STRING = "Invalid PEM string";

@@ -2,38 +2,33 @@ import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
 import { importPKCS8, SignJWT } from "jose";
 import { generateKeyPair } from "crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
+import * as c from '../../constants'
+import { 
+    strToUint8Array
+} from "./utils";
 
-export const signJwtWithSecret = async (
-    payload: any,
-    alg: Algs.HS256 | Algs.HS384 | Algs.HS512,
-    secret: string
-) => {
-    return await new SignJWT({ ...payload })
-        .setProtectedHeader({ alg })
-        .sign(str2ToUint8Array(secret));
-};
 
 export const signJwtWithPrivateKey = async (
     payload: any,
-    algorithm: Algs,
+    alg: Algs,
     privateKey: string
 ) => {
-    const privateKeyObj = await importPKCS8(privateKey, algorithm);
+    let privateKeyObj;
+    try {
+        privateKeyObj = await importPKCS8(privateKey, alg)
+    } catch (e) {
+        if ([Algs.HS256, Algs.HS384, Algs.HS512].includes(alg)) {
+            privateKeyObj = strToUint8Array(privateKey);
+        } else {
+            throw new Error(`Invalid private key for algorithm ${alg}`)
+        }
+    }
+
     return await new SignJWT({ ...payload })
-        .setProtectedHeader({ alg: algorithm, type: JwtKeyTypes?.JWT })
+        .setProtectedHeader({ alg, type: JwtKeyTypes?.JWT })
         .sign(privateKeyObj);
 };
 
-export const str2ToUint8Array = (str: string) => {
-    const buf = new Uint8Array(str.length);
-    for (let i = 0; i < str.length; i++) {
-        buf[i] = str.charCodeAt(i);
-    }
-    return buf;
-};
-
-export const uint8Array2str = (buf: Uint8Array) =>
-    String.fromCharCode.apply(null, buf);
 
 const algorithmsDict = [
     {
@@ -62,7 +57,7 @@ const algorithmsDict = [
         algType: JwtKeyTypes.OKP,
         algIds: Object.values([Algs?.EdDSA])
     }
-    // TODO: handle these algorithms
+    // TODO: implement these algorithms
     // {
     //     algType: "ed448",
     //     algIds: ["ed448"]
@@ -77,22 +72,6 @@ const algorithmsDict = [
     // }
 ];
 
-const publicKeyEncodingPem = {
-    type: "spki",
-    format: "pem"
-};
-
-const privateKeyEncodingPem = {
-    type: "pkcs8",
-    format: "pem"
-};
-
-const namedCurves = {
-    es256: "P-256",
-    es384: "P-384",
-    es512: "P-521",
-    eddsa: "ED25519"
-};
 
 export const getKeyPair = async ({
     algorithmIdentifier,
@@ -113,14 +92,14 @@ export const getKeyPair = async ({
             algType,
             {
                 namedCurve: useCurve
-                    ? namedCurves?.[algorithmIdentifier.toLowerCase()]
+                    ? c.namedCurves?.[algorithmIdentifier.toLowerCase()]
                     : undefined,
                 modulusLength: keySize,
                 publicKeyEncoding: {
-                    ...publicKeyEncodingPem
+                    ...c.publicKeyEncodingPem
                 },
                 privateKeyEncoding: {
-                    ...privateKeyEncodingPem
+                    ...c.privateKeyEncodingPem
                 }
             },
             (err, publicKey, privateKey) => {
