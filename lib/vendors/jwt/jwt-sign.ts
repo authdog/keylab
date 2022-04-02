@@ -15,7 +15,7 @@ export const signJwtWithSecret = async (
 
 export const signJwtWithPrivateKey = async (
     payload: any,
-    algorithm: string,
+    algorithm: Algs,
     privateKey: string
 ) => {
     const privateKeyObj = await importPKCS8(privateKey, algorithm);

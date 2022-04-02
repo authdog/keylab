@@ -9,6 +9,7 @@ import { verifyRSAToken } from "../jwks";
 import { signJwtWithSecret } from "./jwt-sign";
 import { IDecodedJwt } from "./interfaces";
 import { IRSAKeyStore } from "../jwks/jwks";
+import { signJwtWithPrivateKey } from ".";
 
 export interface IcheckTokenValidnessCredentials {
     // can be verified with a private key
@@ -27,7 +28,8 @@ export interface ISignTokenCredentials {
     // HS256
     secret?: string;
     // RS256
-    jwk: any;
+    // jwk?: any;
+    pemPrivateKey?: string;
     sessionDuration: number;
 }
 
@@ -56,7 +58,7 @@ export interface ICheckJwtFields {
 }
 
 export interface ICreateSignedJwtOptions {
-    algorithm: string | enums.JwtAlgorithmsEnum;
+    algorithm: enums.JwtAlgorithmsEnum;
     claims: IJwtTokenClaims;
     signinOptions: ISignTokenCredentials;
 }
@@ -149,7 +151,16 @@ export const checkTokenValidness = async (
                     )}`
                 );
             }
-        case algEnums.RS256 || algEnums.RS384 || algEnums.RS512:
+        case algEnums.RS256 ||
+            algEnums.RS384 ||
+            algEnums.RS512 ||
+            algEnums.ES256 ||
+            algEnums.ES384 ||
+            algEnums.ES512 ||
+            algEnums.PS256 ||
+            algEnums.PS384 ||
+            algEnums.EdDSA ||
+            algEnums.PS512:
             if (!adhoc && !jwksUri) {
                 missingCredentials.push("jwksUri");
             }
@@ -168,16 +179,6 @@ export const checkTokenValidness = async (
                     )}`
                 );
             }
-
-        // wip
-        case algEnums.ES256 ||
-            algEnums.ES384 ||
-            algEnums.ES512 ||
-            algEnums.PS256 ||
-            algEnums.PS384 ||
-            algEnums.EdDSA ||
-            algEnums.PS512:
-            throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
 
         case algEnums.ES256K:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
@@ -328,21 +329,25 @@ export const createSignedJwt = async (
             break;
 
         // TODO: use PEM in signin options
-        // case algEnums.RS256 ||
-        //     algEnums.RS384 ||
-        //     algEnums.RS512 ||
-        //     algEnums.PS256 ||
-        //     algEnums.PS384 ||
-        //     algEnums.PS512:
-        //     token = await signJwtWithJwk(jwtClaims, signinOptions.jwk);
-        //     break;
-
-        // to be implemented
-        case algEnums.ES256 ||
+        case algEnums.RS256 ||
+            algEnums.RS384 ||
+            algEnums.RS512 ||
+            algEnums.PS256 ||
+            algEnums.PS384 ||
+            algEnums.PS512 ||
+            algEnums.ES256 ||
             algEnums.ES384 ||
             algEnums.ES512 ||
-            algEnums.ES256K ||
             algEnums.EdDSA:
+            token = await signJwtWithPrivateKey(
+                jwtClaims,
+                algorithm,
+                signinOptions.pemPrivateKey
+            );
+            break;
+
+        // to be implemented
+        case algEnums.ES256K || algEnums.EdDSA:
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
     }
 

@@ -1,7 +1,0 @@
-i18n
-└── fr
-    ├── code.json
-    └── docusaurus-plugin-content-docs
-        └── current
-            └── [folder]
-                └── [generated].mdx

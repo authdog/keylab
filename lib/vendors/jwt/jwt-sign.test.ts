@@ -129,7 +129,7 @@ it("signs payload with pkcs8 private key", async () => {
 
     const signedPayloadRs256 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "RS256",
+        Algs.RS256,
         keyPairRS256.privateKey
     );
 
@@ -144,7 +144,7 @@ it("signs payload with pkcs8 private key", async () => {
 
     const signedPayloadRs384 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "RS384",
+        Algs?.RS384,
         keyPairRS384.privateKey
     );
 
@@ -159,7 +159,7 @@ it("signs payload with pkcs8 private key", async () => {
 
     const signedPayloadRs512 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "RS512",
+        Algs.RS512,
         keyPairRS512.privateKey
     );
 
@@ -174,7 +174,7 @@ it("signs payload with pkcs8 private key", async () => {
 
     const signedPayloadEs256 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "ES256",
+        Algs.ES256,
         keyPairES256.privateKey
     );
 
@@ -189,7 +189,7 @@ it("signs payload with pkcs8 private key", async () => {
 
     const signedPayloadEs384 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "ES384",
+        Algs.ES384,
         keyPairES384.privateKey
     );
 
@@ -204,7 +204,7 @@ it("signs payload with pkcs8 private key", async () => {
 
     const signedPayloadEs512 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "ES512",
+        Algs.ES512,
         keyPairES512.privateKey
     );
 
@@ -221,7 +221,7 @@ it("signs payload with pkcs8 private key - RSA-PSS", async () => {
 
     const signedPayloadPs256 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "PS256",
+        Algs.PS256,
         keyPairPS256.privateKey
     );
 
@@ -236,7 +236,7 @@ it("signs payload with pkcs8 private key - RSA-PSS", async () => {
 
     const signedPayloadPs384 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "PS384",
+        Algs.PS384,
         keyPairPS384.privateKey
     );
 
@@ -252,7 +252,7 @@ it("signs payload with pkcs8 private key - RSA-PSS", async () => {
 
     const signedPayloadPs512 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "PS512",
+        Algs.PS512,
         keyPairPS512.privateKey
     );
 
@@ -283,11 +283,8 @@ it("signs payload with pkcs8 private key - okp", async () => {
 
     const signedPayloadEddsa = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
-        "EdDSA",
+        Algs.EdDSA,
         keyPairEddsa.privateKey
     );
-
-    console.log(signedPayloadEddsa);
-
     expect(signedPayloadEddsa).toBeTruthy();
 });

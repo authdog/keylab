@@ -2,7 +2,7 @@ const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 const eastjwtGithub = 'https://github.com/authdog/easyjwt'
-const typedocLink = 'https://types.easyjwt.org'
+// const typedocLink = 'https://types.easyjwt.org'
 const introductionPath = 'introduction/installation';
 
 const path = require('path')
@@ -14,13 +14,13 @@ const path = require('path')
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
-  i18n: {
-    defaultLocale: 'en',
-    locales: [
-      'en',
-      'fr'
-    ],
-  },
+  // i18n: {
+  //   defaultLocale: 'en',
+  //   locales: [
+  //     'en',
+  //     // 'fr'
+  //   ],
+  // },
   title: 'easyjwt',
   tagline: 'JSON Web Token made easy',
   url: 'https://authdog.github.io',
@@ -59,10 +59,10 @@ module.exports = {
           position: 'left',
           label: 'Documentation',
         },
-        {
-          type: 'localeDropdown',
-          position: 'right'
-        },
+        // {
+        //   type: 'localeDropdown',
+        //   position: 'right'
+        // },
         {
           href: eastjwtGithub,
           label: 'GitHub',
@@ -98,10 +98,10 @@ module.exports = {
               label: 'GitHub repo',
               href: eastjwtGithub,
             },
-            {
-              label: 'Typedoc',
-              href: typedocLink,
-            },
+            // {
+            //   label: 'Typedoc',
+            //   href: typedocLink,
+            // },
           ],
         },
       ],
