@@ -44,8 +44,7 @@ export const publicKeyEncodingPem = {
 
 export const privateKeyEncodingPem = {
     type: "pkcs8",
-    // type: "pkcs1",
-    format: "pem"
+    format: "jwk"
 };
 
 export const namedCurves = {

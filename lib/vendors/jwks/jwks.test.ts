@@ -13,6 +13,9 @@ import * as c from "../../constants";
 import * as enums from "../../enums";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
+// import {JWK} from 'jose'
+
+
 it("check if key exists in set", () => {
     const jwks = [
         {
@@ -164,7 +167,7 @@ it("verifies token with adhoc jwk store", async () => {
 
 
 
-it ("generates jwk with generateSecret", async () => {
+it ("generates jwk with generateKeyFromStore", async () => {
 
     const store = createKeyStore();
 
@@ -229,112 +232,34 @@ it ("generates jwk with generateSecret", async () => {
     expect(keyEs512).toBeTruthy();
 
 
+    // PS256 / PS384 / PS512
+    // also valid for PS384 and PS512
+    const keyPs256 = await generateKeyFromStore(
+        store,
+        Kty.RSA,
+        Algs.RSAPSS,
+        true
+    );
+
+    expect(keyPs256).toBeTruthy();
+
     
+    // const keyEdDSA = await generateKeyFromStore(
+    //     store,
+    //     Kty.OKP,
+    //     Algs.EdDSA,
+    //     true
+    // );
+
+    // console.log(keyEdDSA)
+    
+    // expect(keyEdDSA).toBeTruthy();
 
 
 
+})
 
-
-
-
-
-
-    // const canBeExtracted = true;
-
-    // // HS256
-    // const secretHS256 = await generateSecret(Algs.HS256, {
-    //     extractable: canBeExtracted
-    // });
-    // expect(secretHS256).toBeTruthy();
-
-    // // HS384
-    // const secretHS384 = await generateSecret(Algs.HS384, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretHS384).toBeTruthy();
-
-    // // HS512
-
-    // const secretHS512 = await generateSecret(Algs.HS512, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretHS512).toBeTruthy();
-
-    // // RS256
-    // const secretRS256 = await generateSecret("RS256", {
-    //     extractable: canBeExtracted
-    // });
-
-
-    // expect(secretRS256).toBeTruthy();
-
-    // // RS384
-    // const secretRS384 = await generateSecret(Algs.RS384, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretRS384).toBeTruthy();
-
-    // // RS512
-    // const secretRS512 = await generateSecret(Algs.RS512, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretRS512).toBeTruthy();
-
-    // // ES256
-    // const secretES256 = await generateSecret(Algs.ES256, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretES256).toBeTruthy();
-
-    // // ES384
-    // const secretES384 = await generateSecret(Algs.ES384, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretES384).toBeTruthy();
-
-    // // ES512
-    // const secretES512 = await generateSecret(Algs.ES512, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretES512).toBeTruthy();
-
-    // // PS256
-    // const secretPS256 = await generateSecret(Algs.PS256, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretPS256).toBeTruthy();
-
-    // // PS384
-    // const secretPS384 = await generateSecret(Algs.PS384, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretPS384).toBeTruthy();
-
-    // // PS512
-
-    // const secretPS512 = await generateSecret(Algs.PS512, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretPS512).toBeTruthy();
-
-    // // EdDSA
-    // const secretEdDSA = await generateSecret(Algs.EdDSA, {
-    //     extractable: canBeExtracted
-    // });
-
-    // expect(secretEdDSA).toBeTruthy();
-
-
-
-
+it ("generate key with jose", async () => {
+    // JWK.createKey("oct", 256, { alg: "A256GCM" }).
+   
 })

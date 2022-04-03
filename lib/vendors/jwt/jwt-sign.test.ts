@@ -409,6 +409,8 @@ it("signs payload with pkcs8 private key - okp", async () => {
         keySize: 4096
     });
 
+    console.log(keyPairEddsa?.privateKey);
+
     expect(keyPairEddsa?.privateKey).toBeTruthy();
 
     const signedPayloadEddsa = await signJwtWithPrivateKey(
@@ -416,5 +418,8 @@ it("signs payload with pkcs8 private key - okp", async () => {
         Algs.EdDSA,
         keyPairEddsa.privateKey
     );
+
+    console.log(signedPayloadEddsa)
+
     expect(signedPayloadEddsa).toBeTruthy();
 });
