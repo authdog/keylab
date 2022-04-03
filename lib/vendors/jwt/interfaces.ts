@@ -32,8 +32,5 @@ export interface IGetKeyPair {
 export interface IKeyPair {
     publicKey: string;
     privateKey: string;
-    opts: {
-        alg: string;
-        kid: string;
-    }
+    kid: string;
 }

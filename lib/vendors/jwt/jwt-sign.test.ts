@@ -417,16 +417,15 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
     });
 
     expect(keyPairES256k?.privateKey).toBeTruthy();
-
-    console.log(keyPairES256k?.privateKey);
-
     const signedPayloadEs256k = await signJwtWithPrivateKey(
         {
             urn: "urn:test:test"
         },
         Algs.ES256K,
         keyPairES256k.privateKey,
-        keyPairES256k?.opts
+        {
+            kid: keyPairES256k?.kid
+        }
     );
 
     console.log(signedPayloadEs256k);
