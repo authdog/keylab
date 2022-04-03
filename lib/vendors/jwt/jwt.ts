@@ -5,7 +5,7 @@ import * as enums from "../../enums";
 import { msg, throwJwtError } from "../../errors";
 import { verifyRSAToken } from "../jwks";
 import { IDecodedJwt } from "./interfaces";
-import { IRSAKeyStore } from "../jwks/jwks";
+import { IRSAKeyStore } from "../jwks";
 import { signJwtWithPrivateKey } from "./jwt-sign";
 
 export interface IcheckTokenValidnessCredentials {
