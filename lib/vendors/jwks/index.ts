@@ -5,6 +5,12 @@ export {
     generateKeyFromStore,
     getKeyFromSet,
     keyExistsInSet,
-    verifyRSAToken,
-    IRSAKeyStore
+    verifyRSAToken
 } from "./jwks";
+
+export {
+    IJwkRecordVisible,
+    IJwksClient,
+    IRSAKeyStore,
+    IVerifyRSATokenCredentials
+} from "./jwks.d";

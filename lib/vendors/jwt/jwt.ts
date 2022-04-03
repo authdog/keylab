@@ -180,7 +180,6 @@ export const checkTokenValidness = async (
                 );
             }
 
-        
         default:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
     }

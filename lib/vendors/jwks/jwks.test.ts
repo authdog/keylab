@@ -208,5 +208,4 @@ it("generates jwk with generateKeyFromStore", async () => {
     );
 
     expect(keyPs256).toBeTruthy();
-
 });
