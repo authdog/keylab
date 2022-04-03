@@ -15,7 +15,7 @@ export enum JwtAlgorithmsEnum {
     PS512 = "PS512",
     RSAPSS = "RSA-PSS",
     EdDSA = "EdDSA",
-    ES256K = "ES256K" // not supported yet
+    ES256K = "ES256K"
 }
 
 // https://datatracker.ietf.org/doc/html/rfc7517#section-4.2

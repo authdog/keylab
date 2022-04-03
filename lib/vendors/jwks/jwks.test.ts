@@ -1,8 +1,4 @@
-import { 
-    createKeyStore,
-    generateKeyFromStore, 
-    keyExistsInSet
-} from "..";
+import { createKeyStore, generateKeyFromStore, keyExistsInSet } from "..";
 
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
 import { default as nock } from "nock";
@@ -14,7 +10,6 @@ import * as enums from "../../enums";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
 // import {JWK} from 'jose'
-
 
 it("check if key exists in set", () => {
     const jwks = [
@@ -163,12 +158,7 @@ it("verifies token with adhoc jwk store", async () => {
     expect(verified).toBeTruthy();
 });
 
-
-
-
-
-it ("generates jwk with generateKeyFromStore", async () => {
-
+it("generates jwk with generateKeyFromStore", async () => {
     const store = createKeyStore();
 
     const keyRsa256 = await generateKeyFromStore(
@@ -182,7 +172,6 @@ it ("generates jwk with generateKeyFromStore", async () => {
 
     expect(keyRsa256).toBeTruthy();
 
-
     const keyRsa384 = await generateKeyFromStore(
         store,
         Kty.RSA,
@@ -191,7 +180,6 @@ it ("generates jwk with generateKeyFromStore", async () => {
     );
 
     expect(keyRsa384).toBeTruthy();
-
 
     const keyRsa512 = await generateKeyFromStore(
         store,
@@ -231,7 +219,6 @@ it ("generates jwk with generateKeyFromStore", async () => {
 
     expect(keyEs512).toBeTruthy();
 
-
     // PS256 / PS384 / PS512
     // also valid for PS384 and PS512
     const keyPs256 = await generateKeyFromStore(
@@ -243,7 +230,6 @@ it ("generates jwk with generateKeyFromStore", async () => {
 
     expect(keyPs256).toBeTruthy();
 
-    
     // const keyEdDSA = await generateKeyFromStore(
     //     store,
     //     Kty.OKP,
@@ -252,14 +238,10 @@ it ("generates jwk with generateKeyFromStore", async () => {
     // );
 
     // console.log(keyEdDSA)
-    
+
     // expect(keyEdDSA).toBeTruthy();
+});
 
-
-
-})
-
-it ("generate key with jose", async () => {
+it("generate key with jose", async () => {
     // JWK.createKey("oct", 256, { alg: "A256GCM" }).
-   
-})
+});

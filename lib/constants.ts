@@ -51,7 +51,8 @@ export const namedCurves = {
     es256: "P-256",
     es384: "P-384",
     es512: "P-521",
-    eddsa: "ED25519"
+    eddsa: "ED25519",
+    es256k: "secp256k1"
 };
 
 export const PEM_CHARS = {

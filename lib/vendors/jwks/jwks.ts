@@ -4,7 +4,7 @@ import * as jose from "node-jose";
 
 import { throwJwtError } from "../../errors";
 // import * as enums from "../../enums";
-import {JwtAlgorithmsEnum as Algs} from '../../enums'
+import { JwtAlgorithmsEnum as Algs } from "../../enums";
 import * as c from "../../constants";
 
 import * as jwt from "jsonwebtoken";
@@ -57,10 +57,11 @@ export const createKeyStore = () => {
 const defaultKeyOptions = (algorithm: any) => {
     return Object.freeze({
         alg: algorithm,
-        use: "sig",
-    })
-}
+        use: "sig"
+    });
+};
 
+// will be deprecated
 export const generateKeyFromStore: any = async (
     store: jose.JWK.KeyStore,
     keyType: string,
@@ -76,18 +77,18 @@ export const generateKeyFromStore: any = async (
         case Algs.RS384:
         case Algs.RS512:
         case Algs.RSAPSS:
-        // case Algs.PS256:
-        // case Algs.PS384:
-        // case Algs.PS512:
+            // case Algs.PS256:
+            // case Algs.PS384:
+            // case Algs.PS512:
             generatedKey = await store.generate(
                 keyType.toUpperCase(),
                 keySize,
                 {
-                    ...defaultKeyOptions(algorithm),
+                    ...defaultKeyOptions(algorithm)
                 }
             );
             break;
-        
+
         // EC
         case Algs.ES256:
         case Algs.ES384:
@@ -96,11 +97,11 @@ export const generateKeyFromStore: any = async (
                 keyType.toUpperCase(),
                 c.namedCurves[algorithm.toLowerCase()],
                 {
-                    ...defaultKeyOptions(algorithm),
-                }                    
-            ); 
+                    ...defaultKeyOptions(algorithm)
+                }
+            );
             break;
-        
+
         // case Algs.EdDSA:
         //     generatedKey = await store.generate(
         //         keyType.toUpperCase(),
@@ -111,13 +112,10 @@ export const generateKeyFromStore: any = async (
         //     );
         //     break;
 
-
-
         default:
             throw new Error(`Unsupported algorithm: ${algorithm}`);
     }
 
-    
     //     await store.generate(
     //     // enums.JwtKeyTypes[keyType],
     //     keyType,

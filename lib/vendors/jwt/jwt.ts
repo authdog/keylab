@@ -133,7 +133,9 @@ export const checkTokenValidness = async (
     const algEnums = enums.JwtAlgorithmsEnum;
 
     switch (algorithm) {
-        case algEnums.HS256 || algEnums.HS384 || algEnums.HS512:
+        case algEnums.HS256:
+        case algEnums.HS384:
+        case algEnums.HS512:
             if (!secret) {
                 missingCredentials.push("secret");
             }
@@ -148,16 +150,16 @@ export const checkTokenValidness = async (
                     )}`
                 );
             }
-        case algEnums.RS256 ||
-            algEnums.RS384 ||
-            algEnums.RS512 ||
-            algEnums.ES256 ||
-            algEnums.ES384 ||
-            algEnums.ES512 ||
-            algEnums.PS256 ||
-            algEnums.PS384 ||
-            algEnums.EdDSA ||
-            algEnums.PS512:
+        case algEnums.RS256:
+        case algEnums.RS384:
+        case algEnums.RS512:
+        case algEnums.ES256:
+        case algEnums.ES384:
+        case algEnums.ES512:
+        case algEnums.PS256:
+        case algEnums.PS384:
+        case algEnums.PS512:
+        case algEnums.EdDSA:
             if (!adhoc && !jwksUri) {
                 missingCredentials.push("jwksUri");
             }
@@ -310,6 +312,7 @@ export const createSignedJwt = async (
         case algEnums.ES384:
         case algEnums.ES512:
         case algEnums.EdDSA:
+        case algEnums.ES256K:
             if (signinOptions?.pemPrivateKey) {
                 token = await signJwtWithPrivateKey(
                     jwtClaims,
@@ -327,7 +330,7 @@ export const createSignedJwt = async (
             break;
 
         // to be implemented
-        case algEnums.ES256K:
+        default:
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
     }
 

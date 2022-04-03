@@ -47,7 +47,8 @@ const algorithmsDict = [
             Algs?.ES256,
             Algs?.ES384,
             Algs?.ES512,
-            Algs?.EdDSA
+            Algs?.EdDSA,
+            Algs?.ES256K
         ])
     },
     {
@@ -58,19 +59,6 @@ const algorithmsDict = [
         algType: JwtKeyTypes.OKP,
         algIds: Object.values([Algs?.EdDSA])
     }
-    // TODO: implement these algorithms
-    // {
-    //     algType: "ed448",
-    //     algIds: ["ed448"]
-    // },
-    // {
-    //     algType: "x25519",
-    //     algIds: ["x25519"]
-    // },
-    // {
-    //     algType: "x448",
-    //     algIds: ["x448"]
-    // }
 ];
 
 export const getKeyPair = async ({

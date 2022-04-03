@@ -402,7 +402,7 @@ it("signs payload with pkcs8 private key - RSA-PSS", async () => {
     // expect(signedPayloadX25519).toBeTruthy();
 });
 
-it("signs payload with pkcs8 private key - okp", async () => {
+it("signs payload with pkcs8 private key - EdDSA", async () => {
     const keyPairEddsa = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs.EdDSA,
@@ -419,7 +419,27 @@ it("signs payload with pkcs8 private key - okp", async () => {
         keyPairEddsa.privateKey
     );
 
-    console.log(signedPayloadEddsa)
-
     expect(signedPayloadEddsa).toBeTruthy();
+
 });
+
+
+it("signs payload with pkcs8 private key - ES256k", async () => {
+    const keyPairES256k = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs.ES256K,
+        keySize: 4096
+    });
+
+    expect(keyPairES256k?.privateKey).toBeTruthy();
+
+    const signedPayloadEs256k = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        Algs.ES256K,
+        keyPairES256k.privateKey
+    );
+
+    console.log(signedPayloadEs256k);
+
+    expect(signedPayloadEs256k).toBeTruthy();
+})

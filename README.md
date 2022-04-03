@@ -15,7 +15,7 @@ easyjwt is a nodejs library aiming to create and validate JSON Web Tokens withou
 
 `yarn add @authdog/easyjwt`
 
-## Usage
+<!-- ## Usage
 
 Creating a token:
 
@@ -23,9 +23,9 @@ Creating a token:
 
 Verifying a token:
 
-- https://www.easyjwt.org/docs/jwt/validating-a-token
+- https://www.easyjwt.org/docs/jwt/validating-a-token -->
 
-## Roadmap Features
+<!-- ## Roadmap Features
 
 - [x] Basic readme validation info
 - [x] Helpers to check issuer and audiences of a given token
@@ -58,7 +58,7 @@ Verifying a token:
 
 - jsonwebtoken
 - node-jose
-- node-fetch
+- node-fetch -->
 
 ## Changelog
 

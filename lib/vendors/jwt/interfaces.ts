@@ -11,8 +11,8 @@ type AlgorithmIdentifier =
     | Algs.PS384
     | Algs.PS512
     | Algs.EdDSA
-    | Algs.RSAPSS;
-// | Algs.ES256K
+    | Algs.RSAPSS
+    | Algs.ES256K
 
 export interface IDecodedJwt {
     iss?: string;
