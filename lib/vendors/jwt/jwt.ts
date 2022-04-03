@@ -11,7 +11,7 @@ import { signJwtWithPrivateKey } from "./jwt-sign";
 export interface IcheckTokenValidnessCredentials {
     // HS256 | HS384 | HS512
     secret?: string;
-    // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA
+    // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA | ES256K
     domainUri?: string;
     jwksUri?: string;
     verifySsl?: boolean;
@@ -23,7 +23,7 @@ export interface IcheckTokenValidnessCredentials {
 export interface ISignTokenCredentials {
     // HS256 | HS384 | HS512
     secret?: string;
-    // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA
+    // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA | ES256K
     pemPrivateKey?: string;
     jwkPrivateKey?: any;
     // any algorithm supported by jwt
@@ -160,6 +160,7 @@ export const checkTokenValidness = async (
         case algEnums.PS384:
         case algEnums.PS512:
         case algEnums.EdDSA:
+        case algEnums.ES256K:
             if (!adhoc && !jwksUri) {
                 missingCredentials.push("jwksUri");
             }
@@ -179,9 +180,7 @@ export const checkTokenValidness = async (
                 );
             }
 
-        case algEnums.ES256K:
-            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
-
+        
         default:
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
     }
@@ -326,10 +325,8 @@ export const createSignedJwt = async (
                     signinOptions.jwkPrivateKey
                 );
             }
-
             break;
 
-        // to be implemented
         default:
             throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM);
     }

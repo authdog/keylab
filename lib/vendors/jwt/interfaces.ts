@@ -12,7 +12,7 @@ type AlgorithmIdentifier =
     | Algs.PS512
     | Algs.EdDSA
     | Algs.RSAPSS
-    | Algs.ES256K
+    | Algs.ES256K;
 
 export interface IDecodedJwt {
     iss?: string;
@@ -27,10 +27,13 @@ export interface IGetKeyPair {
     algorithmIdentifier: AlgorithmIdentifier;
     keySize: number;
     keyFormat: "pem";
-    // passphrase?: string;
 }
 
 export interface IKeyPair {
     publicKey: string;
     privateKey: string;
+    opts: {
+        alg: string;
+        kid: string;
+    }
 }

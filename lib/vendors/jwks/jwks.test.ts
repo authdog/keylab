@@ -9,8 +9,6 @@ import * as c from "../../constants";
 import * as enums from "../../enums";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
-// import {JWK} from 'jose'
-
 it("check if key exists in set", () => {
     const jwks = [
         {
@@ -38,25 +36,6 @@ it("check if key exists in set", () => {
     expect(shouldNotExist).toBeFalsy();
 });
 
-// export const generateKeyFromStore: any = async (
-//     store: jose.JWK.KeyStore,
-//     keyType: string,
-//     algorithm: string,
-//     exposePrivateFields: boolean = false
-// ) => {
-//     const generatedKey = await store.generate(
-//         enums.JwtKeyTypes[keyType],
-//         2048,
-//         {
-//             // jwa: https://datatracker.ietf.org/doc/html/rfc7518
-//             alg: enums.JwtAlgorithmsEnum[algorithm],
-//             // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
-//             // The "use" and "key_ops" JWK members SHOULD NOT be used together;
-//             use: enums.JwtPublicKeyUse.SIGNATURE
-//         }
-//     );
-//     return generatedKey.toJSON(exposePrivateFields);
-// };
 it("verifies correctly token with public uri", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
     const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
@@ -220,7 +199,7 @@ it("generates jwk with generateKeyFromStore", async () => {
     expect(keyEs512).toBeTruthy();
 
     // PS256 / PS384 / PS512
-    // also valid for PS384 and PS512
+    // also valid for PS384 and PS512 as RSA-PSS is used for all of them
     const keyPs256 = await generateKeyFromStore(
         store,
         Kty.RSA,
@@ -230,18 +209,4 @@ it("generates jwk with generateKeyFromStore", async () => {
 
     expect(keyPs256).toBeTruthy();
 
-    // const keyEdDSA = await generateKeyFromStore(
-    //     store,
-    //     Kty.OKP,
-    //     Algs.EdDSA,
-    //     true
-    // );
-
-    // console.log(keyEdDSA)
-
-    // expect(keyEdDSA).toBeTruthy();
-});
-
-it("generate key with jose", async () => {
-    // JWK.createKey("oct", 256, { alg: "A256GCM" }).
 });

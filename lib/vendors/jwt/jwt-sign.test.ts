@@ -387,19 +387,6 @@ it("signs payload with pkcs8 private key - RSA-PSS", async () => {
     );
 
     expect(signedPayloadPs512).toBeTruthy();
-
-    // x25519: does not work
-    // const keyPairX25519 = await getKeyPair({
-    //     keyFormat: "pem",
-    //     algorithmIdentifier: "x25519",
-    //     keySize: 4096
-    // });
-
-    // const signedPayloadX25519 = await signJwtWithPrivateKey({ urn: "urn:test:test" }, "X25519", keyPairX25519.privateKey);
-
-    // const signedPayloadX25519 = await signJwtWithPrivateKey({ urn: "urn:test:test" }, "ECDH-ES", keyPairX25519.privateKey);
-
-    // expect(signedPayloadX25519).toBeTruthy();
 });
 
 it("signs payload with pkcs8 private key - EdDSA", async () => {
@@ -420,9 +407,7 @@ it("signs payload with pkcs8 private key - EdDSA", async () => {
     );
 
     expect(signedPayloadEddsa).toBeTruthy();
-
 });
-
 
 it("signs payload with pkcs8 private key - ES256k", async () => {
     const keyPairES256k = await getKeyPair({
@@ -433,13 +418,18 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
 
     expect(keyPairES256k?.privateKey).toBeTruthy();
 
+    console.log(keyPairES256k?.privateKey);
+
     const signedPayloadEs256k = await signJwtWithPrivateKey(
-        { urn: "urn:test:test" },
+        {
+            urn: "urn:test:test"
+        },
         Algs.ES256K,
-        keyPairES256k.privateKey
+        keyPairES256k.privateKey,
+        keyPairES256k?.opts
     );
 
     console.log(signedPayloadEs256k);
 
     expect(signedPayloadEs256k).toBeTruthy();
-})
+});

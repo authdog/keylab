@@ -1,6 +1,6 @@
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
 import { importPKCS8, importJWK, SignJWT } from "jose";
-import { generateKeyPair } from "crypto";
+import { generateKeyPair, randomBytes } from "crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 import * as c from "../../constants";
 import { strToUint8Array } from "./utils";
@@ -8,7 +8,8 @@ import { strToUint8Array } from "./utils";
 export const signJwtWithPrivateKey = async (
     payload: any,
     alg: Algs,
-    privateKey: string | any
+    privateKey: string | any,
+    opts: any = {}
 ) => {
     let privateKeyObj;
 
@@ -26,7 +27,7 @@ export const signJwtWithPrivateKey = async (
         }
     }
 
-    return await new SignJWT({ ...payload })
+    return await new SignJWT({ ...payload, ...opts })
         .setProtectedHeader({ alg, type: JwtKeyTypes?.JWT })
         .sign(privateKeyObj);
 };
@@ -92,7 +93,14 @@ export const getKeyPair = async ({
             },
             (err, publicKey, privateKey) => {
                 if (err) return reject(err);
-                resolve({ publicKey, privateKey });
+
+
+                const kid = randomBytes(16).toString("hex");
+
+                resolve({ publicKey, privateKey, opts: {
+                    kid,
+                    alg: algorithmIdentifier,
+                } });
             }
         );
     });

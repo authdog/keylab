@@ -77,9 +77,6 @@ export const generateKeyFromStore: any = async (
         case Algs.RS384:
         case Algs.RS512:
         case Algs.RSAPSS:
-            // case Algs.PS256:
-            // case Algs.PS384:
-            // case Algs.PS512:
             generatedKey = await store.generate(
                 keyType.toUpperCase(),
                 keySize,
@@ -102,15 +99,6 @@ export const generateKeyFromStore: any = async (
             );
             break;
 
-        // case Algs.EdDSA:
-        //     generatedKey = await store.generate(
-        //         keyType.toUpperCase(),
-        //         c.namedCurves[algorithm.toLowerCase()],
-        //         {
-        //             ...defaultKeyOptions(algorithm),
-        //         }
-        //     );
-        //     break;
 
         default:
             throw new Error(`Unsupported algorithm: ${algorithm}`);
