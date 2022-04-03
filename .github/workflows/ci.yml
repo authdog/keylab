@@ -1,4 +1,4 @@
-name: adg-easyjwt-lib
+name: adg-keylab-lib
 
 on: [push]
 
