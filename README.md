@@ -1,4 +1,4 @@
-# easyjwt
+# keylab
 
 ![](https://github.com/authdog/easyjwt/workflows/adg-easyjwt-lib/badge.svg)
 [![Build Status](https://travis-ci.com/authdog/easyjwt.svg?branch=master)](https://travis-ci.com/authdog/easyjwt)
@@ -70,14 +70,11 @@ Verifying a token:
 
 If you have found a bug or if you have a feature request, please report them at this repository issues section. Please do not report security vulnerabilities on the public GitHub issue tracker. The [Responsible Disclosure Program](https://authdog.com/whitehat) details the procedure for disclosing security issues.
 
-## Author
-
-[Authdog](https://www.authdog.com)
 
 ## References
 
 - https://w3c.github.io/webcrypto/
-
+- https://nodejs.org/docs/latest-v15.x/api/crypto.html
 
 ## License
 
