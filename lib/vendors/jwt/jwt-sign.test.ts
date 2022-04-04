@@ -4,6 +4,8 @@ import * as c from "../../constants";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
 import { parseJwt, signJwtWithPrivateKey } from ".";
 import { strToUint8Array, uint8ArrayToStr } from "./utils";
+import { generateKeyPair, randomBytes } from "crypto";
+import { IKeyPair } from "./interfaces";
 
 it("jwt sign with payload fields - HS256", async () => {
     const payload = {
@@ -59,6 +61,9 @@ it("jwt sign with payload fields - RS256", async () => {
         Algs.RS256,
         keyPairRS256.privateKey
     );
+
+
+    console.log(signedPayloadRs256)
 
     const { iss, aud, sub, aid } = parseJwt(signedPayloadRs256);
 
@@ -396,8 +401,6 @@ it("signs payload with pkcs8 private key - EdDSA", async () => {
         keySize: 4096
     });
 
-    console.log(keyPairEddsa?.privateKey);
-
     expect(keyPairEddsa?.privateKey).toBeTruthy();
 
     const signedPayloadEddsa = await signJwtWithPrivateKey(
@@ -427,8 +430,82 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
             kid: keyPairES256k?.kid
         }
     );
-
-    console.log(signedPayloadEs256k);
-
     expect(signedPayloadEs256k).toBeTruthy();
+});
+
+
+it("signs payload with pkcs8 private key - unsupported yet", async () => {
+
+    // works but not signin
+    // const keyPairEd25519 = await getKeyPair({
+    //     keyFormat: "pem",
+    //     algorithmIdentifier: Algs.Ed25519,
+    //     keySize: 4096
+    // });
+
+    // expect(keyPairEd25519?.privateKey).toBeTruthy();
+
+    // const keyPairX25519 = await getKeyPair({
+    //     keyFormat: "pem",
+    //     // @ts-ignore
+    //     algorithmIdentifier: "x25519",
+    //     keySize: 4096
+    // });
+
+    // expect(keyPairX25519?.privateKey).toBeTruthy();
+
+    // const signedPayloadX25519 = await signJwtWithPrivateKey(
+    //     { urn: "urn:test:test" },
+    //     Algs.X25519,
+    //     keyPairX25519.privateKey
+    // );
+
+    // expect(signedPayloadX25519).toBeTruthy();
+
+
+})
+
+
+
+it("experiment algorithm", async () => {
+    
+    const generateKey = async ({
+        alg,
+    }): Promise<IKeyPair> => {
+        return new Promise((resolve: Function, reject: Function) => {
+
+            generateKeyPair(alg, {
+                modulusLength: 530,
+                publicKeyEncoding: {
+                    ...c.publicKeyEncodingPem
+                },
+                privateKeyEncoding: {
+                  ...c.privateKeyEncodingPem
+                }
+              },
+              (err, publicKey, privateKey) => {
+                  if (err) return reject(err);
+  
+                  // TODO: define kid length in constants
+                  const kid = randomBytes(16).toString("hex");
+  
+                  resolve({ publicKey, privateKey, kid });
+              })
+
+        });
+    }
+
+    const keyEd25519 = await generateKey({alg: 'ed25519'});
+    expect(keyEd25519?.privateKey).toBeTruthy();
+
+    const keyEd448 = await generateKey({alg: 'ed448'});
+    expect(keyEd448?.privateKey).toBeTruthy();
+
+    const keyX25519 = await generateKey({alg: 'x25519'});
+    expect(keyX25519?.privateKey).toBeTruthy();
+
+    const keyX448 = await generateKey({alg: 'x448'});
+    expect(keyX448?.privateKey).toBeTruthy();
+
+
 });

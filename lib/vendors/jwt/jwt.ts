@@ -5,60 +5,8 @@ import * as enums from "../../enums";
 import { msg, throwJwtError } from "../../errors";
 import { verifyRSAToken } from "../jwks";
 import { IDecodedJwt } from "./interfaces";
-import { IRSAKeyStore } from "../jwks";
+import {ICheckJwtFields, IcheckTokenValidnessCredentials, ICreateSignedJwtOptions} from './jwt.d'
 import { signJwtWithPrivateKey } from "./jwt-sign";
-
-export interface IcheckTokenValidnessCredentials {
-    // HS256 | HS384 | HS512
-    secret?: string;
-    // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA | ES256K
-    domainUri?: string;
-    jwksUri?: string;
-    verifySsl?: boolean;
-    adhoc?: IRSAKeyStore;
-    // scopes
-    requiredScopes?: string[];
-}
-
-export interface ISignTokenCredentials {
-    // HS256 | HS384 | HS512
-    secret?: string;
-    // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA | ES256K
-    pemPrivateKey?: string;
-    jwkPrivateKey?: any;
-    // any algorithm supported by jwt
-    sessionDuration: number;
-}
-
-export interface IJwtTokenClaims {
-    sub: string; // subject id
-    iss: string; // issuer
-    aud: string[]; // audiences
-    scp: string; // scopes eg: "user openid"
-    pld?: any; // payload
-    aid?: string; // authdog global identifier
-}
-
-export interface IJwtTokenOpts {
-    compact?: true;
-    jwk: any;
-    fields?: {
-        typ: string;
-    };
-    sessionDuration: number;
-}
-
-export interface ICheckJwtFields {
-    requiredAudiences?: string[];
-    requiredIssuer?: string;
-    requiredScopes?: string[];
-}
-
-export interface ICreateSignedJwtOptions {
-    algorithm: enums.JwtAlgorithmsEnum;
-    claims: IJwtTokenClaims;
-    signinOptions: ISignTokenCredentials;
-}
 
 /**
  *
@@ -104,13 +52,14 @@ export const getAlgorithmJwt = (token: string) => {
 export const parseJwt = (token: string) => {
     var base64Url = token.split(".")[1];
     var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
     var jsonPayload = decodeURIComponent(
         atob(base64)
-            .split("")
+            .split(c.EMPTY_STRING)
             .map((c: string) => {
                 return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
             })
-            .join("")
+            .join(c.EMPTY_STRING)
     );
 
     return JSON.parse(jsonPayload);

@@ -40,7 +40,7 @@
     },
     "homepage": "https://github.com/authdog/easyjwt#readme",
     "devDependencies": {
-        "@types/jest": "^26.0.24",
+        "@types/jest": "^27.4.1",
         "@types/jsonwebtoken": "^8.5.4",
         "@types/node": "^16.0.0",
         "codecov": "^3.8.3",

@@ -2,11 +2,12 @@ import {
     readTokenHeaders,
     getAlgorithmJwt,
     verifyHSTokenWithSecretString,
-    checkJwtFields
+    checkJwtFields,
+    parseJwt
 } from "./jwt";
 import { JsonWebTokenError } from "jsonwebtoken";
 import * as c from "../../constants";
-import * as enums from "../../enums";
+import {JwtAlgorithmsEnum as Algs} from "../../enums";
 import * as jwt from "jsonwebtoken";
 
 const DUMMY_HS256_TOKEN =
@@ -16,14 +17,14 @@ const DUMMY_NON_JWT_TOKEN = "hello-i-am-not-a-jwt";
 it("extract properly token headers", async () => {
     const headers = readTokenHeaders(DUMMY_HS256_TOKEN);
     expect(headers).toBeTruthy();
-    expect(headers.alg).toEqual(enums.JwtAlgorithmsEnum.HS256);
+    expect(headers.alg).toEqual(Algs.HS256);
     expect(headers.typ).toEqual("JWT");
     expect(c.JWT_SUPPORTED_ALGS.includes(headers.alg)).toBeTruthy();
 });
 
 it("extract properly algorithm from token", async () => {
     expect(getAlgorithmJwt(DUMMY_HS256_TOKEN)).toEqual(
-        enums.JwtAlgorithmsEnum.HS256
+        Algs.HS256
     );
 });
 
@@ -176,3 +177,13 @@ it("verifies token scopes", async () => {
 
     expect(tokenMissesAScope2).toBeFalsy();
 });
+
+
+it("parses token", async () => {
+    const token = `
+    eyJhbGciOiJSUzI1NiIsInR5cGUiOiJqd3QifQ.eyJhaWQiOiIxMjM0NSIsInN1YiI6InN1YjoxMjM0NSIsImlzcyI6Imlzc3VlcjoxMjM0NSIsImF1ZCI6WyJhdWQ6MTIzNDUiXSwic2NwIjoiLCwifQ.JNwBGaPC0QmQjEcCf9djyItd91GWP8cGZThIQUJ2XghZu6yg5sLJWrtPu8C405WqIcPYLwh2SaY6Tr4FrnmcEnS61VGOq47pnyz4MrCjRp9nFaQaKj1WgQwjlo9G_g5OpjwOyvhhHQo3cpMtBT7ns0vjhyZMbHcvx6hyAW7E6vqDM1XpE6KUx4gYj3pA8VhCrBiKnQXjFmxS4yecCJ6DOWDUtGykRgYDrNQDLjBn9fMff8xbCwtsTsBzaYafL4iTlJH_Q4Gz7t6HenGmK06CkXrUdqYav94kVxsWkJzuD19oWepPkRUiILXCcYD4Rnk0EFDllCeBGQIC-K5qCM5CmabEprkeoCVbtAcY1cd8Z2xJIqx4TM50Qc6Oe3HIB_NWFLydVK74sVRbBrNtyM1cmVj39RlBn8XsW6UT-B8qujhsoa8sIcUss_IEd2fEpc_PFHsoe0bU8iEfKgiRNTUBdzIvas15a4nOt6_RjXeI5XOkgVurSDkFfEqjqOtjUeUPzscc2HVgExIDqsQaSn-okSqbx_vxPgbWaQaLuTrIS9zVFNhUQ7ENqjGE2pa4zgkmdqwK4pbf0z_UXSv3Y2iay_a7dnQpLpSWD8wNqOXlkpg6oj49rMQE8_JY3qzw1VslJjrRiwiGCNasS5yKLLC7SyIkdNusTgp_SPbkcLl-_L0
+    `;
+
+    const parsed = parseJwt(token);
+    expect(parsed).toBeTruthy();
+})

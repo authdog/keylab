@@ -11,10 +11,16 @@ import * as jwt from "jsonwebtoken";
 
 import {
     checkJwtFields,
-    IJwtTokenClaims,
-    IJwtTokenOpts,
+
     readTokenHeaders
 } from "../jwt";
+
+import {
+    IJwtTokenClaims,
+    IJwtTokenOpts,
+} from '../jwt/jwt.d'
+
+
 import { IDecodedJwt } from "../jwt/interfaces";
 import {
     IJwkRecordVisible,

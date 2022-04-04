@@ -59,6 +59,14 @@ const algorithmsDict = [
     {
         algType: JwtKeyTypes.OKP,
         algIds: Object.values([Algs?.EdDSA])
+    },
+    {
+        algType: Algs.Ed25519,
+        algIds: Object.values([Algs?.Ed25519])
+    },
+    {
+        algType: Algs.X25519,
+        algIds: Object.values([Algs?.X25519])
     }
 ];
 
