@@ -17,7 +17,7 @@ import {
 import {
     IJwtTokenClaims,
     IJwtTokenOpts,
-} from '../jwt/jwt.d'
+} from '../jwt/jwt_d'
 
 
 import { IDecodedJwt } from "../jwt/interfaces";

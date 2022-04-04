@@ -13,7 +13,7 @@ module.exports = {
         "/node_modules/", "dist", "docs", "coverage", "tsdoc"
     ],
     testMatch: [
-       "<rootDir>/lib/**/*.test.ts",
+       "<rootDir>/src/**/*.test.ts",
        "<rootDir>/scripts/**/*.test.ts"
     ],
     testEnvironment: "node",
