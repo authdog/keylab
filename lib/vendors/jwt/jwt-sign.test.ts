@@ -62,9 +62,6 @@ it("jwt sign with payload fields - RS256", async () => {
         keyPairRS256.privateKey
     );
 
-
-    console.log(signedPayloadRs256)
-
     const { iss, aud, sub, aid } = parseJwt(signedPayloadRs256);
 
     expect(iss).toEqual("issuer:12345");

@@ -147,8 +147,6 @@ it("generates jwk with generateKeyFromStore", async () => {
         true
     );
 
-    console.log(keyRsa256);
-
     expect(keyRsa256).toBeTruthy();
 
     const keyRsa384 = await generateKeyFromStore(
