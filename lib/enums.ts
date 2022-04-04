@@ -33,3 +33,9 @@ export enum JwtKeyTypes {
     OKP = "ed25519", // Edwards-curve Octet Key Pair: https://datatracker.ietf.org/doc/html/rfc8032
     JWT = "jwt" // JSON Web Token key type
 }
+
+export enum JwtParts {
+    HEADER = "header",
+    PAYLOAD = "payload",
+    SIGNATURE = "signature"
+}

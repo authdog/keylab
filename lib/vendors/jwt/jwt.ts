@@ -14,17 +14,13 @@ import { signJwtWithPrivateKey } from "./jwt-sign";
  * @returns headers from the jwt passed as parameter
  */
 export const readTokenHeaders = (token: string) => {
-    let headers;
-    const decodedToken = jwt.decode(token, {
-        complete: true
-    });
-
-    if (!decodedToken) {
-        throwJwtError(c.JWT_CANNOT_BE_DECODED);
-    } else {
-        headers = decodedToken.header;
+    let decoded;
+    try {
+        decoded = parseJwt(token, enums.JwtParts.HEADER);
+    } catch(e) {
+        throwJwtError("impossible to decode jwt");
     }
-    return headers;
+    return decoded;
 };
 
 /**
@@ -43,14 +39,33 @@ export const getAlgorithmJwt = (token: string) => {
     return algorithm;
 };
 
+
+
+
 // https://stackoverflow.com/a/38552302/8483084
 /**
  *
  * @param token
  * @returns JSON payload from token passed as parameter
  */
-export const parseJwt = (token: string) => {
-    var base64Url = token.split(".")[1];
+export const parseJwt = (token: string, part: enums.JwtParts = enums.JwtParts.PAYLOAD) => {
+    let indexPart = -1;
+
+    switch (part) {
+        case enums.JwtParts.HEADER:
+            indexPart = 0;
+            break;
+        case enums.JwtParts.PAYLOAD:
+            indexPart = 1;
+            break;
+        case enums.JwtParts.SIGNATURE:
+            indexPart = 2;
+            break;
+        default:
+            throw throwJwtError("unknown jwt part");
+    }
+
+    var base64Url = token.split(".")[indexPart];
     var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
 
     var jsonPayload = decodeURIComponent(
