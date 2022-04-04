@@ -1,7 +1,7 @@
 {
     "name": "keylab",
     "version": "0.1.0",
-    "description": "easyjwt is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
+    "description": "keylab is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
     "scripts": {
         "test": "jest",
         "test-with-coverage": "jest --collect-coverage",
@@ -13,15 +13,14 @@
         "tsdoc:deploy": "NETLIFY_SITE_ID=7a9aa5c4-6218-4d61-b482-999b3a32f38a netlify deploy --dir=tsdoc --prod",
         "tsdoc:netlify": "yarn tsdoc:build && yarn tsdoc:deploy",
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
-        "postbuild": "ts-node scripts/copy",
         "lib:build:clean": "rm -rf dist",
-        "build": "rm -rf pkg && pika build",
+        "build": "yarn lib:build:clean && pika build",
         "lib:publish": "yarn build && pika publish"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/authdog/easyjwt.git",
-        "author": "Authdog Inc."
+        "url": "git+https://github.com/authdog/keylab.git",
+        "author": "Authdog"
     },
     "keywords": [
         "jwt",
@@ -30,15 +29,14 @@
         "security",
         "openid",
         "token",
-        "node-jose",
         "jose"
     ],
     "author": "Authdog, Inc.",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/authdog/easyjwt/issues"
+        "url": "https://github.com/authdog/keylab/issues"
     },
-    "homepage": "https://github.com/authdog/easyjwt#readme",
+    "homepage": "https://github.com/authdog/keylab#readme",
     "devDependencies": {
         "@types/jest": "^27.4.1",
         "@types/jsonwebtoken": "^8.5.4",
@@ -67,13 +65,8 @@
     },
     "dependencies": {
         "jose": "^4.6.0",
-        "js-base64": "^3.7.2",
-        "jsonwebtoken": "^8.5.1",
-        "jwk-to-pem": "^2.0.5",
         "jws": "^4.0.0",
-        "node-fetch": "^2.6.1",
-        "node-jose": "^2.0.0",
-        "pem-jwk": "^2.0.0"
+        "node-fetch": "^2.6.1"
     },
     "@pika/pack": {
         "pipeline": [
@@ -82,7 +75,8 @@
             {
               "exclude": [
                 "__mocks__/**/*",
-                "__test__/**/*"
+                "__test__/**/*",
+                "src/**/*.test.ts"
               ]
             }
           ],

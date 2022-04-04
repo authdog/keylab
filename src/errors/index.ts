@@ -1,7 +1,8 @@
-import { JsonWebTokenError } from "jsonwebtoken";
+// import { JsonWebTokenError } from "jsonwebtoken";
 import { UnauthorizedError } from "./unauthorized";
 import { EnvironmentError } from "./environment";
 import * as c from "../constants";
+import { JsonWebTokenError } from "./jwt-error";
 
 export const throwUnauthorized = (message?: string) => {
     throw new UnauthorizedError("unauthorized", {
