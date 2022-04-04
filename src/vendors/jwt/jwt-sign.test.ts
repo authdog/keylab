@@ -1,8 +1,8 @@
-import { getKeyPair } from "./jwt-sign";
+import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign";
 import { readTokenHeaders } from "./jwt";
 import * as c from "../../constants";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
-import { parseJwt, signJwtWithPrivateKey } from ".";
+import { parseJwt } from ".";
 import { strToUint8Array, uint8ArrayToStr } from "./utils";
 import { generateKeyPair, randomBytes } from "crypto";
 import { IKeyPair } from "./interfaces";
