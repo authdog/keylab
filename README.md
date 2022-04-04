@@ -1,29 +1,29 @@
 # keylab
 
-![](https://github.com/authdog/easyjwt/workflows/adg-keylab-lib/badge.svg)
-[![Build Status](https://travis-ci.com/authdog/easyjwt.svg?branch=master)](https://travis-ci.com/authdog/keylab)
-[![codecov](https://codecov.io/gh/authdog/easyjwt/branch/master/graph/badge.svg?token=6XA3OTMTAT)](https://codecov.io/gh/authdog/keylab)
+![](https://github.com/authdog/keylab/workflows/adg-keylab-lib/badge.svg)
+[![Build Status](https://travis-ci.com/authdog/keylab.svg?branch=master)](https://travis-ci.com/authdog/keylab)
+[![codecov](https://codecov.io/gh/authdog/keylab/branch/master/graph/badge.svg?token=6XA3OTMTAT)](https://codecov.io/gh/authdog/keylab)
 [![npm version](https://badge.fury.io/js/keylab.svg)](https://badge.fury.io/js/keylab)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
-![bundle size](https://img.shields.io/bundlephobia/minzip/@authdog/easyjwt?label=zipped)
-<!-- [![dependencies Status](https://david-dm.org/authdog/easyjwt/status.svg)](https://david-dm.org/authdog/easyjwt)
-[![devDependencies Status](https://david-dm.org/authdog/easyjwt/dev-status.svg)](https://david-dm.org/authdog/easyjwt?type=dev) -->
+![bundle size](https://img.shields.io/bundlephobia/minzip/keylab?label=zipped)
+<!-- [![dependencies Status](https://david-dm.org/authdog/keylab/status.svg)](https://david-dm.org/authdog/keylab)
+[![devDependencies Status](https://david-dm.org/authdog/keylab/dev-status.svg)](https://david-dm.org/authdog/keylab?type=dev) -->
 
-easyjwt is a nodejs library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.
+keylab is a nodejs library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.
 
 ## Install
 
-`yarn add @authdog/easyjwt`
+`yarn add @authdog/keylab`
 
 <!-- ## Usage
 
 Creating a token:
 
-- https://www.easyjwt.org/docs/jwt/signin-a-token
+- https://www.keylab.org/docs/jwt/signin-a-token
 
 Verifying a token:
 
-- https://www.easyjwt.org/docs/jwt/validating-a-token -->
+- https://www.keylab.org/docs/jwt/validating-a-token -->
 
 <!-- ## Roadmap Features
 
