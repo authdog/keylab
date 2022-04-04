@@ -495,7 +495,7 @@ it("experiment algorithm", async () => {
         });
     }
 
-    const keyEd25519 = await generateKey({alg: 'ed25519'});
+    const keyEd25519 = await generateKey({alg: Algs.Ed25519.toLowerCase()});
     expect(keyEd25519?.privateKey).toBeTruthy();
 
     const keyEd448 = await generateKey({alg: 'ed448'});
