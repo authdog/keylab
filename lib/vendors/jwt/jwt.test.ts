@@ -6,10 +6,10 @@ import {
     parseJwt
 } from "./jwt";
 import { JsonWebTokenError } from "jsonwebtoken";
+import {JwtAlgorithmsEnum as Algs, JwtParts, JwtKeyTypes} from '../../enums'
 import * as c from "../../constants";
-import {JwtAlgorithmsEnum as Algs} from "../../enums";
 import * as jwt from "jsonwebtoken";
-import {JwtParts, JwtAlgorithmsEnum, JwtKeyTypes} from '../../enums'
+
 
 const DUMMY_HS256_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -218,7 +218,7 @@ it("parses token", async () => {
     const parsedHeaders = parseJwt(token, JwtParts.HEADER);
 
     expect(parsedHeaders).toEqual({
-        alg: JwtAlgorithmsEnum?.RS256,
+        alg: Algs?.RS256,
         type: JwtKeyTypes?.JWT
     })
 })
