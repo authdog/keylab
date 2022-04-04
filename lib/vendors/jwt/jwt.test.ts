@@ -142,7 +142,7 @@ it("verifies token audience", async () => {
 
     // right audience - aud array, but missing `missing-audience`
     const token5 = await signJwtWithPrivateKey(
-        { aud: c.AUTHDOG_ID_ISSUER },
+        { aud: [c.AUTHDOG_ID_ISSUER] },
         Algs.HS256,
         "secret"
     );
