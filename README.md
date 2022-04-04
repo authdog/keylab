@@ -1,6 +1,6 @@
 # keylab
 
-![](https://github.com/authdog/easyjwt/workflows/adg-easyjwt-lib/badge.svg)
+![](https://github.com/authdog/easyjwt/workflows/adg-keylab-lib/badge.svg)
 [![Build Status](https://travis-ci.com/authdog/easyjwt.svg?branch=master)](https://travis-ci.com/authdog/easyjwt)
 [![codecov](https://codecov.io/gh/authdog/easyjwt/branch/master/graph/badge.svg?token=6XA3OTMTAT)](https://codecov.io/gh/authdog/keylab)
 [![npm version](https://badge.fury.io/js/%40authdog%2Feasyjwt.svg)](https://badge.fury.io/js/%40authdog%2Feasyjwt)
