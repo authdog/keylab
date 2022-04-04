@@ -15,7 +15,8 @@
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
         "lib:build:clean": "rm -rf dist",
         "build": "yarn lib:build:clean && pika build",
-        "lib:publish": "yarn build && pika publish"
+        "lib:publish": "yarn build && pika publish",
+        "version": "npm run build"
     },
     "repository": {
         "type": "git",
