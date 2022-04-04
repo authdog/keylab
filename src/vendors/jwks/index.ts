@@ -13,4 +13,4 @@ export {
     IJwksClient,
     IRSAKeyStore,
     IVerifyRSATokenCredentials
-} from "./jwks.d";
+} from "./jwks_d";

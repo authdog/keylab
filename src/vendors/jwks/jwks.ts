@@ -3,7 +3,6 @@ import * as https from "https";
 import * as jose from "node-jose";
 
 import { throwJwtError } from "../../errors";
-// import * as enums from "../../enums";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
 import * as c from "../../constants";
 
@@ -26,7 +25,7 @@ import {
     IJwkRecordVisible,
     IRSAKeyStore,
     IVerifyRSATokenCredentials
-} from "./jwks.d";
+} from "./jwks_d";
 
 /**
  *

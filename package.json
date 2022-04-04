@@ -13,10 +13,10 @@
         "tsdoc:deploy": "NETLIFY_SITE_ID=7a9aa5c4-6218-4d61-b482-999b3a32f38a netlify deploy --dir=tsdoc --prod",
         "tsdoc:netlify": "yarn tsdoc:build && yarn tsdoc:deploy",
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
-        "build": "tsc",
         "postbuild": "ts-node scripts/copy",
         "lib:build:clean": "rm -rf dist",
-        "lib:publish": "yarn lib:build:clean && yarn build && npm adduser && npm publish ./dist --access=public"
+        "build": "rm -rf pkg && pika build",
+        "lib:publish": "yarn build && pika publish"
     },
     "repository": {
         "type": "git",
