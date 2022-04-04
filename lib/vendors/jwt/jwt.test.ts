@@ -5,10 +5,9 @@ import {
     checkJwtFields,
     parseJwt
 } from "./jwt";
-import { JsonWebTokenError } from "jsonwebtoken";
-import {JwtAlgorithmsEnum as Algs, JwtParts, JwtKeyTypes} from '../../enums'
+import {JwtAlgorithmsEnum as Algs, JwtParts, JwtKeyTypes as Kty} from '../../enums'
 import * as c from "../../constants";
-import * as jwt from "jsonwebtoken";
+import { signJwtWithPrivateKey } from "./jwt-sign";
 
 
 const DUMMY_HS256_TOKEN =
@@ -19,7 +18,7 @@ it("extract properly token headers", async () => {
     const headers = readTokenHeaders(DUMMY_HS256_TOKEN);
     expect(headers).toBeTruthy();
     expect(headers.alg).toEqual(Algs.HS256);
-    expect(headers.typ).toEqual("JWT");
+    expect(headers.typ).toEqual(Kty.JWT.toUpperCase());
     expect(c.JWT_SUPPORTED_ALGS.includes(headers.alg)).toBeTruthy();
 });
 
@@ -36,16 +35,17 @@ it("should throw an exception if token is malformed", async () => {
 
     expect(() => {
         readTokenHeaders(DUMMY_NON_JWT_TOKEN);
-    }).toThrowError(JsonWebTokenError);
+    }).toThrowError(c.JWT_CANNOT_BE_DECODED);
 });
 
 it("verifies HS256 token", async () => {
     const SECRET_STRING = "secret";
-    const signedToken = jwt.sign(
+    const signedToken = await signJwtWithPrivateKey(
         {
             exp: Math.floor(Date.now() / 1000) + 60 * 60,
             data: "foobar"
         },
+        Algs.HS256,
         SECRET_STRING
     );
 
@@ -63,13 +63,15 @@ it("verifies HS256 token", async () => {
     );
     expect(shouldNotBeVerified).toBeFalsy();
 
-    const signedTokenAlreadyExpired = jwt.sign(
+    const signedTokenAlreadyExpired = await signJwtWithPrivateKey(
         {
             exp: Math.floor(Date.now() / 1000),
             data: "foobar"
         },
+        Algs.HS256,
         SECRET_STRING
     );
+    
 
     const shouldNotBeVerifiedAsExpired = await verifyHSTokenWithSecretString(
         signedTokenAlreadyExpired,
@@ -79,11 +81,12 @@ it("verifies HS256 token", async () => {
     expect(shouldNotBeVerifiedAsExpired).toBeFalsy();
 
 
-    const signedTokenNotExpired = jwt.sign(
+    const signedTokenNotExpired = await signJwtWithPrivateKey(
         {
             exp: Math.floor(Date.now() / 1000) + 60 * 60,
             data: "foobar"
         },
+        Algs.HS256,
         SECRET_STRING
     );
 
@@ -103,28 +106,46 @@ it("verifies token audience", async () => {
     expect(valid).toBeFalsy();
 
     // wrong audience
-    const token2 = jwt.sign({ aud: c.AUTHDOG_ID_ISSUER }, "secret");
+    const token2 = await signJwtWithPrivateKey(
+        { aud: c.AUTHDOG_ID_ISSUER },
+        Algs.HS256,
+        "secret"
+    );
+    
     const valid2 = checkJwtFields(token2, {
         requiredAudiences: ["wrong-audience"]
     });
     expect(valid2).toBeFalsy();
 
     // right audience - aud string
-    const token3 = jwt.sign({ aud: c.AUTHDOG_ID_ISSUER }, "secret");
+    const token3 = await signJwtWithPrivateKey(
+        { aud: c.AUTHDOG_ID_ISSUER },
+        Algs.HS256,
+        "secret"
+    );
+    
     const valid3 = checkJwtFields(token3, {
         requiredAudiences: [c.AUTHDOG_ID_ISSUER]
     });
     expect(valid3).toBeTruthy();
 
     // right audience - aud array
-    const token4 = jwt.sign({ aud: [c.AUTHDOG_ID_ISSUER] }, "secret");
+    const token4 = await signJwtWithPrivateKey(
+        { aud: [c.AUTHDOG_ID_ISSUER] },
+        Algs.HS256,
+        "secret"
+    );
     const valid4 = checkJwtFields(token4, {
         requiredAudiences: [c.AUTHDOG_ID_ISSUER]
     });
     expect(valid4).toBeTruthy();
 
     // right audience - aud array, but missing `missing-audience`
-    const token5 = jwt.sign({ aud: [c.AUTHDOG_ID_ISSUER] }, "secret");
+    const token5 = await signJwtWithPrivateKey(
+        { aud: c.AUTHDOG_ID_ISSUER },
+        Algs.HS256,
+        "secret"
+    );
     const valid5 = checkJwtFields(token5, {
         requiredAudiences: [c.AUTHDOG_ID_ISSUER, "missing-audience"]
     });
@@ -132,10 +153,15 @@ it("verifies token audience", async () => {
 
     // issuer
     // wrong issuer
-    const token6 = jwt.sign(
-        { aud: [c.AUTHDOG_ID_ISSUER], iss: c.AUTHDOG_ID_ISSUER },
+    const token6 = await signJwtWithPrivateKey(
+        {
+            aud: c.AUTHDOG_ID_ISSUER,
+            iss: c.AUTHDOG_ID_ISSUER
+        },
+        Algs.HS256,
         "secret"
     );
+
     const valid6 = checkJwtFields(token6, {
         requiredAudiences: [c.AUTHDOG_ID_ISSUER],
         requiredIssuer: "https://wrong-issuer"
@@ -151,8 +177,12 @@ it("verifies token audience", async () => {
 });
 
 it("verifies token scopes", async () => {
-    const tokenWithOneScopeFoo = jwt.sign(
-        { aud: [c.AUTHDOG_ID_ISSUER], iss: c.AUTHDOG_ID_ISSUER, scp: ["foo"] },
+    const tokenWithOneScopeFoo = await signJwtWithPrivateKey(
+        {
+            aud: [c.AUTHDOG_ID_ISSUER],
+            iss: c.AUTHDOG_ID_ISSUER, scp: ["foo"]
+        },
+        Algs.HS256,
         "secret"
     );
 
@@ -171,14 +201,16 @@ it("verifies token scopes", async () => {
     });
     expect(tokenMissesAScope).toBeFalsy();
 
-    const tokenWithMoreThanOneScope = jwt.sign(
+    const tokenWithMoreThanOneScope = await signJwtWithPrivateKey(
         {
             aud: [c.AUTHDOG_ID_ISSUER],
             iss: c.AUTHDOG_ID_ISSUER,
             scp: ["foo", "bar"]
         },
+        Algs.HS256,
         "secret"
     );
+    
 
     const tokenHasRequiredScopes2 = checkJwtFields(tokenWithMoreThanOneScope, {
         requiredScopes: ["foo", "bar"]
@@ -219,7 +251,7 @@ it("parses token", async () => {
 
     expect(parsedHeaders).toEqual({
         alg: Algs?.RS256,
-        type: JwtKeyTypes?.JWT
+        type: Kty?.JWT
     })
 })
 
