@@ -51,19 +51,21 @@ it("verifies HS256 token", async () => {
 
     const isVerified = await verifyHSTokenWithSecretString(
         signedToken,
-        SECRET_STRING
+        SECRET_STRING,
+        Algs.HS256
     );
     expect(isVerified).toBeTruthy();
 
     const shouldNotBeVerified = await verifyHSTokenWithSecretString(
         signedToken,
-        "wrong-secret"
+        "wrong-secret",
+        Algs.HS256
     );
     expect(shouldNotBeVerified).toBeFalsy();
 
     const signedTokenAlreadyExpired = jwt.sign(
         {
-            exp: Math.floor(Date.now() / 1000) + 0,
+            exp: Math.floor(Date.now() / 1000),
             data: "foobar"
         },
         SECRET_STRING
@@ -71,9 +73,27 @@ it("verifies HS256 token", async () => {
 
     const shouldNotBeVerifiedAsExpired = await verifyHSTokenWithSecretString(
         signedTokenAlreadyExpired,
-        SECRET_STRING
+        SECRET_STRING,
+        Algs.HS256
     );
     expect(shouldNotBeVerifiedAsExpired).toBeFalsy();
+
+
+    const signedTokenNotExpired = jwt.sign(
+        {
+            exp: Math.floor(Date.now() / 1000) + 60 * 60,
+            data: "foobar"
+        },
+        SECRET_STRING
+    );
+
+    const shouldVerifysignedTokenNotExpired = await verifyHSTokenWithSecretString(
+        signedTokenNotExpired,
+        SECRET_STRING,
+        Algs.HS256
+    );
+    expect(shouldVerifysignedTokenNotExpired).toBeTruthy();
+
 });
 
 it("verifies token audience", async () => {

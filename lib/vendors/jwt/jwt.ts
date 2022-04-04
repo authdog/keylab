@@ -1,4 +1,5 @@
-import * as jwt from "jsonwebtoken";
+// import * as jwt from "jsonwebtoken";
+import * as jws from 'jws'
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
 import * as enums from "../../enums";
@@ -153,16 +154,24 @@ export const checkTokenValidness = async (
 
 export const verifyHSTokenWithSecretString = async (
     token: string,
-    secret: string
+    secret: string,
+    algorithm: enums.JwtAlgorithmsEnum = enums.JwtAlgorithmsEnum.HS256
 ) => {
+    let isValid = false;
     let isVerified = false;
-    try {
-        const decoded = jwt.verify(token, secret);
-        if (typeof decoded === "object" && decoded.iat && decoded.exp) {
-            isVerified = true;
+
+    isValid = jws.verify(token, algorithm, secret);
+
+    if (isValid) {
+        const {exp} = parseJwt(token, enums.JwtParts.PAYLOAD);
+
+        if (exp) {
+            const now = Math.floor(Date.now() / 1000);
+            isVerified = now < exp;
         }
-    } catch (err) {}
-    return isVerified;
+    }
+
+    return isVerified
 };
 
 export const checkJwtFields = (
