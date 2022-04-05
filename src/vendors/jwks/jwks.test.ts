@@ -1,6 +1,8 @@
-import { keyExistsInSet } from "..";
+import { getKeyPair, signJwtWithPrivateKey } from '../jwt/jwt-sign';
+import {keyExistsInSet, verifyTokenWithPublicKey} from './jwks'
 
-// import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
+
+import { JwtAlgorithmsEnum as Algs} from "../../enums";
 // import { default as nock } from "nock";
 
 // import { makePublicKey, verifyRSAToken } from "./jwks";
@@ -35,6 +37,39 @@ it("check if key exists in set", () => {
 
     expect(shouldNotExist).toBeFalsy();
 });
+
+
+it ("verified token with public key - es256k", async () => {
+
+    const keyPairES256k = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.ES256K,
+        keySize: 4096
+    });
+
+    expect(keyPairES256k?.privateKey).toBeTruthy();
+    expect(keyPairES256k?.publicKey).toBeTruthy();
+
+
+    const signedPayloadEs256k = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.ES256K,
+        keyPairES256k.privateKey,
+        {
+            kid: keyPairES256k?.kid
+        }
+    );
+    expect(signedPayloadEs256k).toBeTruthy();
+    // "HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512" and "none".".
+    const verifiedEs256k = await verifyTokenWithPublicKey(signedPayloadEs256k, Algs.ES256K, keyPairES256k.publicKey);
+    expect(verifiedEs256k?.payload).toEqual( { urn: 'urn:test:test', kid: keyPairES256k?.kid })
+    expect(verifiedEs256k?.protectedHeader).toEqual( { alg: 'ES256K', type: 'jwt' })
+
+
+})
+
 
 // it("verifies correctly token with public uri", async () => {
 //     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";

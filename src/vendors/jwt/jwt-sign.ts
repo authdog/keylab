@@ -71,6 +71,7 @@ const algorithmsDict = [
 ];
 
 export const getKeyPair = async ({
+    keyFormat,
     algorithmIdentifier,
     keySize
 }: IGetKeyPair): Promise<IKeyPair> => {
@@ -93,10 +94,12 @@ export const getKeyPair = async ({
                     : undefined,
                 modulusLength: keySize,
                 publicKeyEncoding: {
-                    ...c.publicKeyEncodingPem
+                    ...c.publicKeyEncodingPem,
+                    format: keyFormat
                 },
                 privateKeyEncoding: {
-                    ...c.privateKeyEncodingPem
+                    ...c.privateKeyEncodingPem,
+                   format: keyFormat
                 }
             },
             (err, publicKey, privateKey) => {

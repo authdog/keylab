@@ -161,6 +161,7 @@ export const verifyHSTokenWithSecretString = async (
     let isValid = false;
     let isVerified = false;
 
+    // check algorithm validity
     isValid = jws.verify(token, algorithm, secret);
 
     if (isValid) {
