@@ -104,10 +104,8 @@ export const getKeyPair = async ({
             },
             (err, publicKey, privateKey) => {
                 if (err) return reject(err);
-
-                // TODO: define kid length in constants
+                
                 const kid = randomBytes(16).toString("hex");
-
                 resolve({ publicKey, privateKey, kid });
             }
         );
