@@ -39,7 +39,7 @@ it("check if key exists in set", () => {
 });
 
 
-it ("verified token with public key - es256k", async () => {
+it ("verifies token with public key - es256k", async () => {
 
     const keyPairES256k = await getKeyPair({
         keyFormat: "jwk",
@@ -62,11 +62,9 @@ it ("verified token with public key - es256k", async () => {
         }
     );
     expect(signedPayloadEs256k).toBeTruthy();
-    // "HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512" and "none".".
     const verifiedEs256k = await verifyTokenWithPublicKey(signedPayloadEs256k, keyPairES256k.publicKey);
     expect(verifiedEs256k?.payload).toEqual( { urn: 'urn:test:test', kid: keyPairES256k?.kid })
     expect(verifiedEs256k?.protectedHeader).toEqual( { alg: 'ES256K', type: 'jwt' })
-
 
 })
 

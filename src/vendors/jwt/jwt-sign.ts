@@ -48,7 +48,6 @@ const algorithmsDict = [
             Algs?.ES256,
             Algs?.ES384,
             Algs?.ES512,
-            Algs?.EdDSA,
             Algs?.ES256K
         ])
     },
@@ -104,7 +103,7 @@ export const getKeyPair = async ({
             },
             (err, publicKey, privateKey) => {
                 if (err) return reject(err);
-                
+
                 const kid = randomBytes(16).toString("hex");
                 resolve({ publicKey, privateKey, kid });
             }
