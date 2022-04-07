@@ -120,9 +120,14 @@ export const verifyTokenWithPublicKey = async (
     opts: IVerifyRSATokenCredentials = null
 ): Promise<any> => {
     let JWKS = null;
+    let key = null;
     let decoded = null;
 
-    if (publicKey) {
+    if (typeof publicKey === "string") {
+        //key = await importSPKI(publicKey, parseJwt(token, JwtParts.HEADER)?.alg);
+        throw new Error("Verify with PEM not implemented yet");
+    }
+    else if (typeof publicKey === "object") {
         JWKS = createLocalJWKSet({
             keys: [publicKey]
         });
@@ -141,10 +146,22 @@ export const verifyTokenWithPublicKey = async (
     }
 
     try {
-        decoded = await jwtVerify(token, JWKS, {
-            issuer: opts?.requiredIssuer,
-            audience: opts?.requiredAudiences
-        });
+
+        if (JWKS) {
+            decoded = await jwtVerify(token, JWKS, {
+                issuer: opts?.requiredIssuer,
+                audience: opts?.requiredAudiences
+            });
+        } else if (key) {
+            decoded = await jwtVerify(token, publicKey, {
+                issuer: opts?.requiredIssuer,
+                audience: opts?.requiredAudiences
+            });
+        } else {
+            throw new Error("Invalid public key format (must me PEM, JWK or JWKs URI)");
+        }
+
+
     } catch (e) {
         throw new Error(e.message);
     }

@@ -266,7 +266,6 @@ export const createSignedJwt = async (
             );
             break;
 
-        // TODO: use PEM in signin options
         case algEnums.RS256:
         case algEnums.RS384:
         case algEnums.RS512:

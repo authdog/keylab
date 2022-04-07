@@ -382,6 +382,37 @@ it("verifies token with public key - ES512", async () => {
     });
 });
 
+it("verifies token with public key - ES256k / pem", async () => {
+    const keyPairES256k = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs.ES256K,
+        keySize: 4096
+    });
+
+    expect(keyPairES256k?.privateKey).toBeTruthy();
+    expect(keyPairES256k?.publicKey).toBeTruthy();
+
+    const signedPayloadEs256k = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.ES256K,
+        keyPairES256k.privateKey,
+        {
+            kid: keyPairES256k?.kid
+        }
+    );
+    expect(signedPayloadEs256k).toBeTruthy();
+
+    await expect(
+        verifyTokenWithPublicKey(
+            signedPayloadEs256k,
+            keyPairES256k.publicKey
+        )
+    ).rejects.toThrow("Verify with PEM not implemented yet")
+})
+
+
 it("verifies correctly token with public uri", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
     const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
