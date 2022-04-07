@@ -382,6 +382,48 @@ it("verifies token with public key - ES512", async () => {
     });
 });
 
+
+it("verifies token with public key - EdDSA", async () => {
+
+    const keyPairEDDSA = await getKeyPair({
+        algorithmIdentifier: Algs.EdDSA,
+        keySize: 4096
+    });
+
+    expect(keyPairEDDSA?.privateKey).toBeTruthy();
+
+    const signedPayloadEdDSA = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.EdDSA,
+        keyPairEDDSA.privateKey,
+        {
+            kid: keyPairEDDSA?.kid
+        }
+    );
+
+    expect(signedPayloadEdDSA).toBeTruthy();
+
+
+    const verifiedEdDSA = await verifyTokenWithPublicKey(
+        signedPayloadEdDSA,
+        keyPairEDDSA.publicKey
+    );
+
+    expect(verifiedEdDSA?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairEDDSA?.kid
+    });
+
+    expect(verifiedEdDSA?.protectedHeader).toEqual({
+        alg: Algs?.EdDSA,
+        type: Kty.JWT
+    });
+})
+
+
+
 it("THROWS an error: verifies token with public key - ES256k / pem", async () => {
     const keyPairES256k = await getKeyPair({
         keyFormat: "pem",
