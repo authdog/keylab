@@ -8,7 +8,8 @@ export const JWT_NON_COMPLIANT_AUDIENCE =
 
 export const JWT_GENERIC_ERROR_MESSAGE = "error jwt";
 
-export const JWK_NO_APPLICABLE_KEY = "no applicable key found in the JSON Web Key Set"
+export const JWK_NO_APPLICABLE_KEY =
+    "no applicable key found in the JSON Web Key Set";
 
 export const MALFORMED_URI = "URI malformed";
 

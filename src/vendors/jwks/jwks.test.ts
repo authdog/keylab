@@ -427,7 +427,7 @@ it("verifies correctly token with public uri", async () => {
         });
     } catch (e) {}
 
-    expect(verified?.protectedHeader).toEqual({"alg": "ES512", "type": "jwt"});
+    expect(verified?.protectedHeader).toEqual({ alg: "ES512", type: "jwt" });
     expect(verified?.payload).toEqual({
         urn: "urn:test:test",
         kid: keyPairES512?.kid

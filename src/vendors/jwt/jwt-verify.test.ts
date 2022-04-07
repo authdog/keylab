@@ -251,7 +251,6 @@ it("parses token (payload and header)", async () => {
     });
 });
 
-
 it("verifies a token with checkTokenValidness signed with ES512 key", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
     const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
@@ -287,24 +286,19 @@ it("verifies a token with checkTokenValidness signed with ES512 key", async () =
 
     const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
 
-    const tokenInJwksStoreValidness = await checkTokenValidness(signedPayloadEs512, {
-        jwksUri 
-        // requiredAudiences: [c.AUTHDOG_ID_ISSUER],
-        // requiredIssuer: c.AUTHDOG_ID_ISSUER,
-        // requiredScopes: ["foo", "bar"]
-    });
+    const tokenInJwksStoreValidness = await checkTokenValidness(
+        signedPayloadEs512,
+        {
+            jwksUri
+        }
+    );
 
     expect(tokenInJwksStoreValidness).toBeTruthy();
 
-   
-
-
-
     scopeNock.persist(false);
-})
+});
 
-
-it ("throws an error while verifying token with public uri whose key is missing from set", async () => {
+it("throws an error while verifying token with public uri whose key is missing from set", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
     const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
     const keyPairES512 = await getKeyPair({
@@ -326,10 +320,7 @@ it ("throws an error while verifying token with public uri whose key is missing 
             keys
         });
 
-
-
     const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
-
 
     // test with a token that is not in jwks store
     const keyPairES256K = await getKeyPair({
@@ -348,11 +339,11 @@ it ("throws an error while verifying token with public uri whose key is missing 
         }
     );
 
-    await expect(checkTokenValidness(signedPayloadEs256k, {
-        jwksUri 
-    }))
-    .rejects
-    .toThrow(c.JWK_NO_APPLICABLE_KEY);
+    await expect(
+        checkTokenValidness(signedPayloadEs256k, {
+            jwksUri
+        })
+    ).rejects.toThrow(c.JWK_NO_APPLICABLE_KEY);
 
     scopeNock.persist(false);
-})
+});

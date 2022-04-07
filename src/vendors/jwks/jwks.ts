@@ -213,8 +213,7 @@ export const verifyTokenWithPublicKey = async (
         JWKS = createLocalJWKSet({
             // @ts-ignore
             keys: [...remoteJwks.keys]
-        })
-
+        });
     } else {
         throw new Error("Invalid public key format (must me JWK or JWKs URI)");
     }
@@ -224,12 +223,11 @@ export const verifyTokenWithPublicKey = async (
             issuer: opts?.requiredIssuer,
             audience: opts?.requiredAudiences
         });
-    } catch(e) {
+    } catch (e) {
         throw new Error(e.message);
     }
 
     return decoded;
-
 };
 
 // export const verifyRSAToken = async (
