@@ -13,7 +13,7 @@ keylab is a nodejs library aiming to create and validate JSON Web Tokens without
 
 ## Install
 
-`yarn add @authdog/keylab`
+`yarn add keylab`
 
 <!-- ## Usage
 
