@@ -382,7 +382,7 @@ it("verifies token with public key - ES512", async () => {
     });
 });
 
-it("verifies token with public key - ES256k / pem", async () => {
+it("THROWS an error: verifies token with public key - ES256k / pem", async () => {
     const keyPairES256k = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs.ES256K,
@@ -409,7 +409,7 @@ it("verifies token with public key - ES256k / pem", async () => {
             signedPayloadEs256k,
             keyPairES256k.publicKey
         )
-    ).rejects.toThrow("Verify with PEM not implemented yet")
+    ).rejects.toThrow("JSON Web Key Set malformed")
 })
 
 
