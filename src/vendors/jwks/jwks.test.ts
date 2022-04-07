@@ -405,13 +405,9 @@ it("THROWS an error: verifies token with public key - ES256k / pem", async () =>
     expect(signedPayloadEs256k).toBeTruthy();
 
     await expect(
-        verifyTokenWithPublicKey(
-            signedPayloadEs256k,
-            keyPairES256k.publicKey
-        )
-    ).rejects.toThrow("JSON Web Key Set malformed")
-})
-
+        verifyTokenWithPublicKey(signedPayloadEs256k, keyPairES256k.publicKey)
+    ).rejects.toThrow("JSON Web Key Set malformed");
+});
 
 it("verifies correctly token with public uri", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
