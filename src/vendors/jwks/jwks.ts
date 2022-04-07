@@ -4,20 +4,6 @@ import { throwJwtError } from "../../errors";
 import * as c from "../../constants";
 import { createLocalJWKSet, jwtVerify } from "jose";
 
-// import * as jwt from "jsonwebtoken";
-
-// import {
-//     checkJwtFields,
-
-//     readTokenHeaders
-// } from "../jwt";
-
-// import {
-//     IJwtTokenClaims,
-//     IJwtTokenOpts,
-// } from '../jwt/jwt_d'
-
-// import { IDecodedJwt } from "../jwt/interfaces";
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
     domainUri?: string; // required when domainUri doesn't match jwksUri's host
@@ -117,47 +103,6 @@ export interface IRSAKeyStore {
 //     //     }
 //     // );
 //     return generatedKey.toJSON(exposePrivateFields);
-// };
-
-// export const generateJwtFromPayload = async (
-//     { sub, iss, aud, scp, pld }: IJwtTokenClaims,
-//     { compact, jwk, fields, sessionDuration }: IJwtTokenOpts
-// ) => {
-//     const payload = JSON.stringify({
-//         iss,
-//         sub,
-//         aud,
-//         ...pld,
-//         exp: Math.floor(Date.now() / 1000 + sessionDuration * 60),
-//         iat: Math.floor(Date.now() / 1000),
-//         azp: iss,
-//         // https://stackoverflow.com/a/49492971/8483084
-//         gzp: "client-credentials",
-//         scp
-//     });
-
-//     const token = await jose.JWS.createSign(
-//         Object.assign({ compact, jwk, fields }),
-//         jwk
-//     )
-//         .update(payload)
-//         .final();
-
-//     return token;
-// };
-
-// export const generatePrivateJwk: any = async (
-//     keyType: string,
-//     algorithm: string
-// ) => {
-//     const store = createKeyStore();
-//     const jsonWebKey = await generateKeyFromStore(
-//         store,
-//         keyType,
-//         algorithm,
-//         true
-//     );
-//     return jsonWebKey;
 // };
 
 // TODO: add proper type for key parameter

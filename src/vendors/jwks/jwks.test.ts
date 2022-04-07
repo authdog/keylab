@@ -1,7 +1,7 @@
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign";
 import { keyExistsInSet, verifyTokenWithPublicKey } from "./jwks";
 
-import { JwtAlgorithmsEnum as Algs } from "../../enums";
+import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
 // import { default as nock } from "nock";
 
 // import { makePublicKey, verifyRSAToken } from "./jwks";
@@ -68,7 +68,7 @@ it("verifies token with public key - es256k", async () => {
     });
     expect(verifiedEs256k?.protectedHeader).toEqual({
         alg: "ES256K",
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -103,7 +103,7 @@ it("verifies token with public key - rs256", async () => {
     });
     expect(verifiedRs256?.protectedHeader).toEqual({
         alg: Algs.RS256,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -138,7 +138,7 @@ it("verifies token with public key - rs384", async () => {
     });
     expect(verifiedRs384?.protectedHeader).toEqual({
         alg: Algs?.RS384,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -173,7 +173,7 @@ it("verifies token with public key - rs512", async () => {
     });
     expect(verifiedRs512?.protectedHeader).toEqual({
         alg: Algs?.RS512,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -208,7 +208,7 @@ it("verifies token with public key - ps256", async () => {
     });
     expect(verifiedPs256?.protectedHeader).toEqual({
         alg: Algs?.PS256,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -243,7 +243,7 @@ it("verifies token with public key - ps384", async () => {
     });
     expect(verifiedPs384?.protectedHeader).toEqual({
         alg: Algs?.PS384,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -278,7 +278,7 @@ it("verifies token with public key - ps512", async () => {
     });
     expect(verifiedPs512?.protectedHeader).toEqual({
         alg: Algs?.PS512,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -313,7 +313,7 @@ it("verifies token with public key - ES256", async () => {
     });
     expect(verifiedEs256?.protectedHeader).toEqual({
         alg: Algs?.ES256,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -348,7 +348,7 @@ it("verifies token with public key - ES384", async () => {
     });
     expect(verifiedEs384?.protectedHeader).toEqual({
         alg: Algs?.ES384,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
 
@@ -383,6 +383,6 @@ it("verifies token with public key - ES512", async () => {
     });
     expect(verifiedEs512?.protectedHeader).toEqual({
         alg: Algs?.ES512,
-        type: "jwt"
+        type: Kty.JWT
     });
 });
