@@ -28,7 +28,7 @@ export interface IDecodedJwt {
 export interface IGetKeyPair {
     algorithmIdentifier: AlgorithmIdentifier;
     keySize: number;
-    keyFormat: "pem" | "jwk";
+    keyFormat?: "pem" | "jwk"; // can also be a binary certificate
 }
 
 export interface IJwkPrivateKey {

@@ -11,6 +11,7 @@ import {
     ICreateSignedJwtOptions
 } from "..";
 import { signJwtWithPrivateKey } from "./jwt-sign";
+import {verifyTokenWithPublicKey} from '../jwks'
 
 /**
  *
@@ -53,7 +54,7 @@ export const checkTokenValidness = async (
             }
 
             if (missingCredentials.length === 0) {
-                isValid = await verifyHSTokenWithSecretString(token, secret);
+                isValid = !!await verifyHSTokenWithSecretString(token, secret);
                 break;
             } else {
                 throwJwtError(
@@ -77,13 +78,15 @@ export const checkTokenValidness = async (
                 missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
-                // TODO
-                // isValid = await verifyRSAToken(token, {
-                //     jwksUri,
-                //     verifySsl,
-                //     adhoc,
-                //     requiredScopes
-                // });
+                isValid = await verifyTokenWithPublicKey(token, null,
+                    {
+                        jwksUri,
+                        verifySsl,
+                        adhoc,
+                        requiredScopes
+                    }
+                );
+
                 break;
             } else {
                 throwJwtError(

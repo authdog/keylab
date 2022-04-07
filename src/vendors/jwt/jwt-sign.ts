@@ -73,7 +73,7 @@ const algorithmsDict = [
 ];
 
 export const getKeyPair = async ({
-    keyFormat,
+    keyFormat = "jwk",
     algorithmIdentifier,
     keySize
 }: IGetKeyPair): Promise<IKeyPair> => {

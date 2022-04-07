@@ -2,7 +2,8 @@ import {
     getAlgorithmJwt,
     verifyHSTokenWithSecretString,
     checkJwtFields,
-    parseJwt
+    parseJwt,
+    checkTokenValidness
 } from "./jwt-verify";
 import {
     JwtAlgorithmsEnum as Algs,
@@ -10,11 +11,13 @@ import {
     JwtKeyTypes as Kty
 } from "../../enums";
 import * as c from "../../constants";
-import { signJwtWithPrivateKey } from "./jwt-sign";
+import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign";
 
 const DUMMY_HS256_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 const DUMMY_NON_JWT_TOKEN = "hello-i-am-not-a-jwt";
+
+import { default as nock } from "nock";
 
 it("extract properly token headers", async () => {
     const headers = parseJwt(DUMMY_HS256_TOKEN, JwtParts.HEADER);
@@ -247,3 +250,109 @@ it("parses token (payload and header)", async () => {
         type: Kty?.JWT
     });
 });
+
+
+it("verifies a token with checkTokenValidness signed with ES512 key", async () => {
+    const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
+    const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
+    const keyPairES512 = await getKeyPair({
+        algorithmIdentifier: Algs.ES512,
+        keySize: 4096
+    });
+
+    const regExpPathAppJwks = new RegExp(
+        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
+    );
+
+    const keys = [keyPairES512.publicKey];
+    const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
+
+    const scopeNock = nock(AUTHDOG_API_ROOT)
+        .persist()
+        .get(regExpPathAppJwks)
+        .reply(200, {
+            keys
+        });
+
+    const signedPayloadEs512 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.ES512,
+        keyPairES512.privateKey,
+        {
+            kid: keyPairES512?.kid
+        }
+    );
+
+    const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
+
+    const tokenInJwksStoreValidness = await checkTokenValidness(signedPayloadEs512, {
+        jwksUri 
+        // requiredAudiences: [c.AUTHDOG_ID_ISSUER],
+        // requiredIssuer: c.AUTHDOG_ID_ISSUER,
+        // requiredScopes: ["foo", "bar"]
+    });
+
+    expect(tokenInJwksStoreValidness).toBeTruthy();
+
+   
+
+
+
+    scopeNock.persist(false);
+})
+
+
+it ("throws an error while verifying token with public uri whose key is missing from set", async () => {
+    const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
+    const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
+    const keyPairES512 = await getKeyPair({
+        algorithmIdentifier: Algs.ES512,
+        keySize: 4096
+    });
+
+    const regExpPathAppJwks = new RegExp(
+        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
+    );
+
+    const keys = [keyPairES512.publicKey];
+    const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
+
+    const scopeNock = nock(AUTHDOG_API_ROOT)
+        .persist()
+        .get(regExpPathAppJwks)
+        .reply(200, {
+            keys
+        });
+
+
+
+    const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
+
+
+    // test with a token that is not in jwks store
+    const keyPairES256K = await getKeyPair({
+        algorithmIdentifier: Algs.ES256K,
+        keySize: 4096
+    });
+
+    const signedPayloadEs256k = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.ES256K,
+        keyPairES256K.privateKey,
+        {
+            kid: keyPairES256K?.kid
+        }
+    );
+
+    await expect(checkTokenValidness(signedPayloadEs256k, {
+        jwksUri 
+    }))
+    .rejects
+    .toThrow(c.JWK_NO_APPLICABLE_KEY);
+
+    scopeNock.persist(false);
+})

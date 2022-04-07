@@ -2,13 +2,11 @@ import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign";
 import { keyExistsInSet, verifyTokenWithPublicKey } from "./jwks";
 
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
-// import { default as nock } from "nock";
+import { default as nock } from "nock";
 
-// import { makePublicKey, verifyRSAToken } from "./jwks";
-
-// import * as c from "../../constants";
+import * as c from "../../constants";
 // import * as enums from "../../enums";
-// const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
+const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
 it("check if key exists in set", () => {
     const jwks = [
@@ -319,7 +317,6 @@ it("verifies token with public key - ES256", async () => {
 
 it("verifies token with public key - ES384", async () => {
     const keyPairES384 = await getKeyPair({
-        keyFormat: "jwk",
         algorithmIdentifier: Algs.ES384,
         keySize: 4096
     });
@@ -354,7 +351,6 @@ it("verifies token with public key - ES384", async () => {
 
 it("verifies token with public key - ES512", async () => {
     const keyPairES512 = await getKeyPair({
-        keyFormat: "jwk",
         algorithmIdentifier: Algs.ES512,
         keySize: 4096
     });
@@ -385,4 +381,57 @@ it("verifies token with public key - ES512", async () => {
         alg: Algs?.ES512,
         type: Kty.JWT
     });
+});
+
+// Jwks remote keys
+
+it("verifies correctly token with public uri", async () => {
+    const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
+    const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
+    const keyPairES512 = await getKeyPair({
+        algorithmIdentifier: Algs.ES512,
+        keySize: 4096
+    });
+
+    const regExpPathAppJwks = new RegExp(
+        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
+    );
+
+    const keys = [keyPairES512.publicKey];
+
+    const scopeNock = nock(AUTHDOG_API_ROOT)
+        .persist()
+        .get(regExpPathAppJwks)
+        .reply(200, {
+            keys
+        });
+
+    const signedPayloadEs512 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.ES512,
+        keyPairES512.privateKey,
+        {
+            kid: keyPairES512?.kid
+        }
+    );
+
+    const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
+
+    let verified = null;
+
+    try {
+        verified = await verifyTokenWithPublicKey(signedPayloadEs512, null, {
+            jwksUri
+        });
+    } catch (e) {}
+
+    expect(verified?.protectedHeader).toEqual({"alg": "ES512", "type": "jwt"});
+    expect(verified?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairES512?.kid
+    });
+
+    scopeNock.persist(false);
 });

@@ -187,24 +187,49 @@ export const getKeyFromSet = (keyId: string, jwks: IJwkRecordVisible[]) => {
 
 // TODO
 
-export interface IVerifyTokenWithPublicKeyOpts {
-    issuer?: string;
-    audience?: string;
-}
+// export interface IVerifyTokenWithPublicKeyOpts {
+//     issuer?: string;
+//     audience?: string;
+// }
 
 export const verifyTokenWithPublicKey = async (
     token: string,
     publicKey: any,
-    opts: IVerifyTokenWithPublicKeyOpts = null
+    opts: IVerifyRSATokenCredentials = null
 ): Promise<any> => {
-    const JWKS = createLocalJWKSet({
-        keys: [publicKey]
-    });
+    let JWKS = null;
+    let decoded = null;
 
-    return await jwtVerify(token, JWKS, {
-        issuer: opts?.issuer,
-        audience: opts?.audience
-    });
+    if (publicKey) {
+        JWKS = createLocalJWKSet({
+            keys: [publicKey]
+        });
+    } else if (opts?.jwksUri) {
+        // fetch jwk keys
+        const remoteJwks = await fetchJwksWithUri({
+            jwksUri: opts?.jwksUri
+        });
+
+        JWKS = createLocalJWKSet({
+            // @ts-ignore
+            keys: [...remoteJwks.keys]
+        })
+
+    } else {
+        throw new Error("Invalid public key format (must me JWK or JWKs URI)");
+    }
+
+    try {
+        decoded = await jwtVerify(token, JWKS, {
+            issuer: opts?.requiredIssuer,
+            audience: opts?.requiredAudiences
+        });
+    } catch(e) {
+        throw new Error(e.message);
+    }
+
+    return decoded;
+
 };
 
 // export const verifyRSAToken = async (
