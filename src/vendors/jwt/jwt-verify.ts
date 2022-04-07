@@ -1,28 +1,16 @@
 // import * as jwt from "jsonwebtoken";
-import * as jws from 'jws'
+import * as jws from "jws";
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
 import * as enums from "../../enums";
 import { msg, throwJwtError } from "../../errors";
-// import { verifyRSAToken } from "../jwks";
 import { IDecodedJwt } from "./interfaces";
-import {ICheckJwtFields, IcheckTokenValidnessCredentials, ICreateSignedJwtOptions} from '..'
+import {
+    ICheckJwtFields,
+    IcheckTokenValidnessCredentials,
+    ICreateSignedJwtOptions
+} from "..";
 import { signJwtWithPrivateKey } from "./jwt-sign";
-
-/**
- *
- * @param token
- * @returns headers from the jwt passed as parameter
- */
-export const readTokenHeaders = (token: string) => {
-    let decoded;
-    try {
-        decoded = parseJwt(token, enums.JwtParts.HEADER);
-    } catch(e) {
-        throwJwtError("impossible to decode jwt");
-    }
-    return decoded;
-};
 
 /**
  *
@@ -31,54 +19,13 @@ export const readTokenHeaders = (token: string) => {
  */
 export const getAlgorithmJwt = (token: string) => {
     let algorithm;
-    const headers = readTokenHeaders(token);
+    const headers = parseJwt(token, enums?.JwtParts?.HEADER);
     if (headers && headers.alg) {
         algorithm = headers.alg;
     } else {
         throw throwJwtError(c.JWT_MALFORMED_HEADERS);
     }
     return algorithm;
-};
-
-
-
-
-// https://stackoverflow.com/a/38552302/8483084
-/**
- *
- * @param token
- * @returns JSON payload from token passed as parameter
- */
-export const parseJwt = (token: string, part: enums.JwtParts = enums.JwtParts.PAYLOAD) => {
-    let indexPart = -1;
-
-    switch (part) {
-        case enums.JwtParts.HEADER:
-            indexPart = 0;
-            break;
-        case enums.JwtParts.PAYLOAD:
-            indexPart = 1;
-            break;
-        case enums.JwtParts.SIGNATURE:
-            indexPart = 2;
-            break;
-        default:
-            throw throwJwtError("unknown jwt part");
-    }
-
-    var base64Url = token.split(".")[indexPart];
-    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-
-    var jsonPayload = decodeURIComponent(
-        atob(base64)
-            .split(c.EMPTY_STRING)
-            .map((c: string) => {
-                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-            })
-            .join(c.EMPTY_STRING)
-    );
-
-    return JSON.parse(jsonPayload);
 };
 
 export const checkTokenValidness = async (
@@ -165,7 +112,7 @@ export const verifyHSTokenWithSecretString = async (
     isValid = jws.verify(token, algorithm, secret);
 
     if (isValid) {
-        const {exp} = parseJwt(token, enums.JwtParts.PAYLOAD);
+        const { exp } = parseJwt(token, enums.JwtParts.PAYLOAD);
 
         if (exp) {
             const now = Math.floor(Date.now() / 1000);
@@ -173,7 +120,7 @@ export const verifyHSTokenWithSecretString = async (
         }
     }
 
-    return isVerified
+    return isVerified;
 };
 
 export const checkJwtFields = (
@@ -241,6 +188,47 @@ export const checkJwtFields = (
         validFields = false;
     }
     return validFields;
+};
+
+// https://stackoverflow.com/a/38552302/8483084
+/**
+ *
+ * @param token
+ * @returns JSON payload from token passed as parameter
+ */
+export const parseJwt = (
+    token: string,
+    part: enums.JwtParts = enums.JwtParts.PAYLOAD
+) => {
+    let indexPart = -1;
+
+    switch (part) {
+        case enums.JwtParts.HEADER:
+            indexPart = 0;
+            break;
+        case enums.JwtParts.PAYLOAD:
+            indexPart = 1;
+            break;
+        case enums.JwtParts.SIGNATURE:
+            indexPart = 2;
+            break;
+        default:
+            throw throwJwtError("unknown jwt part");
+    }
+
+    var base64Url = token.split(".")[indexPart];
+    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+    var jsonPayload = decodeURIComponent(
+        atob(base64)
+            .split(c.EMPTY_STRING)
+            .map((c: string) => {
+                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join(c.EMPTY_STRING)
+    );
+
+    return JSON.parse(jsonPayload);
 };
 
 export const createSignedJwt = async (

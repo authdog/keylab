@@ -17,7 +17,6 @@ import { createLocalJWKSet, jwtVerify } from "jose";
 //     IJwtTokenOpts,
 // } from '../jwt/jwt_d'
 
-
 // import { IDecodedJwt } from "../jwt/interfaces";
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -47,7 +46,6 @@ export interface IVerifyRSATokenCredentials {
 export interface IRSAKeyStore {
     keys: [IJwkRecordVisible];
 }
-
 
 /**
  *
@@ -249,24 +247,20 @@ export interface IVerifyTokenWithPublicKeyOpts {
     audience?: string;
 }
 
-
 export const verifyTokenWithPublicKey = async (
     token: string,
     publicKey: any,
     opts: IVerifyTokenWithPublicKeyOpts = null
 ): Promise<any> => {
     const JWKS = createLocalJWKSet({
-        keys: [
-          publicKey
-        ]
-    })
-
+        keys: [publicKey]
+    });
 
     return await jwtVerify(token, JWKS, {
-       issuer: opts?.issuer,
-       audience: opts?.audience,
-    })
-}
+        issuer: opts?.issuer,
+        audience: opts?.audience
+    });
+};
 
 // export const verifyRSAToken = async (
 //     token: string,

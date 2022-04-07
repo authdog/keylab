@@ -1,5 +1,5 @@
-import {IRSAKeyStore} from '../jwks'
-import {JwtAlgorithmsEnum as Algs} from '../../enums'
+import { IRSAKeyStore } from "../jwks";
+import { JwtAlgorithmsEnum as Algs } from "../../enums";
 
 export interface IcheckTokenValidnessCredentials {
     // HS256 | HS384 | HS512

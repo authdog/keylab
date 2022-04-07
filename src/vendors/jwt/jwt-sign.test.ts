@@ -1,8 +1,7 @@
 import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign";
-import { readTokenHeaders } from "./jwt";
+import { parseJwt } from "./jwt-verify";
 import * as c from "../../constants";
-import { JwtAlgorithmsEnum as Algs } from "../../enums";
-import { parseJwt } from ".";
+import { JwtAlgorithmsEnum as Algs, JwtParts } from "../../enums";
 import { strToUint8Array, uint8ArrayToStr } from "./utils";
 import { generateKeyPair, randomBytes } from "crypto";
 import { IKeyPair } from "./interfaces";
@@ -14,7 +13,7 @@ it("jwt sign with payload fields - HS256", async () => {
     };
     const token = await signJwtWithPrivateKey(payload, Algs.HS256, "secret");
     expect(token).toBeTruthy();
-    const { alg } = readTokenHeaders(token);
+    const { alg } = parseJwt(token, JwtParts?.HEADER);
     expect(alg).toEqual(Algs.HS256);
 });
 
@@ -25,7 +24,7 @@ it("jwt sign with payload fields - HS384", async () => {
     };
     const token = await signJwtWithPrivateKey(payload, Algs.HS384, "secret");
     expect(token).toBeTruthy();
-    const { alg } = readTokenHeaders(token);
+    const { alg } = parseJwt(token, JwtParts?.HEADER);
     expect(alg).toEqual(Algs.HS384);
 });
 
@@ -36,7 +35,7 @@ it("jwt sign with payload fields - HS512", async () => {
     };
     const token = await signJwtWithPrivateKey(payload, Algs.HS512, "secret");
     expect(token).toBeTruthy();
-    const { alg } = readTokenHeaders(token);
+    const { alg } = parseJwt(token, JwtParts?.HEADER);
     expect(alg).toEqual(Algs.HS512);
 });
 
@@ -346,7 +345,7 @@ it("signs payload with pkcs8 private key", async () => {
 it("signs payload with pkcs8 private key - RSA-PSS", async () => {
     // PS256
     const keyPairPS256 = await getKeyPair({
-        keyFormat: "pem",
+        keyFormat: "jwk",
         algorithmIdentifier: Algs?.RSAPSS,
         keySize: 4096
     });
@@ -430,79 +429,64 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
     expect(signedPayloadEs256k).toBeTruthy();
 });
 
-
 it("signs payload with pkcs8 private key - unsupported yet", async () => {
-
     // works but not signin
     // const keyPairEd25519 = await getKeyPair({
     //     keyFormat: "pem",
     //     algorithmIdentifier: Algs.Ed25519,
     //     keySize: 4096
     // });
-
     // expect(keyPairEd25519?.privateKey).toBeTruthy();
-
     // const keyPairX25519 = await getKeyPair({
     //     keyFormat: "pem",
     //     // @ts-ignore
     //     algorithmIdentifier: "x25519",
     //     keySize: 4096
     // });
-
     // expect(keyPairX25519?.privateKey).toBeTruthy();
-
     // const signedPayloadX25519 = await signJwtWithPrivateKey(
     //     { urn: "urn:test:test" },
     //     Algs.X25519,
     //     keyPairX25519.privateKey
     // );
-
     // expect(signedPayloadX25519).toBeTruthy();
-
-
-})
-
-
+});
 
 it("experiment algorithm", async () => {
-    
-    const generateKey = async ({
-        alg,
-    }): Promise<IKeyPair> => {
+    const generateKey = async ({ alg }): Promise<IKeyPair> => {
         return new Promise((resolve: Function, reject: Function) => {
-
-            generateKeyPair(alg, {
-                modulusLength: 530,
-                publicKeyEncoding: {
-                    ...c.publicKeyEncodingPem
+            generateKeyPair(
+                alg,
+                {
+                    modulusLength: 530,
+                    publicKeyEncoding: {
+                        ...c.publicKeyEncodingPem
+                    },
+                    privateKeyEncoding: {
+                        ...c.privateKeyEncodingPem
+                    }
                 },
-                privateKeyEncoding: {
-                  ...c.privateKeyEncodingPem
+                (err, publicKey, privateKey) => {
+                    if (err) return reject(err);
+
+                    // TODO: define kid length in constants
+                    const kid = randomBytes(16).toString("hex");
+
+                    resolve({ publicKey, privateKey, kid });
                 }
-              },
-              (err, publicKey, privateKey) => {
-                  if (err) return reject(err);
-  
-                  // TODO: define kid length in constants
-                  const kid = randomBytes(16).toString("hex");
-  
-                  resolve({ publicKey, privateKey, kid });
-              })
-
+            );
         });
-    }
+    };
 
-    const keyEd25519 = await generateKey({alg: Algs.Ed25519.toLowerCase()});
+    const keyEd25519 = await generateKey({ alg: Algs.Ed25519.toLowerCase() });
     expect(keyEd25519?.privateKey).toBeTruthy();
 
-    const keyEd448 = await generateKey({alg: 'ed448'});
+    const keyEd448 = await generateKey({ alg: "ed448" });
     expect(keyEd448?.privateKey).toBeTruthy();
 
-    const keyX25519 = await generateKey({alg: 'x25519'});
+    const keyX25519 = await generateKey({ alg: "x25519" });
     expect(keyX25519?.privateKey).toBeTruthy();
 
-    const keyX448 = await generateKey({alg: 'x448'});
+    const keyX448 = await generateKey({ alg: "x448" });
     expect(keyX448?.privateKey).toBeTruthy();
-
-
 });

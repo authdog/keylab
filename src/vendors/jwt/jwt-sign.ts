@@ -39,7 +39,10 @@ const algorithmsDict = [
             Algs?.RS256,
             Algs?.RS384,
             Algs?.RS512,
-            Algs?.RSAPSS
+            Algs?.RSAPSS,
+            Algs?.PS256,
+            Algs?.PS384,
+            Algs?.PS512
         ])
     },
     {
@@ -98,7 +101,7 @@ export const getKeyPair = async ({
                 },
                 privateKeyEncoding: {
                     ...c.privateKeyEncodingPem,
-                   format: keyFormat
+                    format: keyFormat
                 }
             },
             (err, publicKey, privateKey) => {

@@ -1,8 +1,7 @@
-import { getKeyPair, signJwtWithPrivateKey } from '../jwt/jwt-sign';
-import {keyExistsInSet, verifyTokenWithPublicKey} from './jwks'
+import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign";
+import { keyExistsInSet, verifyTokenWithPublicKey } from "./jwks";
 
-
-import { JwtAlgorithmsEnum as Algs} from "../../enums";
+import { JwtAlgorithmsEnum as Algs } from "../../enums";
 // import { default as nock } from "nock";
 
 // import { makePublicKey, verifyRSAToken } from "./jwks";
@@ -38,9 +37,7 @@ it("check if key exists in set", () => {
     expect(shouldNotExist).toBeFalsy();
 });
 
-
-it ("verifies token with public key - es256k", async () => {
-
+it("verifies token with public key - es256k", async () => {
     const keyPairES256k = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.ES256K,
@@ -49,7 +46,6 @@ it ("verifies token with public key - es256k", async () => {
 
     expect(keyPairES256k?.privateKey).toBeTruthy();
     expect(keyPairES256k?.publicKey).toBeTruthy();
-
 
     const signedPayloadEs256k = await signJwtWithPrivateKey(
         {
@@ -62,181 +58,331 @@ it ("verifies token with public key - es256k", async () => {
         }
     );
     expect(signedPayloadEs256k).toBeTruthy();
-    const verifiedEs256k = await verifyTokenWithPublicKey(signedPayloadEs256k, keyPairES256k.publicKey);
-    expect(verifiedEs256k?.payload).toEqual( { urn: 'urn:test:test', kid: keyPairES256k?.kid })
-    expect(verifiedEs256k?.protectedHeader).toEqual( { alg: 'ES256K', type: 'jwt' })
+    const verifiedEs256k = await verifyTokenWithPublicKey(
+        signedPayloadEs256k,
+        keyPairES256k.publicKey
+    );
+    expect(verifiedEs256k?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairES256k?.kid
+    });
+    expect(verifiedEs256k?.protectedHeader).toEqual({
+        alg: "ES256K",
+        type: "jwt"
+    });
+});
 
-})
+it("verifies token with public key - rs256", async () => {
+    const keyPairRS256 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RS256,
+        keySize: 4096
+    });
 
+    expect(keyPairRS256?.privateKey).toBeTruthy();
+    expect(keyPairRS256?.publicKey).toBeTruthy();
 
-// it("verifies correctly token with public uri", async () => {
-//     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
-//     const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
-//     const store = createKeyStore();
-//     const exposeJwkPrivateFields = true;
-//     const keyGenerated = await generateKeyFromStore(
-//         store,
-//         Kty["RSA"].toUpperCase(),
-//         Algs.RS256,
-//         exposeJwkPrivateFields
-//     );
-//     const regExpPathAppJwks = new RegExp(
-//         `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
-//     );
+    const signedPayloadRs256 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.RS256,
+        keyPairRS256.privateKey,
+        {
+            kid: keyPairRS256?.kid
+        }
+    );
+    expect(signedPayloadRs256).toBeTruthy();
+    const verifiedRs256 = await verifyTokenWithPublicKey(
+        signedPayloadRs256,
+        keyPairRS256.publicKey
+    );
+    expect(verifiedRs256?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairRS256?.kid
+    });
+    expect(verifiedRs256?.protectedHeader).toEqual({
+        alg: Algs.RS256,
+        type: "jwt"
+    });
+});
 
-//     const keys = [makePublicKey(keyGenerated)];
+it("verifies token with public key - rs384", async () => {
+    const keyPairRS384 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RS384,
+        keySize: 4096
+    });
 
-//     const scopeNock = nock(AUTHDOG_API_ROOT)
-//         .persist()
-//         .get(regExpPathAppJwks)
-//         .reply(200, {
-//             keys
-//         });
+    expect(keyPairRS384?.privateKey).toBeTruthy();
+    expect(keyPairRS384?.publicKey).toBeTruthy();
 
-//     const payload = {
-//         userId: "a88f05c2-81ae-4e1b-9860-d4ac39170bfe",
-//         userName: "dbrrt"
-//     };
+    const signedPayloadRs384 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.RS384,
+        keyPairRS384.privateKey,
+        {
+            kid: keyPairRS384?.kid
+        }
+    );
+    expect(signedPayloadRs384).toBeTruthy();
+    const verifiedRs384 = await verifyTokenWithPublicKey(
+        signedPayloadRs384,
+        keyPairRS384.publicKey
+    );
+    expect(verifiedRs384?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairRS384?.kid
+    });
+    expect(verifiedRs384?.protectedHeader).toEqual({
+        alg: Algs?.RS384,
+        type: "jwt"
+    });
+});
 
-//     const token = await generateJwtFromPayload(
-//         {
-//             sub: payload?.userId,
-//             aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"],
-//             iss: c.AUTHDOG_ID_ISSUER,
-//             scp: "user openid"
-//         },
-//         {
-//             compact: true,
-//             fields: { typ: Kty.JWT },
-//             jwk: keyGenerated,
-//             sessionDuration: 8 * 60 // 8 hours
-//         }
-//     );
+it("verifies token with public key - rs512", async () => {
+    const keyPairRS512 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RS512,
+        keySize: 4096
+    });
 
-//     const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
+    expect(keyPairRS512?.privateKey).toBeTruthy();
+    expect(keyPairRS512?.publicKey).toBeTruthy();
 
-//     let verified = false;
+    const signedPayloadRs512 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.RS512,
+        keyPairRS512.privateKey,
+        {
+            kid: keyPairRS512?.kid
+        }
+    );
+    expect(signedPayloadRs512).toBeTruthy();
+    const verifiedRs512 = await verifyTokenWithPublicKey(
+        signedPayloadRs512,
+        keyPairRS512.publicKey
+    );
+    expect(verifiedRs512?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairRS512?.kid
+    });
+    expect(verifiedRs512?.protectedHeader).toEqual({
+        alg: Algs?.RS512,
+        type: "jwt"
+    });
+});
 
-//     try {
-//         verified = await verifyRSAToken(token, {
-//             jwksUri
-//         });
-//     } catch (e) {}
+it("verifies token with public key - ps256", async () => {
+    const keyPairPS256 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.PS256,
+        keySize: 4096
+    });
 
-//     expect(verified).toBeTruthy();
+    expect(keyPairPS256?.privateKey).toBeTruthy();
+    expect(keyPairPS256?.publicKey).toBeTruthy();
 
-//     scopeNock.persist(false);
-// });
+    const signedPayloadPs256 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.PS256,
+        keyPairPS256.privateKey,
+        {
+            kid: keyPairPS256?.kid
+        }
+    );
+    expect(signedPayloadPs256).toBeTruthy();
+    const verifiedPs256 = await verifyTokenWithPublicKey(
+        signedPayloadPs256,
+        keyPairPS256.publicKey
+    );
+    expect(verifiedPs256?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairPS256?.kid
+    });
+    expect(verifiedPs256?.protectedHeader).toEqual({
+        alg: Algs?.PS256,
+        type: "jwt"
+    });
+});
 
-// it("verifies token with adhoc jwk store", async () => {
-//     const store = createKeyStore();
-//     const exposeJwkPrivateFields = true;
-//     const keyGenerated = await generateKeyFromStore(
-//         store,
-//         Kty.RSA.toUpperCase(),
-//         Algs.RS256,
-//         exposeJwkPrivateFields
-//     );
+it("verifies token with public key - ps384", async () => {
+    const keyPairPS384 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.PS384,
+        keySize: 4096
+    });
 
-//     const payload = {
-//         userId: "eb13a135-b84a-400c-b590-0c44febf6c4e",
-//         userName: "dbrrt"
-//     };
+    expect(keyPairPS384?.privateKey).toBeTruthy();
+    expect(keyPairPS384?.publicKey).toBeTruthy();
 
-//     const token = await generateJwtFromPayload(
-//         {
-//             sub: payload?.userId,
-//             iss: c.AUTHDOG_ID_ISSUER,
-//             scp: "user openid",
-//             aud: [c.AUTHDOG_ID_ISSUER, "https://my-app.com"]
-//         },
-//         {
-//             compact: true,
-//             fields: { typ: enums.JwtKeyTypes.JWT },
-//             jwk: keyGenerated,
-//             sessionDuration: 8 * 60 // 8 hours
-//         }
-//     );
+    const signedPayloadPs384 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.PS384,
+        keyPairPS384.privateKey,
+        {
+            kid: keyPairPS384?.kid
+        }
+    );
+    expect(signedPayloadPs384).toBeTruthy();
+    const verifiedPs384 = await verifyTokenWithPublicKey(
+        signedPayloadPs384,
+        keyPairPS384.publicKey
+    );
+    expect(verifiedPs384?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairPS384?.kid
+    });
+    expect(verifiedPs384?.protectedHeader).toEqual({
+        alg: Algs?.PS384,
+        type: "jwt"
+    });
+});
 
-//     let verified = false;
+it("verifies token with public key - ps512", async () => {
+    const keyPairPS512 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.PS512,
+        keySize: 4096
+    });
 
-//     try {
-//         const keys: any = [makePublicKey(keyGenerated)];
-//         verified = await verifyRSAToken(token, {
-//             adhoc: { keys }
-//         });
-//     } catch (e) {}
+    expect(keyPairPS512?.privateKey).toBeTruthy();
+    expect(keyPairPS512?.publicKey).toBeTruthy();
 
-//     expect(verified).toBeTruthy();
-// });
+    const signedPayloadPs512 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.PS512,
+        keyPairPS512.privateKey,
+        {
+            kid: keyPairPS512?.kid
+        }
+    );
+    expect(signedPayloadPs512).toBeTruthy();
+    const verifiedPs512 = await verifyTokenWithPublicKey(
+        signedPayloadPs512,
+        keyPairPS512.publicKey
+    );
+    expect(verifiedPs512?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairPS512?.kid
+    });
+    expect(verifiedPs512?.protectedHeader).toEqual({
+        alg: Algs?.PS512,
+        type: "jwt"
+    });
+});
 
-// it("generates jwk with generateKeyFromStore", async () => {
-//     const store = createKeyStore();
+it("verifies token with public key - ES256", async () => {
+    const keyPairES256 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.ES256,
+        keySize: 4096
+    });
 
-//     const keyRsa256 = await generateKeyFromStore(
-//         store,
-//         Kty["RSA"].toUpperCase(),
-//         Algs.RS256,
-//         true
-//     );
+    expect(keyPairES256?.privateKey).toBeTruthy();
+    expect(keyPairES256?.publicKey).toBeTruthy();
 
-//     expect(keyRsa256).toBeTruthy();
+    const signedPayloadEs256 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.ES256,
+        keyPairES256.privateKey,
+        {
+            kid: keyPairES256?.kid
+        }
+    );
+    expect(signedPayloadEs256).toBeTruthy();
+    const verifiedEs256 = await verifyTokenWithPublicKey(
+        signedPayloadEs256,
+        keyPairES256.publicKey
+    );
+    expect(verifiedEs256?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairES256?.kid
+    });
+    expect(verifiedEs256?.protectedHeader).toEqual({
+        alg: Algs?.ES256,
+        type: "jwt"
+    });
+});
 
-//     const keyRsa384 = await generateKeyFromStore(
-//         store,
-//         Kty.RSA,
-//         Algs.RS384,
-//         true
-//     );
+it("verifies token with public key - ES384", async () => {
+    const keyPairES384 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.ES384,
+        keySize: 4096
+    });
 
-//     expect(keyRsa384).toBeTruthy();
+    expect(keyPairES384?.privateKey).toBeTruthy();
+    expect(keyPairES384?.publicKey).toBeTruthy();
 
-//     const keyRsa512 = await generateKeyFromStore(
-//         store,
-//         Kty.RSA,
-//         Algs.RS512,
-//         true
-//     );
+    const signedPayloadEs384 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.ES384,
+        keyPairES384.privateKey,
+        {
+            kid: keyPairES384?.kid
+        }
+    );
+    expect(signedPayloadEs384).toBeTruthy();
+    const verifiedEs384 = await verifyTokenWithPublicKey(
+        signedPayloadEs384,
+        keyPairES384.publicKey
+    );
+    expect(verifiedEs384?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairES384?.kid
+    });
+    expect(verifiedEs384?.protectedHeader).toEqual({
+        alg: Algs?.ES384,
+        type: "jwt"
+    });
+});
 
-//     expect(keyRsa512).toBeTruthy();
+it("verifies token with public key - ES512", async () => {
+    const keyPairES512 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.ES512,
+        keySize: 4096
+    });
 
-//     const keyEs256 = await generateKeyFromStore(
-//         store,
-//         Kty.EC,
-//         Algs.ES256,
-//         true
-//     );
+    expect(keyPairES512?.privateKey).toBeTruthy();
+    expect(keyPairES512?.publicKey).toBeTruthy();
 
-//     // console.log(keyEs256);
-
-//     expect(keyEs256).toBeTruthy();
-
-//     const keyEs384 = await generateKeyFromStore(
-//         store,
-//         Kty.EC,
-//         Algs.ES384,
-//         true
-//     );
-
-//     expect(keyEs384).toBeTruthy();
-
-//     const keyEs512 = await generateKeyFromStore(
-//         store,
-//         Kty.EC,
-//         Algs.ES512,
-//         true
-//     );
-
-//     expect(keyEs512).toBeTruthy();
-
-//     // PS256 / PS384 / PS512
-//     // also valid for PS384 and PS512 as RSA-PSS is used for all of them
-//     const keyPs256 = await generateKeyFromStore(
-//         store,
-//         Kty.RSA,
-//         Algs.RSAPSS,
-//         true
-//     );
-
-//     expect(keyPs256).toBeTruthy();
-// });
+    const signedPayloadEs512 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.ES512,
+        keyPairES512.privateKey,
+        {
+            kid: keyPairES512?.kid
+        }
+    );
+    expect(signedPayloadEs512).toBeTruthy();
+    const verifiedEs512 = await verifyTokenWithPublicKey(
+        signedPayloadEs512,
+        keyPairES512.publicKey
+    );
+    expect(verifiedEs512?.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairES512?.kid
+    });
+    expect(verifiedEs512?.protectedHeader).toEqual({
+        alg: Algs?.ES512,
+        type: "jwt"
+    });
+});

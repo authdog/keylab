@@ -5,7 +5,7 @@
     "scripts": {
         "test": "jest",
         "test-with-coverage": "jest --collect-coverage",
-        "pretty": "npx prettier --write lib scripts",
+        "pretty": "npx prettier --write src",
         "docs:dev": "yarn --cwd docs start",
         "docs:build-i18n": "ts-node scripts/build-i18n-docs",
         "docs:deploy": "GIT_USER=dbrrt USE_SSH=true yarn --cwd docs deploy",

@@ -69,7 +69,7 @@ export interface IJwkPublicKey {
 }
 
 export interface IKeyPair {
-    publicKey: string  & IJwkPublicKey;
+    publicKey: string & IJwkPublicKey;
     privateKey: string & IJwkPrivateKey;
     kid: string;
 }
