@@ -8,6 +8,8 @@ export const JWT_NON_COMPLIANT_AUDIENCE =
 
 export const JWT_GENERIC_ERROR_MESSAGE = "error jwt";
 
+export const MALFORMED_URI = "URI malformed";
+
 export const JWKS_MISSING_KEY_ID = "keyId does not exist in the target set";
 export const JWK_MISSING_KEY_ID_FROM_HEADERS = "kid missing from token headers";
 export const GENERIC_UNAUTHORIZED_MESSAGE = "unauthorized";

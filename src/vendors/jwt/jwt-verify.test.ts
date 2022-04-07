@@ -31,7 +31,7 @@ it("extract properly algorithm from token", async () => {
 it("should throw an exception if token is malformed", async () => {
     expect(() => {
         parseJwt(DUMMY_NON_JWT_TOKEN, JwtParts.HEADER);
-    }).toThrow(c.JWT_CANNOT_BE_DECODED);
+    }).toThrow(c.MALFORMED_URI);
 });
 
 it("verifies HS256 token", async () => {
