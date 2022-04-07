@@ -33,77 +33,6 @@ export interface IRSAKeyStore {
     keys: [IJwkRecordVisible];
 }
 
-/**
- *
- * @returns new JWK store
- */
-// export const createKeyStore = () => {
-//     return jose.JWK.createKeyStore();
-// };
-
-// const defaultKeyOptions = (algorithm: any) => {
-//     return Object.freeze({
-//         alg: algorithm,
-//         use: "sig"
-//     });
-// };
-
-// will be deprecated
-// export const generateKeyFromStore: any = async (
-//     store: jose.JWK.KeyStore,
-//     keyType: string,
-//     algorithm: string,
-//     exposePrivateFields: boolean = false,
-//     keySize: number = 2048
-// ) => {
-//     let generatedKey = null;
-
-//     switch (algorithm) {
-//         // RSA
-//         case Algs.RS256:
-//         case Algs.RS384:
-//         case Algs.RS512:
-//         case Algs.RSAPSS:
-//             generatedKey = await store.generate(
-//                 keyType.toUpperCase(),
-//                 keySize,
-//                 {
-//                     ...defaultKeyOptions(algorithm)
-//                 }
-//             );
-//             break;
-
-//         // EC
-//         case Algs.ES256:
-//         case Algs.ES384:
-//         case Algs.ES512:
-//             generatedKey = await store.generate(
-//                 keyType.toUpperCase(),
-//                 c.namedCurves[algorithm.toLowerCase()],
-//                 {
-//                     ...defaultKeyOptions(algorithm)
-//                 }
-//             );
-//             break;
-
-//         default:
-//             throw new Error(`Unsupported algorithm: ${algorithm}`);
-//     }
-
-//     //     await store.generate(
-//     //     // enums.JwtKeyTypes[keyType],
-//     //     keyType,
-//     //     2048,
-//     //     {
-//     //         // jwa: https://datatracker.ietf.org/doc/html/rfc7518
-//     //         alg: algorithm, //enums.JwtAlgorithmsEnum[algorithm],
-//     //         // https://datatracker.ietf.org/doc/html/rfc7517#section-4.3
-//     //         // The "use" and "key_ops" JWK members SHOULD NOT be used together;
-//     //         use: enums.JwtPublicKeyUse.SIGNATURE
-//     //     }
-//     // );
-//     return generatedKey.toJSON(exposePrivateFields);
-// };
 
 // TODO: add proper type for key parameter
 /**
@@ -184,13 +113,6 @@ export const getKeyFromSet = (keyId: string, jwks: IJwkRecordVisible[]) => {
         throwJwtError(c.JWKS_MISSING_KEY_ID);
     }
 };
-
-// TODO
-
-// export interface IVerifyTokenWithPublicKeyOpts {
-//     issuer?: string;
-//     audience?: string;
-// }
 
 export const verifyTokenWithPublicKey = async (
     token: string,

@@ -5,7 +5,6 @@ import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
 import { default as nock } from "nock";
 
 import * as c from "../../constants";
-// import * as enums from "../../enums";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
 it("check if key exists in set", () => {
@@ -382,8 +381,6 @@ it("verifies token with public key - ES512", async () => {
         type: Kty.JWT
     });
 });
-
-// Jwks remote keys
 
 it("verifies correctly token with public uri", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
