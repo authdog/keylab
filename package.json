@@ -34,7 +34,7 @@
         "token",
         "jose"
     ],
-    "author": "Authdog, Inc.",
+    "author": "dbrrt",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/authdog/keylab/issues"
