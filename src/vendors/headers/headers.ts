@@ -19,7 +19,7 @@ export const extractBearerTokenFromHeaders = (
     }
 
     const parts = headers[fieldCredentials].split(" ");
-    if (parts.length == 2) {
+    if (parts.length === 2) {
         const [scheme, credentials] = parts;
         if (/^Bearer$/i.test(scheme)) {
             token = credentials;

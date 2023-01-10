@@ -382,9 +382,7 @@ it("verifies token with public key - ES512", async () => {
     });
 });
 
-
 it("verifies token with public key - EdDSA", async () => {
-
     const keyPairEDDSA = await getKeyPair({
         algorithmIdentifier: Algs.EdDSA,
         keySize: 4096
@@ -405,7 +403,6 @@ it("verifies token with public key - EdDSA", async () => {
 
     expect(signedPayloadEdDSA).toBeTruthy();
 
-
     const verifiedEdDSA = await verifyTokenWithPublicKey(
         signedPayloadEdDSA,
         keyPairEDDSA.publicKey
@@ -420,9 +417,7 @@ it("verifies token with public key - EdDSA", async () => {
         alg: Algs?.EdDSA,
         type: Kty.JWT
     });
-})
-
-
+});
 
 it("THROWS an error: verifies token with public key - ES256k / pem", async () => {
     const keyPairES256k = await getKeyPair({
