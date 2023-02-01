@@ -17,6 +17,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
       - uses: actions/cache@v2
         with:
           path: '**/node_modules'
