@@ -76,7 +76,7 @@ export const fetchJwksWithUri = async ({
     const httpsAgent = new https.Agent({
         rejectUnauthorized: verifySsl
     });
-    const jwks = await fetch(jwksUri, {
+    return await fetch(jwksUri, {
         method: "GET",
         agent: httpsAgent
     })
@@ -84,8 +84,7 @@ export const fetchJwksWithUri = async ({
         .catch((err) => {
             throw new Error(err.message);
         });
-    
-    return <IRSAKeyStore>jwks;
+
 };
 
 // NOT USED
@@ -132,16 +131,17 @@ export const verifyTokenWithPublicKey = async (
         JWKS = createLocalJWKSet({
             keys: [publicKey]
         });
+
     } else if (opts?.jwksUri) {
         // fetch jwk keys
-        const remoteJwks = await fetchJwksWithUri({
+        const remoteJwks: any = await fetchJwksWithUri({
             jwksUri: opts?.jwksUri
         });
 
         JWKS = createLocalJWKSet({
-            // @ts-ignore
             keys: [...remoteJwks.keys]
         });
+
     } else {
         throw new Error("Invalid public key format (must me JWK or JWKs URI)");
     }

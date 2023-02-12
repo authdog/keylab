@@ -13,7 +13,8 @@ export const signJwtWithPrivateKey = async (
     payload: any,
     alg: Algs,
     privateKey: string | any,
-    opts: ISignJwtOpts = {}
+    opts: ISignJwtOpts = {},
+    altOpts: any = {}
 ) => {
     let privateKeyObj;
 
@@ -31,10 +32,22 @@ export const signJwtWithPrivateKey = async (
         }
     }
 
-    return await new SignJWT({ ...payload })
-        .setProtectedHeader({ alg, type: JwtKeyTypes?.JWT, kid: opts?.kid })
+    let protectedHeaders = {
+        alg, type: JwtKeyTypes?.JWT
+    };
+
+    if (altOpts?.keyId) {
+        // @ts-ignore
+        protectedHeaders = { ...protectedHeaders, kid: altOpts.keyId };
+    }
+
+    return await new SignJWT({ ...payload, ...opts })
+        .setProtectedHeader({
+            ...protectedHeaders,
+        })
         .sign(privateKeyObj);
 };
+
 
 const algorithmsDict = [
     {
