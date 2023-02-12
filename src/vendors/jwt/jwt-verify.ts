@@ -11,7 +11,7 @@ import {
     ICreateSignedJwtOptions
 } from "..";
 import { signJwtWithPrivateKey } from "./jwt-sign";
-import { verifyTokenWithPublicKey } from "../jwks";
+import { ITokenExtractedWithPubKey, verifyTokenWithPublicKey } from "../jwks";
 
 /**
  *
@@ -41,6 +41,7 @@ export const checkTokenValidness = async (
 ): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
+    let extractedPayload: ITokenExtractedWithPubKey;
     let isValid = false;
 
     const algEnums = enums.JwtAlgorithmsEnum;
@@ -81,12 +82,17 @@ export const checkTokenValidness = async (
                 missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
-                isValid = await verifyTokenWithPublicKey(token, null, {
+                extractedPayload = await verifyTokenWithPublicKey(token, null, {
                     jwksUri,
                     verifySsl,
                     adhoc,
                     requiredScopes
                 });
+
+                if (!!extractedPayload) {
+                    isValid = true;
+                }
+
 
                 break;
             } else {
