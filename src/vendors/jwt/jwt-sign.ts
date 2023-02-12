@@ -5,11 +5,15 @@ import { IGetKeyPair, IKeyPair } from "./interfaces";
 import * as c from "../../constants";
 import { strToUint8Array } from "./utils";
 
+interface ISignJwtOpts {
+    kid?: string;
+}
+
 export const signJwtWithPrivateKey = async (
     payload: any,
     alg: Algs,
     privateKey: string | any,
-    opts: any = {}
+    opts: ISignJwtOpts = {}
 ) => {
     let privateKeyObj;
 
@@ -27,8 +31,8 @@ export const signJwtWithPrivateKey = async (
         }
     }
 
-    return await new SignJWT({ ...payload, ...opts })
-        .setProtectedHeader({ alg, type: JwtKeyTypes?.JWT })
+    return await new SignJWT({ ...payload })
+        .setProtectedHeader({ alg, type: JwtKeyTypes?.JWT, kid: opts?.kid })
         .sign(privateKeyObj);
 };
 

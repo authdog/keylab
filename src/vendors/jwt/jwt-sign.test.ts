@@ -11,10 +11,11 @@ it("jwt sign with payload fields - HS256", async () => {
         sub: "12345",
         aud: [c.AUTHDOG_ID_ISSUER]
     };
-    const token = await signJwtWithPrivateKey(payload, Algs.HS256, "secret");
+    const token = await signJwtWithPrivateKey(payload, Algs.HS256, "secret", {kid: "random-key"});
     expect(token).toBeTruthy();
-    const { alg } = parseJwt(token, JwtParts?.HEADER);
+    const { alg, kid } = parseJwt(token, JwtParts?.HEADER);
     expect(alg).toEqual(Algs.HS256);
+    expect(kid).toEqual("random-key")
 });
 
 it("jwt sign with payload fields - HS384", async () => {
