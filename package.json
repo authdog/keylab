@@ -1,6 +1,6 @@
 {
     "name": "keylab",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "source": "src/index.ts",
     "main": "dist/index.js",
     "description": "keylab is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
