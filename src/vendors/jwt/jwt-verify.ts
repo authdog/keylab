@@ -92,7 +92,6 @@ export const checkTokenValidness = async (
                     isValid = true;
                 }
 
-
                 break;
             } else {
                 throwJwtError(

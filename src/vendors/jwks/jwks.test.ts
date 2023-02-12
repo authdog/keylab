@@ -1,5 +1,9 @@
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign";
-import { ITokenExtractedWithPubKey, keyExistsInSet, verifyTokenWithPublicKey } from "./jwks";
+import {
+    ITokenExtractedWithPubKey,
+    keyExistsInSet,
+    verifyTokenWithPublicKey
+} from "./jwks";
 
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
 import { default as nock } from "nock";
@@ -480,8 +484,6 @@ it("verifies correctly token with public uri", async () => {
 
     const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
 
-
-
     let verified: ITokenExtractedWithPubKey | undefined;
 
     try {
@@ -491,7 +493,7 @@ it("verifies correctly token with public uri", async () => {
     } catch (e) {
         console.error(e);
     }
-    
+
     if (verified) {
         expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" });
         expect(verified.payload).toEqual({

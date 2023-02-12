@@ -5,6 +5,6 @@ export {
 } from "./vendors";
 export * from "./enums";
 
-export {
-    signJwtWithPrivateKey
-} from "./vendors/jwt/jwt-sign"
+export { signJwtWithPrivateKey } from "./vendors/jwt/jwt-sign";
+
+export { JwtAlgorithmsEnum } from "./enums";

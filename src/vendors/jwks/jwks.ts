@@ -1,11 +1,11 @@
-import {resolveFetch} from '../fetch/fetch'
+import { resolveFetch } from "../fetch/fetch";
 
-type Fetch = typeof fetch
+type Fetch = typeof fetch;
 
 import { throwJwtError } from "../../errors";
 import * as c from "../../constants";
 import { createLocalJWKSet, jwtVerify } from "jose";
-import crossFetch from 'cross-fetch';
+import crossFetch from "cross-fetch";
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -76,16 +76,18 @@ export const fetchJwksWithUri = async ({
     jwksUri,
     verifySsl = true
 }: {
-    jwksUri: string,
-    verifySsl?: boolean
+    jwksUri: string;
+    verifySsl?: boolean;
 }): Promise<IRSAKeyStore> => {
-    const fetchWithContext: Fetch = await resolveFetch(crossFetch)
+    const fetchWithContext: Fetch = await resolveFetch(crossFetch);
     return await fetchWithContext(jwksUri, {
         method: "GET"
     })
         .then((res) => {
             if (!res.ok) {
-                throw new Error(`Failed to fetch JWKS with status code: ${res.status}`);
+                throw new Error(
+                    `Failed to fetch JWKS with status code: ${res.status}`
+                );
             }
             return res.json();
         })
