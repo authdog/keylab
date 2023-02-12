@@ -1,4 +1,4 @@
-import crossFetch, { Headers as CrossFetchHeaders } from 'cross-fetch'
+import crossFetch from 'cross-fetch'
 
 type Fetch = typeof fetch
 
@@ -14,12 +14,3 @@ export const resolveFetch = (customFetch?: Fetch): Fetch => {
   }
   return (...args) => _fetch(...args)
 }
-
-export const resolveHeadersConstructor = () => {
-    if (typeof Headers === 'undefined') {
-      return CrossFetchHeaders
-    }
-  
-    return Headers
-  }
-  

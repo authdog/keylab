@@ -6,64 +6,29 @@
 [![npm version](https://badge.fury.io/js/keylab.svg)](https://badge.fury.io/js/keylab)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 ![bundle size](https://img.shields.io/bundlephobia/minzip/keylab?label=zipped)
-<!-- [![dependencies Status](https://david-dm.org/authdog/keylab/status.svg)](https://david-dm.org/authdog/keylab)
-[![devDependencies Status](https://david-dm.org/authdog/keylab/dev-status.svg)](https://david-dm.org/authdog/keylab?type=dev) -->
 
 keylab is a nodejs library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.
 
 ## Install
 
+### with yarn
+
 `yarn add keylab`
 
-<!-- ## Usage
+### with pnpm
 
-Creating a token:
+`pnpm add keylab`
 
-- https://www.keylab.org/docs/jwt/signin-a-token
+### with npm
 
-Verifying a token:
+`npm install keylab`
 
-- https://www.keylab.org/docs/jwt/validating-a-token -->
-
-<!-- ## Roadmap Features
-
-- [x] Basic readme validation info
-- [x] Helpers to check issuer and audiences of a given token
-- [x] Sign/Verify HS256 token
-- [x] Sign/Verify RS256 token
-- [x] Sign/Verify RS384 token
-- [x] Sign/Verify RS512 token
-- [x] Sign/Verify PS256 token
-- [x] Sign/Verify PS384 token
-- [x] Sign/Verify PS512 token
-- [x] JWT scopes validation
-- [ ] Migrate node-jose to jose
-
-## Roadmap Documentation
-
-- [x] Documentation End user *Introduction*
-- [x] Documentation End user *JWT*
-- [x] Translation foundations
-
-### Next features
-
-- [ ] Sign/Verify HS384 token 
-- [ ] Sign/Verify ES256 token 
-- [ ] Sign/Verify ES384 token 
-- [ ] Sign/Verify ES512 token 
-- [ ] Sign/Verify EdDSA token 
-- [ ] Sign/Verify ES256K token 
-
-## Dependencies
-
-- jsonwebtoken
-- node-jose
-- node-fetch -->
 
 ## Changelog
 
-- JWT signed with a JSON Web Key can be "ad-hoc" validated
-  - (22.FEB.22) `verifyRSATokenWithUri` has been replaced with `verifyRSAToken`
+- 0.1.4: Using `cross-fetch` for edge ecosystems
+- 0.0.0: JWT signed with a JSON Web Key can be "ad-hoc" validated
+- 0.0.0: `verifyRSATokenWithUri` has been replaced with `verifyRSAToken`
 
 
 ## Issue Reporting
