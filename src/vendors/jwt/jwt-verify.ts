@@ -1,4 +1,3 @@
-// import * as jwt from "jsonwebtoken";
 import * as jws from "jws";
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
