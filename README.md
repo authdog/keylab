@@ -24,6 +24,72 @@ Keylab is a Node.js library designed to simplify the creation and validation of 
 
 `npm install keylab`
 
+## Get Started
+
+### Signin a Token with a Private key
+
+```typescript
+
+// ES256
+
+import {getKeyPair, signJwtWithPrivateKey, Algs} from "keylab"
+
+const keyPairES256 = await getKeyPair({
+    keyFormat: "pem",
+    algorithmIdentifier: Algs?.ES256,
+    keySize: 4096
+});
+
+const signedPayloadEs256 = await signJwtWithPrivateKey(
+    {
+        aid: "12345",
+        sub: "sub:12345",
+        iss: "issuer:12345",
+        aud: ["aud:12345"],
+        scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
+            " "
+        )
+    },
+    Algs.ES256,
+    keyPairES256.privateKey
+);
+
+```
+
+### Verify a token with private key (symetric)
+
+- HS256 
+
+```typescript
+
+import {verifyHSTokenWithSecretString, Algs} from "keylab"
+
+const isVerified = await verifyHSTokenWithSecretString(
+    signedToken,
+    SECRET_STRING,
+    Algs.HS256
+);
+```
+
+### Verify a token with a public OpenID endpoint (asymetric)
+
+- ES512
+
+```typescript
+
+import {checkTokenValidness} from "keylab"
+
+const signedPayloadEs512 = "ey.....";
+const jwksUri = `https://openid.auth.dog/.well-known/jwks.json`;
+
+const isValid = await checkTokenValidness(
+    signedPayloadEs512,
+    {
+        jwksUri
+    }
+);
+
+```
 
 ## Changelog
 
