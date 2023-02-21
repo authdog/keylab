@@ -46,9 +46,7 @@ const signedPayloadEs256 = await signJwtWithPrivateKey(
         sub: "sub:12345",
         iss: "issuer:12345",
         aud: ["aud:12345"],
-        scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
-            " "
-        )
+        scp: [["a", "b:c", "d"].join(" ")
     },
     Algs.ES256,
     keyPairES256.privateKey
