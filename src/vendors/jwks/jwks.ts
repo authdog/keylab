@@ -1,6 +1,6 @@
 import { throwJwtError } from "../../errors";
 import * as c from "../../constants";
-import { createLocalJWKSet, importSPKI, JSONWebKeySet, jwtVerify } from "jose";
+import { createLocalJWKSet, importSPKI, JSONWebKeySet, JWK, jwtVerify } from "jose";
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -120,15 +120,22 @@ export interface ITokenExtractedWithPubKey {
 // TODO: add PEM from opts
 export const verifyTokenWithPublicKey = async (
     token: string,
-    publicKey: any,
+    publicKey: string | JWK | null,
     opts: IVerifyRSATokenCredentials = null
 ): Promise<ITokenExtractedWithPubKey> => {
     let JWKS = null;
     let decoded = null;
 
     if (publicKey) {
+        let jwk;
+        if (typeof publicKey === "string") {
+            // extract alg from token headers
+            jwk = await pemToJwk(publicKey, "RS256")
+        } else {
+            jwk = publicKey;
+        }
         JWKS = createLocalJWKSet({
-            keys: [publicKey]
+            keys: [jwk]
         });
     } else if (opts?.jwksUri) {
         // fetch jwk keys

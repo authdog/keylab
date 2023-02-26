@@ -11,6 +11,8 @@ export interface IcheckTokenValidnessCredentials {
     adhoc?: IRSAKeyStore;
     // scopes
     requiredScopes?: string[];
+    // public
+    publicKey?: string;
 }
 
 export interface ISignTokenCredentials {

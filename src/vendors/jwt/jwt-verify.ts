@@ -36,7 +36,8 @@ export const checkTokenValidness = async (
         jwksUri,
         verifySsl = true,
         adhoc,
-        requiredScopes
+        requiredScopes,
+        publicKey
     }: IcheckTokenValidnessCredentials
 ): Promise<boolean> => {
     const algorithm = getAlgorithmJwt(token);
@@ -82,7 +83,7 @@ export const checkTokenValidness = async (
                 missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
-                extractedPayload = await verifyTokenWithPublicKey(token, null, {
+                extractedPayload = await verifyTokenWithPublicKey(token, publicKey, {
                     jwksUri,
                     verifySsl,
                     adhoc,

@@ -1,5 +1,5 @@
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
-import { importPKCS8, importJWK, SignJWT } from "jose";
+import { importPKCS8, importJWK, SignJWT, JWTHeaderParameters } from "jose";
 import { generateKeyPair, randomBytes } from "crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 import * as c from "../../constants";
@@ -32,20 +32,17 @@ export const signJwtWithPrivateKey = async (
         }
     }
 
-    let protectedHeaders = {
+    let protectedHeaders: JWTHeaderParameters = {
         alg,
         type: JwtKeyTypes?.JWT
     };
 
     if (altOpts?.keyId) {
-        // @ts-ignore
         protectedHeaders = { ...protectedHeaders, kid: altOpts.keyId };
     }
 
     return await new SignJWT({ ...payload, ...opts })
-        .setProtectedHeader({
-            ...protectedHeaders
-        })
+        .setProtectedHeader(protectedHeaders)
         .sign(privateKeyObj);
 };
 
