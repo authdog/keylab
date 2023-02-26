@@ -130,9 +130,16 @@ export const verifyTokenWithPublicKey = async (
     if (publicKey) {
         let jwk;
         if (typeof publicKey === "string") {
-            // extract alg from token headers
             const alg = extractAlgFromJwtHeader(token)
-            jwk = await pemToJwk(publicKey, alg)
+            const keyLike = await pemToJwk(publicKey, alg)
+            
+            decoded = await jwtVerify(token, keyLike, {
+                issuer: opts?.requiredIssuer,
+                audience: opts?.requiredAudiences
+            })
+
+            return decoded;
+
         } else {
             jwk = publicKey;
         }
@@ -167,3 +174,4 @@ export const verifyTokenWithPublicKey = async (
 export const pemToJwk = async (pemString: string, algorithm: string) => {
     return await importSPKI(pemString, algorithm);
 };
+

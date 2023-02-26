@@ -191,3 +191,36 @@ it("test verify token with pem - RS512", async () => {
         await jwtVerify(signedPayloadRs512, jwk)
     ).toBeTruthy();
 });
+
+
+
+it("test verify token with pem - RS512", async () => {
+    const keyPairRS512 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs.RS512,
+        keySize: 4096
+    });
+
+    expect(keyPairRS512?.privateKey).toBeTruthy();
+    expect(keyPairRS512?.publicKey).toBeTruthy();
+
+    expect(typeof keyPairRS512?.publicKey === "string");
+    expect(typeof keyPairRS512?.privateKey === "string");
+
+    const signedPayloadRs512 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.RS512,
+        keyPairRS512.privateKey,
+        {
+            kid: keyPairRS512?.kid
+        }
+    );
+    expect(signedPayloadRs512).toBeTruthy();
+
+    const jwk = await pemToJwk(keyPairRS512?.publicKey,  Algs.RS512);
+    expect(
+        await jwtVerify(signedPayloadRs512, jwk)
+    ).toBeTruthy();
+});
