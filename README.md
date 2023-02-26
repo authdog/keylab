@@ -91,10 +91,12 @@ const isValid = await checkTokenValidness(
 
 ## Changelog
 
+- 0.1.12:
+ - Remove `jws` from dependencies
+ - improve compatibility with Cloudflare Workers
 - 0.1.11: Add support for keyid injection in jwt header (required for Apple OAuth2.0 flow)
 - 0.0.0: JWT signed with a JSON Web Key can be "ad-hoc" validated
 - 0.0.0: `verifyRSATokenWithUri` has been replaced with `verifyRSAToken`
-
 
 ## Issue Reporting
 
