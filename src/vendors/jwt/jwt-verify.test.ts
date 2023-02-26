@@ -18,7 +18,6 @@ const DUMMY_HS256_TOKEN =
 const DUMMY_NON_JWT_TOKEN = "hello-i-am-not-a-jwt";
 
 import { default as nock } from "nock";
-import { verifyTokenWithPublicKey } from "../jwks";
 
 it("extract properly token headers", async () => {
     const headers = parseJwt(DUMMY_HS256_TOKEN, JwtParts.HEADER);
