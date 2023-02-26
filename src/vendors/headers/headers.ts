@@ -17,7 +17,6 @@ export const extractBearerTokenFromHeaders = (
             message: c.HEADERS_CREDENTIALS_FORMAT
         });
     }
-
     const parts = headers[fieldCredentials].split(" ");
     if (parts.length === 2) {
         const [scheme, credentials] = parts;
@@ -35,3 +34,4 @@ export const extractBearerTokenFromHeaders = (
     }
     return token;
 };
+

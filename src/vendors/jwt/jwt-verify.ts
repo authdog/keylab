@@ -310,3 +310,18 @@ export const createSignedJwt = async (
 
     return token;
 };
+
+
+export const extractAlgFromJwtHeader = (jwt: string) => {
+    // Split the JWT into its three parts: header, payload, and signature
+    const parts = jwt.split('.');
+    
+    // Decode the header JSON string
+    const headerJson = atob(parts[0]);
+    const header = JSON.parse(headerJson);
+    
+    // Extract the "alg" field from the header
+    const alg = header.alg;
+    
+    return alg;
+}

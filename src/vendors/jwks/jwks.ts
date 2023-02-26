@@ -1,6 +1,7 @@
 import { throwJwtError } from "../../errors";
 import * as c from "../../constants";
 import { createLocalJWKSet, importSPKI, JSONWebKeySet, JWK, jwtVerify } from "jose";
+import { extractAlgFromJwtHeader } from "../jwt";
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -130,7 +131,8 @@ export const verifyTokenWithPublicKey = async (
         let jwk;
         if (typeof publicKey === "string") {
             // extract alg from token headers
-            jwk = await pemToJwk(publicKey, "RS256")
+            const alg = extractAlgFromJwtHeader(token)
+            jwk = await pemToJwk(publicKey, alg)
         } else {
             jwk = publicKey;
         }
