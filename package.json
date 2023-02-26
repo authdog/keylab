@@ -59,7 +59,6 @@
     },
     "dependencies": {
         "jose": "^4.11.4",
-        "jws": "4.0.0",
         "node-fetch": "2.6.9"
     }
 }

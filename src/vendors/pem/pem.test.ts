@@ -1,6 +1,7 @@
+import { jwtVerify } from "jose";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
+import { pemToJwk } from "../jwks/jwks";
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign";
-import * as jws from "jws";
 
 it("test verify token with pem - ES256", async () => {
     const keyPairES256 = await getKeyPair({
@@ -27,8 +28,10 @@ it("test verify token with pem - ES256", async () => {
     );
     expect(signedPayloadEs256).toBeTruthy();
 
+    const jwk = await pemToJwk(keyPairES256?.publicKey, Algs.ES256)
+
     expect(
-        jws.verify(signedPayloadEs256, Algs.ES256, keyPairES256.publicKey)
+        await jwtVerify(signedPayloadEs256, jwk)
     ).toBeTruthy();
 });
 
@@ -56,9 +59,9 @@ it("test verify token with pem - ES384", async () => {
         }
     );
     expect(signedPayloadEs384).toBeTruthy();
-
+    const jwk = await pemToJwk(keyPairES384?.publicKey,  Algs.ES384);   
     expect(
-        jws.verify(signedPayloadEs384, Algs.ES384, keyPairES384.publicKey)
+        await jwtVerify(signedPayloadEs384, jwk)
     ).toBeTruthy();
 });
 
@@ -87,10 +90,13 @@ it("test verify token with pem - ES512", async () => {
     );
     expect(signedPayloadEs512).toBeTruthy();
 
+    const jwk = await pemToJwk(keyPairES512?.publicKey,  Algs.ES512);   
+
     expect(
-        jws.verify(signedPayloadEs512, Algs.ES512, keyPairES512.publicKey)
+        await jwtVerify(signedPayloadEs512, jwk)
     ).toBeTruthy();
 });
+
 
 it("test verify token with pem - RS256", async () => {
     const keyPairRS256 = await getKeyPair({
@@ -117,10 +123,12 @@ it("test verify token with pem - RS256", async () => {
     );
     expect(signedPayloadRs256).toBeTruthy();
 
+    const jwk = await pemToJwk(keyPairRS256?.publicKey,  Algs.RS256);
     expect(
-        jws.verify(signedPayloadRs256, Algs.RS256, keyPairRS256.publicKey)
+        await jwtVerify(signedPayloadRs256, jwk)
     ).toBeTruthy();
 });
+
 
 it("test verify token with pem - RS384", async () => {
     const keyPairRS384 = await getKeyPair({
@@ -147,8 +155,9 @@ it("test verify token with pem - RS384", async () => {
     );
     expect(signedPayloadRs384).toBeTruthy();
 
+    const jwk = await pemToJwk(keyPairRS384?.publicKey,  Algs.RS384);
     expect(
-        jws.verify(signedPayloadRs384, Algs.RS384, keyPairRS384.publicKey)
+        await jwtVerify(signedPayloadRs384, jwk)
     ).toBeTruthy();
 });
 
@@ -177,7 +186,8 @@ it("test verify token with pem - RS512", async () => {
     );
     expect(signedPayloadRs512).toBeTruthy();
 
+    const jwk = await pemToJwk(keyPairRS512?.publicKey,  Algs.RS512);
     expect(
-        jws.verify(signedPayloadRs512, Algs.RS512, keyPairRS512.publicKey)
+        await jwtVerify(signedPayloadRs512, jwk)
     ).toBeTruthy();
 });

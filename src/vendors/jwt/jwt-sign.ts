@@ -33,7 +33,8 @@ export const signJwtWithPrivateKey = async (
     }
 
     let protectedHeaders = {
-        alg, type: JwtKeyTypes?.JWT
+        alg,
+        type: JwtKeyTypes?.JWT
     };
 
     if (altOpts?.keyId) {
@@ -43,11 +44,10 @@ export const signJwtWithPrivateKey = async (
 
     return await new SignJWT({ ...payload, ...opts })
         .setProtectedHeader({
-            ...protectedHeaders,
+            ...protectedHeaders
         })
         .sign(privateKeyObj);
 };
-
 
 const algorithmsDict = [
     {

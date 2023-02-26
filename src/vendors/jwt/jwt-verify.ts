@@ -1,4 +1,3 @@
-import * as jws from "jws";
 import { atob } from "../ponyfills/ponyfills";
 import * as c from "../../constants";
 import * as enums from "../../enums";
@@ -11,6 +10,8 @@ import {
 } from "..";
 import { signJwtWithPrivateKey } from "./jwt-sign";
 import { ITokenExtractedWithPubKey, verifyTokenWithPublicKey } from "../jwks";
+import { jwtVerify } from "jose";
+import { TextEncoder } from "util";
 
 /**
  *
@@ -111,22 +112,28 @@ export const checkTokenValidness = async (
 export const verifyHSTokenWithSecretString = async (
     token: string,
     secret: string,
-    algorithm: enums.JwtAlgorithmsEnum = enums.JwtAlgorithmsEnum.HS256
+    algorithm: enums.JwtAlgorithmsEnum = enums.JwtAlgorithmsEnum.HS256,
+    issuer?: any,
+    audience?: any
 ) => {
-    let isValid = false;
+    let decoded;
     let isVerified = false;
 
-    // check algorithm validity
-    isValid = jws.verify(token, algorithm, secret);
-
-    if (isValid) {
-        const { exp } = parseJwt(token, enums.JwtParts.PAYLOAD);
-
-        if (exp) {
-            const now = Math.floor(Date.now() / 1000);
-            isVerified = now < exp;
+    try {
+        decoded = await jwtVerify(token, new TextEncoder().encode(secret), {
+            issuer,
+            audience
+        })
+    
+        if (decoded?.payload) {
+            const { exp } = parseJwt(token, enums.JwtParts.PAYLOAD);
+    
+            if (exp) {
+                const now = Math.floor(Date.now() / 1000);
+                isVerified = now < exp;
+            }
         }
-    }
+    } catch (e) {}
 
     return isVerified;
 };

@@ -1,6 +1,6 @@
 import { throwJwtError } from "../../errors";
 import * as c from "../../constants";
-import { createLocalJWKSet, jwtVerify } from "jose";
+import { createLocalJWKSet, importSPKI, JSONWebKeySet, jwtVerify } from "jose";
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -70,7 +70,7 @@ export const makePublicKey = (privateKey: any) => {
 export const fetchJwksWithUri = async ({
     jwksUri,
     verifySsl = true
-}): Promise<IRSAKeyStore> => {
+}): Promise<JSONWebKeySet> => {
     const fetch = require("node-fetch");
     const https = require("https");
     const httpsAgent = new https.Agent({
@@ -84,7 +84,6 @@ export const fetchJwksWithUri = async ({
         .catch((err) => {
             throw new Error(err.message);
         });
-
 };
 
 // NOT USED
@@ -131,17 +130,15 @@ export const verifyTokenWithPublicKey = async (
         JWKS = createLocalJWKSet({
             keys: [publicKey]
         });
-
     } else if (opts?.jwksUri) {
         // fetch jwk keys
-        const remoteJwks: any = await fetchJwksWithUri({
+        const remoteJwks: JSONWebKeySet = await fetchJwksWithUri({
             jwksUri: opts?.jwksUri
         });
 
         JWKS = createLocalJWKSet({
             keys: [...remoteJwks.keys]
         });
-
     } else {
         throw new Error("Invalid public key format (must me JWK or JWKs URI)");
     }
@@ -156,4 +153,8 @@ export const verifyTokenWithPublicKey = async (
     }
 
     return decoded;
+};
+
+export const pemToJwk = async (pemString: string, algorithm: string) => {
+    return await importSPKI(pemString, algorithm);
 };

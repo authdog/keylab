@@ -2,6 +2,7 @@ import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign";
 import {
     ITokenExtractedWithPubKey,
     keyExistsInSet,
+    pemToJwk,
     verifyTokenWithPublicKey
 } from "./jwks";
 
@@ -503,4 +504,53 @@ it("verifies correctly token with public uri", async () => {
     }
 
     scopeNock.persist(false);
+});
+
+
+describe("pemToJwk", () => {
+    test("converts RSA public key PEM to JWK", async () => {
+        const pemString0 = `-----BEGIN PUBLIC KEY-----
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqjB7Y3MqL/Vg7pFwThG1
+        ItJZrnzgQ2BrCrZxRyGm4yAzduai4CQf4wD0tHd3tPqXt/wSbSxW5/DshLohN0LI
+        7oM5Wdw00E2Zf5I/9vG8imj/1JruFpBnPFn5amvbj8W5fOW2I+18kZ96Cc1vzf8G
+        L+WUnE4yGUTf2KykjkDgkq+3tIKZ3KXAgquz23Mx+hKRYMK/OYqPbT7+u8ThwfaR
+        pGvoT+XQfHklxwtbJfVYhjKcd/7hqG+OwUfJRpUjC6U0N6uN+6aafj+3qkwYzbvM
+        Me/qe+TbTstTJgk2rXJzGn7/+gfbj+Yd7Jry70w+/whF7Vodl1nUjdwMYzPXY/yw
+        QwIDAQAB
+        -----END PUBLIC KEY-----`;
+
+        const key0 = await pemToJwk(pemString0, "RS256");
+        expect(key0).toBeTruthy();
+
+        const pemString1 = `-----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFlHHWfLk0gLBbsLTcuCrbCqoHqmM
+      YJepMC+Q+Dd6RBmBiA41evUsNMwLeN+PNFqib+xwi9JkJ8qhZkq8Y/IzGg==
+      -----END PUBLIC KEY-----`;
+        const algString1 = "ES256";
+
+        const key1 = await pemToJwk(pemString1, algString1);
+        expect(key1).toBeTruthy();
+
+
+            const pemString2 = `-----BEGIN PUBLIC KEY-----
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAmqt5Nx9J2GUY/PITEJQc
+    llj1uPcM0fhEY4nzgC4jzeXK/C45rIHku7nX1Sl0d/92qoMRSyPrW4a6P3szIegs
+    pNG1dds99JrTy0dtcWgc0QWb3YtergGSV7c4ibnwUz1JWIDGNUuKLeEI3VIyiCTO
+    spUOSs3JVKjPSUCAd6gC/sPPx3CfYnv4kkU9FjkSRxIMg+OnCRRTX67PsP06eYGm
+    0NvRbTWE9XaxYMYtxUTK8AkECBd8Gz0Uso9j4R6SzsJnCHo4RtglSPDmg6LdbZGM
+    AZWj0lnZBO+5VXXxw0DPJpsd8XdRXKsUGrzP0TEmJ/l9TOuwjm3CSlIqgwBj07cE
+    d5JKML8bnFHrdXUaaiaGj4bKgtF55gxamOxxJyfJR74gYszeCisYL7zXWSfyiTJ3
+    KQH8rtREYp/uawagjK3+MJOqvVANbrHiUm8bKKKw1zBFI10cmDEu93qp3mYgrlcU
+    v94QHDZbcHWSRkHxko3r3KozWPWN4R1y9dfpSBjQgKzTUno+v5YAB39jQDYC/SMB
+    hGW34S67F42/VOos7h16H4WyzupZYGVL8Ue9cwvEPcCO5OxMjnavDw/bYt7zmcg3
+    vtwSRYOZXbrFw6voU4kS6SKmNlqVwPyUsB98Udrw5Ap1ayjYGSfr5pJ+TzHXvVNo
+    u16AxM36rkcCb+ZSdkwL9bsCAwEAAQ==
+    -----END PUBLIC KEY-----
+    `
+
+    const key2 = await pemToJwk(pemString2, "RS256");
+    expect(key2).toBeTruthy();
+
+
+    });
 });
