@@ -91,6 +91,8 @@ const isValid = await checkTokenValidness(
 
 ## Changelog
 
+- 0.1.19: Export `getKeyPair`
+- 0.1.18: Export `pemToJwk`
 - 0.1.14: Extract alg to verify token with PEM
 - 0.1.13: Validate tokens signed with PEM
 - 0.1.12:

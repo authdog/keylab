@@ -118,7 +118,13 @@ export interface ITokenExtractedWithPubKey {
     protectedHeader: any;
 }
 
-// TODO: add PEM from opts
+/**
+ * 
+ * @param token token to verify
+ * @param publicKey string is PEM, JWK is JSON Web Key
+ * @param opts
+ * @returns 
+ */
 export const verifyTokenWithPublicKey = async (
     token: string,
     publicKey: string | JWK | null,
@@ -137,9 +143,7 @@ export const verifyTokenWithPublicKey = async (
                 issuer: opts?.requiredIssuer,
                 audience: opts?.requiredAudiences
             })
-
             return decoded;
-
         } else {
             jwk = publicKey;
         }
@@ -153,7 +157,7 @@ export const verifyTokenWithPublicKey = async (
         });
 
         JWKS = createLocalJWKSet({
-            keys: [...remoteJwks.keys]
+            keys: remoteJwks.keys
         });
     } else {
         throw new Error("Invalid public key format (must me JWK or JWKs URI)");
@@ -171,6 +175,12 @@ export const verifyTokenWithPublicKey = async (
     return decoded;
 };
 
+/**
+ * 
+ * @param pemString 
+ * @param algorithm 
+ * @returns 
+ */
 export const pemToJwk = async (pemString: string, algorithm: string) => {
     return await importSPKI(pemString, algorithm);
 };

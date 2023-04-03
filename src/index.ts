@@ -1,7 +1,9 @@
 export {
     checkTokenValidness,
     createSignedJwt,
-    extractBearerTokenFromHeaders
+    extractBearerTokenFromHeaders,
+    pemToJwk,
+    getKeyPair
 } from "./vendors";
 export * from "./enums";
 
