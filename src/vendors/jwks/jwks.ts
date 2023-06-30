@@ -73,7 +73,7 @@ export const fetchJwksWithUri = async ({
     verifySsl = true
 }): Promise<JSONWebKeySet> => {
     const fetch = require("node-fetch");
-    const https = require("https");
+    const https = require("node:https");
     const httpsAgent = new https.Agent({
         rejectUnauthorized: verifySsl
     });

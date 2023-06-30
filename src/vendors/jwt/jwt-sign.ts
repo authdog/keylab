@@ -1,6 +1,6 @@
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
 import { importPKCS8, importJWK, SignJWT, JWTHeaderParameters } from "jose";
-import { generateKeyPair, randomBytes } from "crypto";
+import { generateKeyPair, randomBytes } from "node:crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 import * as c from "../../constants";
 import { strToUint8Array } from "./utils";
