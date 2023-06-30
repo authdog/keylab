@@ -1,5 +1,3 @@
-import { throwJwtError } from "../../errors";
-import * as c from "../../constants";
 import {
     createLocalJWKSet,
     importSPKI,
@@ -79,44 +77,22 @@ export const fetchJwksWithUri = async ({
     verifySsl = true
 }): Promise<JSONWebKeySet> => {
     const fetch = require("node-fetch");
-    const https = require("node:https");
-    const httpsAgent = new https.Agent({
-        rejectUnauthorized: verifySsl
-    });
-    return await fetch(jwksUri, {
-        method: "GET",
-        agent: httpsAgent
-    })
-        .then((res) => res.json())
-        .catch((err) => {
-            throw new Error(err.message);
-        });
-};
-
-// NOT USED
-/**
- *
- * @param keyId keyId to be checked
- * @param jwks JSON Web Key Set
- * @returns true if the key exists in the set passed as parameter
- */
-export const keyExistsInSet = (keyId: string, jwks: IJwkRecordVisible[]) => {
-    const exists = jwks.find((jwk: IJwkRecordVisible) => jwk.kid === keyId);
-    return Boolean(exists);
-};
-
-/**
- *
- * @param keyId
- * @param jwks
- * @returns retrieves the key from the json web key set
- */
-export const getKeyFromSet = (keyId: string, jwks: IJwkRecordVisible[]) => {
-    if (keyExistsInSet(keyId, jwks)) {
-        return jwks.find((jwk: IJwkRecordVisible) => jwk.kid === keyId);
-    } else {
-        throwJwtError(c.JWKS_MISSING_KEY_ID);
+    let httpsAgent;
+    
+    if (!verifySsl) {
+      httpsAgent = new (require("https").Agent)({
+        rejectUnauthorized: false,
+      });
     }
+    
+    return await fetch(jwksUri, {
+      method: "GET",
+      agent: httpsAgent,
+    })
+      .then((res) => res.json())
+      .catch((err) => {
+        throw new Error(err.message);
+      });
 };
 
 export interface ITokenExtractedWithPubKey {

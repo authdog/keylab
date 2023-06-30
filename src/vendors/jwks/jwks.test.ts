@@ -1,7 +1,6 @@
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign";
 import {
     ITokenExtractedWithPubKey,
-    keyExistsInSet,
     pemToJwk,
     verifyTokenWithPublicKey
 } from "./jwks";
@@ -11,33 +10,6 @@ import { default as nock } from "nock";
 
 import * as c from "../../constants";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
-
-it("check if key exists in set", () => {
-    const jwks = [
-        {
-            kty: "RSA",
-            kid: "THxOr1j3MA7jcXKNCJvrqHysckPAcgma-vm0w0HPP00",
-            use: "sig",
-            alg: "RS256",
-            e: "AQAB",
-            n: "s5rjPEt0pnbEUzYKKN6BsB5OdK4P5WRnYyil-lAgySihNUr8P3qzNUcEUnMrrhd2W2M3a4DI0tfd1qWINpIjr14udvZkUV9zTeep24LwFU7JZ2NyvIO8yJ8ZXyNNhGgcW3MFKO5pcGb54Q2k0dViSWSyJJ8pzJCpsHMcUduJRooTuB9SkPwz1p14LMHJTUjdZCB1wAnjjSMmoX-9oaLHLAfSJ1laB2m4P_cZfsXZiR_uMhxoMd6JZAm3SfmoKc23UbNypDdIeUfMTj7av09nxq2V5P06wt4Hi1pEehgC9BPRfVvERW4LHtRBtRb9sBpki5AjhUcSzFgxjQlQNnLW2Q"
-        }
-    ];
-
-    const exists = keyExistsInSet(
-        "THxOr1j3MA7jcXKNCJvrqHysckPAcgma-vm0w0HPP00",
-        jwks
-    );
-
-    expect(exists).toBeTruthy();
-
-    const shouldNotExist = keyExistsInSet(
-        "THxOr1j3MA7jcXKNCJvrqHysckPAcgma-vm0w0HPP00",
-        []
-    );
-
-    expect(shouldNotExist).toBeFalsy();
-});
 
 it("verifies token with public key - es256k", async () => {
     const keyPairES256k = await getKeyPair({
