@@ -83,12 +83,16 @@ export const checkTokenValidness = async (
                 missingCredentials.push("jwksUri");
             }
             if (missingCredentials.length === 0) {
-                extractedPayload = await verifyTokenWithPublicKey(token, publicKey, {
-                    jwksUri,
-                    verifySsl,
-                    adhoc,
-                    requiredScopes
-                });
+                extractedPayload = await verifyTokenWithPublicKey(
+                    token,
+                    publicKey,
+                    {
+                        jwksUri,
+                        verifySsl,
+                        adhoc,
+                        requiredScopes
+                    }
+                );
 
                 if (!!extractedPayload) {
                     isValid = true;
@@ -124,11 +128,11 @@ export const verifyHSTokenWithSecretString = async (
         decoded = await jwtVerify(token, new TextEncoder().encode(secret), {
             issuer,
             audience
-        })
-    
+        });
+
         if (decoded?.payload) {
             const { exp } = parseJwt(token, enums.JwtParts.PAYLOAD);
-    
+
             if (exp) {
                 const now = Math.floor(Date.now() / 1000);
                 isVerified = now < exp;
@@ -311,14 +315,13 @@ export const createSignedJwt = async (
     return token;
 };
 
-
 export const extractAlgFromJwtHeader = (jwt: string) => {
     // Split the JWT into its three parts: header, payload, and signature
-    const parts = jwt.split('.');
+    const parts = jwt.split(".");
     // Decode the header JSON string
     const headerJson = atob(parts[0]);
     const header = JSON.parse(headerJson);
     // Extract the "alg" field from the header
     const alg = header.alg;
     return alg;
-}
+};

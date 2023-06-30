@@ -1,6 +1,12 @@
 import { throwJwtError } from "../../errors";
 import * as c from "../../constants";
-import { createLocalJWKSet, importSPKI, JSONWebKeySet, JWK, jwtVerify } from "jose";
+import {
+    createLocalJWKSet,
+    importSPKI,
+    JSONWebKeySet,
+    JWK,
+    jwtVerify
+} from "jose";
 import { extractAlgFromJwtHeader } from "../jwt";
 
 export interface IJwksClient {
@@ -119,11 +125,11 @@ export interface ITokenExtractedWithPubKey {
 }
 
 /**
- * 
+ *
  * @param token token to verify
  * @param publicKey string is PEM, JWK is JSON Web Key
  * @param opts
- * @returns 
+ * @returns
  */
 export const verifyTokenWithPublicKey = async (
     token: string,
@@ -136,13 +142,13 @@ export const verifyTokenWithPublicKey = async (
     if (publicKey) {
         let jwk;
         if (typeof publicKey === "string") {
-            const alg = extractAlgFromJwtHeader(token)
-            const keyLike = await pemToJwk(publicKey, alg)
-            
+            const alg = extractAlgFromJwtHeader(token);
+            const keyLike = await pemToJwk(publicKey, alg);
+
             decoded = await jwtVerify(token, keyLike, {
                 issuer: opts?.requiredIssuer,
                 audience: opts?.requiredAudiences
-            })
+            });
             return decoded;
         } else {
             jwk = publicKey;
@@ -176,12 +182,11 @@ export const verifyTokenWithPublicKey = async (
 };
 
 /**
- * 
- * @param pemString 
- * @param algorithm 
- * @returns 
+ *
+ * @param pemString
+ * @param algorithm
+ * @returns
  */
 export const pemToJwk = async (pemString: string, algorithm: string) => {
     return await importSPKI(pemString, algorithm);
 };
-

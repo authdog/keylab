@@ -1,6 +1,6 @@
+/* global window */
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
 import { importPKCS8, importJWK, SignJWT, JWTHeaderParameters } from "jose";
-import { generateKeyPair, randomBytes } from "node:crypto";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 import * as c from "../../constants";
 import { strToUint8Array } from "./utils";
@@ -102,9 +102,12 @@ export const getKeyPair = async ({
 
         const useCurve = algType === JwtKeyTypes.EC;
 
-        generateKeyPair(
-            algType,
-            {
+        // if platform is nodejs
+        // @ts-ignore
+        if (typeof window === "undefined") {
+            const { generateKeyPairSync, randomBytes } = require("crypto");
+
+            const { publicKey, privateKey } = generateKeyPairSync(algType, {
                 namedCurve: useCurve
                     ? c.namedCurves?.[algorithmIdentifier.toLowerCase()]
                     : undefined,
@@ -117,13 +120,32 @@ export const getKeyPair = async ({
                     ...c.privateKeyEncodingPem,
                     format: keyFormat
                 }
-            },
-            (err, publicKey, privateKey) => {
-                if (err) return reject(err);
+            });
 
-                const kid = randomBytes(16).toString("hex");
-                resolve({ publicKey, privateKey, kid });
-            }
-        );
+            const kid = randomBytes(16).toString("hex");
+            return resolve({ publicKey, privateKey, kid });
+        } else {
+            // if platform is browser
+            const { generateKey } = require("jose/dist/browser");
+
+            generateKey(algorithmIdentifier, useCurve, {
+                modulusLength: keySize
+            })
+                .then((key: any) => {
+                    // @ts-ignore
+                    const kid = window.crypto
+                        .getRandomValues(new Uint8Array(16))
+                        .toString();
+
+                    return resolve({
+                        publicKey: key.publicKey,
+                        privateKey: key.privateKey,
+                        kid
+                    });
+                })
+                .catch((err: any) => {
+                    return reject(err);
+                });
+        }
     });
 };

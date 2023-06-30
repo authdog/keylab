@@ -506,7 +506,6 @@ it("verifies correctly token with public uri", async () => {
     scopeNock.persist(false);
 });
 
-
 describe("pemToJwk", () => {
     test("converts RSA public key PEM to JWK", async () => {
         const pemString0 = `-----BEGIN PUBLIC KEY-----
@@ -531,8 +530,7 @@ describe("pemToJwk", () => {
         const key1 = await pemToJwk(pemString1, algString1);
         expect(key1).toBeTruthy();
 
-
-            const pemString2 = `-----BEGIN PUBLIC KEY-----
+        const pemString2 = `-----BEGIN PUBLIC KEY-----
     MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAmqt5Nx9J2GUY/PITEJQc
     llj1uPcM0fhEY4nzgC4jzeXK/C45rIHku7nX1Sl0d/92qoMRSyPrW4a6P3szIegs
     pNG1dds99JrTy0dtcWgc0QWb3YtergGSV7c4ibnwUz1JWIDGNUuKLeEI3VIyiCTO
@@ -546,11 +544,9 @@ describe("pemToJwk", () => {
     vtwSRYOZXbrFw6voU4kS6SKmNlqVwPyUsB98Udrw5Ap1ayjYGSfr5pJ+TzHXvVNo
     u16AxM36rkcCb+ZSdkwL9bsCAwEAAQ==
     -----END PUBLIC KEY-----
-    `
+    `;
 
-    const key2 = await pemToJwk(pemString2, "RS256");
-    expect(key2).toBeTruthy();
-
-
+        const key2 = await pemToJwk(pemString2, "RS256");
+        expect(key2).toBeTruthy();
     });
 });
