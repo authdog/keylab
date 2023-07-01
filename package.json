@@ -1,6 +1,6 @@
 {
     "name": "keylab",
-    "version": "0.1.23",
+    "version": "0.1.24",
     "source": "src/index.ts",
     "main": "dist/index.js",
     "description": "keylab is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
@@ -17,7 +17,7 @@
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
         "lib:build:clean": "rm -rf pkg",
         "build": "yarn lib:build:clean && tsup src/index.ts",
-        "lib:publish": "yarn build && yarn publish",
+        "lib:publish": "yarn build && npm pack dist && yarn publish *.tgz && rm *.tgz",
         "version": "npm run build"
     },
     "repository": {
