@@ -1,5 +1,5 @@
 /* global window crypto */
-import { JwtAlgorithmsEnum as Algs, JwtAlgorithmsEnum, JwtKeyTypes } from "../../enums";
+import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
 import { importPKCS8, importJWK, SignJWT, JWTHeaderParameters } from "jose";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 import * as c from "../../constants";
