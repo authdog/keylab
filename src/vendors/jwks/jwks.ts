@@ -142,7 +142,7 @@ export const verifyTokenWithPublicKey = async (
             keys: remoteJwks.keys
         });
     } else {
-        throw new Error("Invalid public key format (must me JWK or JWKs URI)");
+        throw new Error("Invalid public key format (must be JWK or JWKs URI)");
     }
 
     try {
