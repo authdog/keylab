@@ -39,11 +39,10 @@ export const checkTokenValidness = async (
         requiredScopes,
         publicKey
     }: IcheckTokenValidnessCredentials
-): Promise<boolean> => {
+): Promise<boolean|any> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
-    let extractedPayload: ITokenExtractedWithPubKey;
-    let isValid = false;
+    let extractedPayload: ITokenExtractedWithPubKey | any = null;
 
     const algEnums = enums.JwtAlgorithmsEnum;
 
@@ -56,7 +55,7 @@ export const checkTokenValidness = async (
             }
 
             if (missingCredentials.length === 0) {
-                isValid = !!(await verifyHSTokenWithSecretString(
+                extractedPayload = !!(await verifyHSTokenWithSecretString(
                     token,
                     secret
                 ));
@@ -94,9 +93,9 @@ export const checkTokenValidness = async (
                     }
                 );
 
-                if (!!extractedPayload) {
-                    isValid = true;
-                }
+                // if (!!extractedPayload) {
+                //     isValid = true;
+                // }
 
                 break;
             } else {
@@ -111,7 +110,7 @@ export const checkTokenValidness = async (
             throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM);
     }
 
-    return isValid;
+    return extractedPayload;
 };
 
 export const verifyHSTokenWithSecretString = async (
@@ -140,7 +139,7 @@ export const verifyHSTokenWithSecretString = async (
         }
     } catch (e) {}
 
-    return isVerified;
+    return isVerified ? decoded?.payload: null;
 };
 
 export const checkJwtFields = (
