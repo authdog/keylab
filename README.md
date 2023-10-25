@@ -91,6 +91,7 @@ const isValid = await checkTokenValidness(
 
 ## Changelog
 
+- 0.1.26: Remove fetchJwksWithUri, remove node-fetch dependency
 - 0.1.20: Improve Cloudflare Workers compatibility for verify
 - 0.1.19: Export `getKeyPair`
 - 0.1.18: Export `pemToJwk`
