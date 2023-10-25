@@ -1,9 +1,9 @@
 import {
     createLocalJWKSet,
     importSPKI,
-    JSONWebKeySet,
     JWK,
-    jwtVerify
+    jwtVerify,
+    createRemoteJWKSet
 } from "jose";
 import { extractAlgFromJwtHeader } from "../jwt";
 
@@ -66,35 +66,6 @@ export const makePublicKey = (privateKey: any) => {
     return publicKey;
 };
 
-/**
- *
- * @param jwksUri is the endpoint to retrieve the public Json web keys
- * @param verifySsl can be used in a context where self-signed certificates are being used
- * @returns return an array with keys objects
- */
-export const fetchJwksWithUri = async ({
-    jwksUri,
-    verifySsl = true
-}): Promise<JSONWebKeySet> => {
-    const fetch = require("node-fetch");
-    let httpsAgent;
-    
-    if (!verifySsl) {
-      httpsAgent = new (require("https").Agent)({
-        rejectUnauthorized: false,
-      });
-    }
-    
-    return await fetch(jwksUri, {
-      method: "GET",
-      agent: httpsAgent,
-    })
-      .then((res) => res.json())
-      .catch((err) => {
-        throw new Error(err.message);
-      });
-};
-
 export interface ITokenExtractedWithPubKey {
     payload: any;
     protectedHeader: any;
@@ -133,14 +104,7 @@ export const verifyTokenWithPublicKey = async (
             keys: [jwk]
         });
     } else if (opts?.jwksUri) {
-        // fetch jwk keys
-        const remoteJwks: JSONWebKeySet = await fetchJwksWithUri({
-            jwksUri: opts?.jwksUri
-        });
-
-        JWKS = createLocalJWKSet({
-            keys: remoteJwks.keys
-        });
+        JWKS = createRemoteJWKSet(new URL(opts?.jwksUri))
     } else {
         throw new Error("Invalid public key format (must be JWK or JWKs URI)");
     }
