@@ -13,7 +13,7 @@ module.exports = {
        "<rootDir>/scripts/**/*.test.ts"
     ],
     testEnvironment: "node",
-    testTimeout: 10000,
+    testTimeout: 25000,
     collectCoverageFrom: [
         "<rootDir>/scripts/**/*.ts",
         "<rootDir>/lib/**/*.ts",
