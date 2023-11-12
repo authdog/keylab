@@ -103,8 +103,10 @@ export const verifyTokenWithPublicKey = async (
             jwk = publicKey;
         }
 
+        let adhocKeys = opts?.adhoc || adhocJwks;
+
         JWKS = createLocalJWKSet({
-            keys: !!adhocJwks ? adhocJwks: [jwk]
+            keys: adhocKeys ? <JWK[]>adhocKeys: [jwk]
         });
     } else if (opts?.jwksUri) {
         JWKS = createRemoteJWKSet(new URL(opts?.jwksUri))
