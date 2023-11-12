@@ -28,9 +28,10 @@ export const HEADERS_CREDENTIALS_FORMAT =
     "Format is Authorization: Bearer [token]";
 
 export const ALLOWED_AUTHORIZATION_HEADER_CAPITALIZED = "Authorization";
-export const ALLOWED_AUTHORIZATION_HEADER_LOWERCASED =
-    ALLOWED_AUTHORIZATION_HEADER_CAPITALIZED.toLowerCase();
+export const ALLOWED_AUTHORIZATION_HEADER_LOWERCASED = "authorization";
 
 export const INVALID_SCOPE_FIELD_TYPE = "Invalid scp field type";
 
 export const INVALID_PEM_STRING = "Invalid PEM string";
+
+export const INVALID_PUBLIC_KEY_FORMAT = "Invalid public key format (must be PEM, JWK, adhoc JWks or JWKs URI)"

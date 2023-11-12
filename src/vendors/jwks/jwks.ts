@@ -1,11 +1,12 @@
 import {
     createLocalJWKSet,
     importSPKI,
-    JWK,
     jwtVerify,
-    createRemoteJWKSet
+    createRemoteJWKSet,
+    JWK
 } from "jose";
 import { extractAlgFromJwtHeader } from "../jwt";
+import {INVALID_PUBLIC_KEY_FORMAT} from "../../errors/messages"
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -75,18 +76,19 @@ export interface ITokenExtractedWithPubKey {
  *
  * @param token token to verify
  * @param publicKey string is PEM, JWK is JSON Web Key
- * @param opts
- * @returns
+ * @param opts verifyRSA Token Credentials
+ * @returns decoded payload if token is valid
  */
 export const verifyTokenWithPublicKey = async (
     token: string,
     publicKey: string | JWK | null,
-    opts: IVerifyRSATokenCredentials = null
+    opts: IVerifyRSATokenCredentials = null,
+    adhocJwks: any[] = null
 ): Promise<ITokenExtractedWithPubKey> => {
     let JWKS = null;
     let decoded = null;
 
-    if (publicKey) {
+    if (publicKey || adhocJwks) {
         let jwk;
         if (typeof publicKey === "string") {
             const alg = extractAlgFromJwtHeader(token);
@@ -97,16 +99,17 @@ export const verifyTokenWithPublicKey = async (
                 audience: opts?.requiredAudiences
             });
             return decoded;
-        } else {
+        } else if (!!publicKey) {
             jwk = publicKey;
         }
+
         JWKS = createLocalJWKSet({
-            keys: [jwk]
+            keys: !!adhocJwks ? adhocJwks: [jwk]
         });
     } else if (opts?.jwksUri) {
         JWKS = createRemoteJWKSet(new URL(opts?.jwksUri))
     } else {
-        throw new Error("Invalid public key format (must be JWK or JWKs URI)");
+        throw new Error(INVALID_PUBLIC_KEY_FORMAT);
     }
 
     try {
