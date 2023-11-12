@@ -88,7 +88,7 @@ export const verifyTokenWithPublicKey = async (
     let JWKS = null;
     let decoded = null;
 
-    if (publicKey || adhocJwks) {
+    if (publicKey || opts?.adhoc || adhocJwks) {
         let jwk;
         if (typeof publicKey === "string") {
             const alg = extractAlgFromJwtHeader(token);
