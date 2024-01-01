@@ -8,15 +8,6 @@ import {
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
 import { default as nock } from "nock";
 
-// TODO: move this to jest config
-import fetch, { Headers } from "node-fetch";
-
-// https://stackoverflow.com/a/75956506/8483084
-if (!globalThis.fetch) {
-    globalThis.fetch = fetch;
-    globalThis.Headers = Headers;
-}
-
 import * as c from "../../constants";
 import { SignJWT, jwtVerify } from "jose";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
