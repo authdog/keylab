@@ -96,8 +96,7 @@ export const verifyTokenWithPublicKey = async (
 
             decoded = await jwtVerify(token, keyLike, {
                 issuer: opts?.requiredIssuer,
-                audience: opts?.requiredAudiences,
-
+                audience: opts?.requiredAudiences
             });
             return decoded;
         } else if (!!publicKey) {
@@ -113,7 +112,7 @@ export const verifyTokenWithPublicKey = async (
         JWKS = createRemoteJWKSet(new URL(opts?.jwksUri), {
             headers: {
                 "Content-Type": "application/json",
-                "User-Agent": "authdog-jwks-rsa",
+                "User-Agent": "authdog-jwks-rsa"
             }
         });
     } else {

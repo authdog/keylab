@@ -8,6 +8,15 @@ import {
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
 import { default as nock } from "nock";
 
+// TODO: move this to jest config
+import fetch, { Headers } from "node-fetch";
+
+// https://stackoverflow.com/a/75956506/8483084
+if (!globalThis.fetch) {
+    globalThis.fetch = fetch;
+    globalThis.Headers = Headers;
+}
+
 import * as c from "../../constants";
 import { SignJWT, jwtVerify } from "jose";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
@@ -453,7 +462,6 @@ it("signs with Ed25519 key pair", async () => {
 
     expect(verifiedPayload?.payload).toMatchObject(payload);
     expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
-
 });
 it("verifies Ed448 Key pair", async () => {
     const crypto = require("crypto");
@@ -483,9 +491,6 @@ it("verifies Ed448 Key pair", async () => {
     expect(verifiedPayload?.payload).toMatchObject(payload);
     expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
 });
-
-
-
 
 it("verifies correctly token with public uri", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
@@ -523,22 +528,15 @@ it("verifies correctly token with public uri", async () => {
 
     let verified: ITokenExtractedWithPubKey | undefined;
 
-    try {
-        verified = await verifyTokenWithPublicKey(signedPayloadEs512, null, {
-            jwksUri
-        });
-    } catch (e) {
-        // TODO: fix [ ReferenceError: Headers is not defined]
-        //console.error(e);
-    }
+    verified = await verifyTokenWithPublicKey(signedPayloadEs512, null, {
+        jwksUri
+    });
 
-    if (verified) {
-        expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" });
-        expect(verified.payload).toEqual({
-            urn: "urn:test:test",
-            kid: keyPairES512?.kid
-        });
-    }
+    expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" });
+    expect(verified.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairES512?.kid
+    });
 
     scopeNock.persist(false);
 });
