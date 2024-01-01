@@ -8,6 +8,15 @@ import {
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
 import { default as nock } from "nock";
 
+// TODO: move this to jest config
+import fetch, { Headers } from "node-fetch";
+
+// https://stackoverflow.com/a/75956506/8483084
+if (!globalThis.fetch) {
+  globalThis.fetch = fetch
+  globalThis.Headers = Headers
+}
+
 import * as c from "../../constants";
 import { SignJWT, jwtVerify } from "jose";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
@@ -488,6 +497,9 @@ it("verifies Ed448 Key pair", async () => {
 
 
 it("verifies correctly token with public uri", async () => {
+
+
+
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
     const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
     const keyPairES512 = await getKeyPair({
@@ -523,21 +535,19 @@ it("verifies correctly token with public uri", async () => {
 
     let verified: ITokenExtractedWithPubKey | undefined;
 
-    try {
         verified = await verifyTokenWithPublicKey(signedPayloadEs512, null, {
             jwksUri
         });
-    } catch (e) {
-        // TODO: fix [ ReferenceError: Headers is not defined]
-        //console.error(e);
-    }
 
-    if (verified) {
+
         expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" });
         expect(verified.payload).toEqual({
             urn: "urn:test:test",
             kid: keyPairES512?.kid
         });
+
+    if (verified) {
+
     }
 
     scopeNock.persist(false);
