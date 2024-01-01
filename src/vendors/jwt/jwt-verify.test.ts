@@ -258,11 +258,6 @@ it("verifies a token with checkTokenValidness signed with ES512 key - jwk", asyn
         algorithmIdentifier: Algs.ES512,
         keySize: 4096
     });
-
-    // const regExpPathAppJwks = new RegExp(
-    //     `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
-    // );
-
     const keys = [keyPairES512.publicKey];
 
     const jwks = {
@@ -307,6 +302,116 @@ it("verifies a token with checkTokenValidness signed with ES512 key - jwk", asyn
 
     scopeNock.persist(false);
 });
+
+
+it("verifies a token with checkTokenValidness signed with Ed25519 key - jwk", async () => {
+    const keyPairEd25519 = await getKeyPair({
+        algorithmIdentifier: Algs.Ed25519,
+        keySize: 4096
+    });
+
+    const keys = [keyPairEd25519.publicKey];
+
+    const jwks = {
+        keys: [
+            {
+                crv: "P-256",
+                x: "fqCXPnWs3sSfwztvwYU9SthmRdoT4WCXxS8eD8icF6U",
+                y: "nP6GIc42c61hoKqPcZqkvzhzIJkBV3Jw3g8sGG7UeP8",
+                kty: "EC",
+                kid: "one"
+            },
+            ...keys
+        ]
+    };
+
+    const scopeNock = nock("https://as.example.com")
+        .get("/jwks")
+        .once()
+        .reply(200, jwks);
+
+    const signedPayloadEd25519 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.EdDSA,
+        keyPairEd25519.privateKey,
+        {
+            kid: keyPairEd25519?.kid
+        }
+    );
+
+    const jwksUri = `https://as.example.com/jwks`;
+
+    const tokenInJwksStoreValidness = await checkTokenValidness(
+        signedPayloadEd25519,
+        {
+            jwksUri
+        }
+    );
+
+    expect(tokenInJwksStoreValidness).toBeTruthy();
+
+    scopeNock.persist(false);
+
+});
+
+
+it("verifies a token with checkTokenValidness signed with Ed448 key - jwk", async () => {
+    const keyPairEd448 = await getKeyPair({
+        algorithmIdentifier: Algs.Ed448,
+        keySize: 4096
+    });
+
+    const keys = [keyPairEd448.publicKey];
+
+    const jwks = {
+        keys: [
+            {
+                crv: "P-256",
+                x: "fqCXPnWs3sSfwztvwYU9SthmRdoT4WCXxS8eD8icF6U",
+                y: "nP6GIc42c61hoKqPcZqkvzhzIJkBV3Jw3g8sGG7UeP8",
+                kty: "EC",
+                kid: "one"
+            },
+            ...keys
+        ]
+    };
+
+    const scopeNock = nock("https://as.example.com")
+        .get("/jwks")
+        .once()
+        .reply(200, jwks);
+
+    const signedPayloadEd448 = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:test"
+        },
+        Algs.EdDSA,
+        keyPairEd448.privateKey,
+        {
+            kid: keyPairEd448?.kid
+        }
+    );
+
+    const jwksUri = `https://as.example.com/jwks`;
+
+    const tokenInJwksStoreValidness = await checkTokenValidness(
+        signedPayloadEd448,
+        {
+            jwksUri
+        }
+    );
+
+    expect(tokenInJwksStoreValidness).toBeTruthy();
+
+    scopeNock.persist(false);
+
+});
+
+
+
+
 
 it("throws an error while verifying token with public uri whose key is missing from set", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
