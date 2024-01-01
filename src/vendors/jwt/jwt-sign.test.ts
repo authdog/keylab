@@ -415,6 +415,48 @@ it("signs payload with pkcs8 private key - EdDSA", async () => {
     expect(signedPayloadEddsa).toBeTruthy();
 });
 
+it("signs payload with pkcs8 private key - Ed25519", async () => {
+    const {
+        privateKey,
+        publicKey
+    } = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs.Ed25519,
+        keySize: 4096
+    });
+
+    expect(privateKey).toBeTruthy();
+    expect(publicKey).toBeTruthy();
+
+    const signedPayloadEd25519 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        Algs.EdDSA,
+        privateKey
+    );
+
+    expect(signedPayloadEd25519).toBeTruthy();
+});
+
+
+it("signs payload with pkcs8 private key - Ed448", async () => {
+    const keyPairEd448 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs.Ed448,
+        keySize: 4096
+    });
+
+    expect(keyPairEd448?.privateKey).toBeTruthy();
+
+    const signedPayloadEd448 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        Algs.EdDSA,
+        keyPairEd448.privateKey
+    );
+
+    expect(signedPayloadEd448).toBeTruthy();
+});
+
+
 it("signs payload with pkcs8 private key - ES256k", async () => {
     const keyPairES256k = await getKeyPair({
         keyFormat: "pem",
@@ -434,29 +476,6 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
         }
     );
     expect(signedPayloadEs256k).toBeTruthy();
-});
-
-it("signs payload with pkcs8 private key - unsupported yet", async () => {
-    // works but not signin
-    // const keyPairEd25519 = await getKeyPair({
-    //     keyFormat: "pem",
-    //     algorithmIdentifier: Algs.Ed25519,
-    //     keySize: 4096
-    // });
-    // expect(keyPairEd25519?.privateKey).toBeTruthy();
-    // const keyPairX25519 = await getKeyPair({
-    //     keyFormat: "pem",
-    //     // @ts-ignore
-    //     algorithmIdentifier: "x25519",
-    //     keySize: 4096
-    // });
-    // expect(keyPairX25519?.privateKey).toBeTruthy();
-    // const signedPayloadX25519 = await signJwtWithPrivateKey(
-    //     { urn: "urn:test:test" },
-    //     Algs.X25519,
-    //     keyPairX25519.privateKey
-    // );
-    // expect(signedPayloadX25519).toBeTruthy();
 });
 
 it("experiment algorithm", async () => {

@@ -78,6 +78,8 @@ export const checkTokenValidness = async (
         case algEnums.PS512:
         case algEnums.EdDSA:
         case algEnums.ES256K:
+        case algEnums.Ed25519:
+        case algEnums.Ed448:
             if (!adhoc && !jwksUri) {
                 missingCredentials.push("jwksUri");
             }

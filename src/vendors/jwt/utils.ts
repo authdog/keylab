@@ -8,3 +8,11 @@ export const strToUint8Array = (str: string) => {
 
 export const uint8ArrayToStr = (buf: Uint8Array) =>
     String.fromCharCode.apply(null, buf);
+
+export const isNodeJs = () => {
+    return (
+        typeof process !== "undefined" &&
+        process.versions != null &&
+        process.versions.node != null
+    );
+}

@@ -3,7 +3,7 @@ import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
 import { importPKCS8, importJWK, SignJWT, JWTHeaderParameters } from "jose";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 import * as c from "../../constants";
-import { strToUint8Array } from "./utils";
+import { isNodeJs, strToUint8Array } from "./utils";
 
 interface ISignJwtOpts {
     kid?: string;
@@ -75,14 +75,6 @@ const algorithmsDict = [
     {
         algType: JwtKeyTypes.OKP,
         algIds: Object.values([Algs?.EdDSA])
-    },
-    {
-        algType: Algs.Ed25519,
-        algIds: Object.values([Algs?.Ed25519])
-    },
-    {
-        algType: Algs.X25519,
-        algIds: Object.values([Algs?.X25519])
     }
 ];
 
@@ -102,12 +94,11 @@ export const getKeyPair = async ({
 
         const useCurve = algType === JwtKeyTypes.EC;
 
-        // if platform is nodejs
-        // @ts-ignore
-        if (typeof window === "undefined") {
+        const IS_NODE = isNodeJs();
+        if (IS_NODE) {
             const { generateKeyPairSync, randomBytes } = require("crypto");
 
-            const { publicKey, privateKey } = generateKeyPairSync(algType, {
+            const { publicKey, privateKey } = generateKeyPairSync(algType ?? algorithmIdentifier?.toLowerCase(), {
                 namedCurve: useCurve
                     ? c.namedCurves?.[algorithmIdentifier.toLowerCase()]
                     : undefined,
