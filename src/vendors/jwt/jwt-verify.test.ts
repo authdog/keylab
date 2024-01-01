@@ -15,15 +15,6 @@ import * as c from "../../constants";
 import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign";
 import nock from "nock";
 
-// TODO: move this to jest config
-import fetch, { Headers } from "node-fetch";
-
-// https://stackoverflow.com/a/75956506/8483084
-if (!globalThis.fetch) {
-    globalThis.fetch = fetch;
-    globalThis.Headers = Headers;
-}
-
 const DUMMY_HS256_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 const DUMMY_NON_JWT_TOKEN = "hello-i-am-not-a-jwt";
