@@ -9,6 +9,7 @@ import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
 import { default as nock } from "nock";
 
 import * as c from "../../constants";
+import { SignJWT, jwtVerify } from "jose";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
 it("verifies token with public key - es256k", async () => {
@@ -396,7 +397,7 @@ it("verifies token with public key - EdDSA", async () => {
     });
 });
 
-it("THROWS an error: verifies token with public key - ES256k / pem", async () => {
+it("verifies token with public key - ES256k / pem", async () => {
     const keyPairES256k = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs.ES256K,
@@ -422,6 +423,69 @@ it("THROWS an error: verifies token with public key - ES256k / pem", async () =>
         verifyTokenWithPublicKey(signedPayloadEs256k, keyPairES256k.publicKey)
     ).toBeTruthy();
 });
+
+// Ed25519 is the EdDSA signature scheme using SHA-512 (SHA-2) and Curve25519
+it("signs with Ed25519 key pair", async () => {
+    const crypto = require("crypto");
+    const { publicKey, privateKey } = crypto.generateKeyPairSync("ed25519");
+
+    expect(publicKey).toBeTruthy();
+    expect(privateKey).toBeTruthy();
+
+    const protectedHeaders = {
+        alg: "EdDSA",
+        typ: "JWT"
+    };
+
+    const payload = {
+        urn: "urn:test:test"
+    };
+
+    const jwt = await new SignJWT(payload)
+        .setProtectedHeader(protectedHeaders)
+        .sign(privateKey);
+
+    expect(jwt).toBeTruthy();
+
+    const verifiedPayload = await jwtVerify(jwt, publicKey);
+
+    expect(verifiedPayload).toBeTruthy();
+
+    expect(verifiedPayload?.payload).toMatchObject(payload);
+    expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
+
+});
+it("verifies Ed448 Key pair", async () => {
+    const crypto = require("crypto");
+    const { publicKey, privateKey } = crypto.generateKeyPairSync("ed448");
+    expect(publicKey).toBeTruthy();
+    expect(privateKey).toBeTruthy();
+
+    const protectedHeaders = {
+        alg: "EdDSA", // Ed448 uses the EdDSA algorithm
+        typ: "JWT"
+    };
+
+    const payload = {
+        urn: "urn:test:test"
+    };
+
+    const jwt = await new SignJWT(payload)
+        .setProtectedHeader(protectedHeaders)
+        .sign(privateKey);
+
+    expect(jwt).toBeTruthy();
+
+    const verifiedPayload = await jwtVerify(jwt, publicKey);
+
+    expect(verifiedPayload).toBeTruthy();
+
+    expect(verifiedPayload?.payload).toMatchObject(payload);
+    expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
+});
+
+
+
 
 it("verifies correctly token with public uri", async () => {
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";

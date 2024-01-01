@@ -6,7 +6,7 @@ import {
     JWK
 } from "jose";
 import { extractAlgFromJwtHeader } from "../jwt";
-import {INVALID_PUBLIC_KEY_FORMAT} from "../../errors/messages"
+import { INVALID_PUBLIC_KEY_FORMAT } from "../../errors/messages";
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -106,10 +106,10 @@ export const verifyTokenWithPublicKey = async (
         let adhocKeys = opts?.adhoc || adhocJwks;
 
         JWKS = createLocalJWKSet({
-            keys: adhocKeys ? <JWK[]>adhocKeys: [jwk]
+            keys: adhocKeys ? <JWK[]>adhocKeys : [jwk]
         });
     } else if (opts?.jwksUri) {
-        JWKS = createRemoteJWKSet(new URL(opts?.jwksUri))
+        JWKS = createRemoteJWKSet(new URL(opts?.jwksUri));
     } else {
         throw new Error(INVALID_PUBLIC_KEY_FORMAT);
     }
