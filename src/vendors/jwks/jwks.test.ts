@@ -13,8 +13,8 @@ import fetch, { Headers } from "node-fetch";
 
 // https://stackoverflow.com/a/75956506/8483084
 if (!globalThis.fetch) {
-  globalThis.fetch = fetch
-  globalThis.Headers = Headers
+    globalThis.fetch = fetch;
+    globalThis.Headers = Headers;
 }
 
 import * as c from "../../constants";
@@ -462,7 +462,6 @@ it("signs with Ed25519 key pair", async () => {
 
     expect(verifiedPayload?.payload).toMatchObject(payload);
     expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
-
 });
 it("verifies Ed448 Key pair", async () => {
     const crypto = require("crypto");
@@ -493,13 +492,7 @@ it("verifies Ed448 Key pair", async () => {
     expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
 });
 
-
-
-
 it("verifies correctly token with public uri", async () => {
-
-
-
     const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
     const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
     const keyPairES512 = await getKeyPair({
@@ -535,20 +528,15 @@ it("verifies correctly token with public uri", async () => {
 
     let verified: ITokenExtractedWithPubKey | undefined;
 
-        verified = await verifyTokenWithPublicKey(signedPayloadEs512, null, {
-            jwksUri
-        });
+    verified = await verifyTokenWithPublicKey(signedPayloadEs512, null, {
+        jwksUri
+    });
 
-
-        expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" });
-        expect(verified.payload).toEqual({
-            urn: "urn:test:test",
-            kid: keyPairES512?.kid
-        });
-
-    if (verified) {
-
-    }
+    expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" });
+    expect(verified.payload).toEqual({
+        urn: "urn:test:test",
+        kid: keyPairES512?.kid
+    });
 
     scopeNock.persist(false);
 });

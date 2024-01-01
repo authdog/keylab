@@ -3,7 +3,7 @@ import {
     verifyHSTokenWithSecretString,
     checkJwtFields,
     parseJwt,
-    checkTokenValidness,
+    checkTokenValidness
     // checkTokenValidness
 } from "./jwt-verify";
 import {
@@ -20,10 +20,9 @@ import fetch, { Headers } from "node-fetch";
 
 // https://stackoverflow.com/a/75956506/8483084
 if (!globalThis.fetch) {
-  globalThis.fetch = fetch
-  globalThis.Headers = Headers
+    globalThis.fetch = fetch;
+    globalThis.Headers = Headers;
 }
-
 
 const DUMMY_HS256_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -264,7 +263,6 @@ it("parses token (payload and header)", async () => {
 });
 
 it("verifies a token with checkTokenValidness signed with ES512 key - jwk", async () => {
-
     const keyPairES512 = await getKeyPair({
         algorithmIdentifier: Algs.ES512,
         keySize: 4096
@@ -278,18 +276,21 @@ it("verifies a token with checkTokenValidness signed with ES512 key - jwk", asyn
 
     const jwks = {
         keys: [
-          {
-            crv: 'P-256',
-            x: 'fqCXPnWs3sSfwztvwYU9SthmRdoT4WCXxS8eD8icF6U',
-            y: 'nP6GIc42c61hoKqPcZqkvzhzIJkBV3Jw3g8sGG7UeP8',
-            kty: 'EC',
-            kid: 'one',
-          },
-          ...keys
-        ],
-      }
-    
-      const scopeNock = nock('https://as.example.com').get('/jwks').once().reply(200, jwks)
+            {
+                crv: "P-256",
+                x: "fqCXPnWs3sSfwztvwYU9SthmRdoT4WCXxS8eD8icF6U",
+                y: "nP6GIc42c61hoKqPcZqkvzhzIJkBV3Jw3g8sGG7UeP8",
+                kty: "EC",
+                kid: "one"
+            },
+            ...keys
+        ]
+    };
+
+    const scopeNock = nock("https://as.example.com")
+        .get("/jwks")
+        .once()
+        .reply(200, jwks);
 
     const signedPayloadEs512 = await signJwtWithPrivateKey(
         {
