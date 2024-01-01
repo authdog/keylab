@@ -34,4 +34,5 @@ export const INVALID_SCOPE_FIELD_TYPE = "Invalid scp field type";
 
 export const INVALID_PEM_STRING = "Invalid PEM string";
 
-export const INVALID_PUBLIC_KEY_FORMAT = "Invalid public key format (must be PEM, JWK, adhoc JWks or JWKs URI)"
+export const INVALID_PUBLIC_KEY_FORMAT =
+    "Invalid public key format (must be PEM, JWK, adhoc JWks or JWKs URI)";

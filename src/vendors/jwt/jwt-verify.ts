@@ -39,7 +39,7 @@ export const checkTokenValidness = async (
         requiredScopes,
         publicKey
     }: IcheckTokenValidnessCredentials
-): Promise<boolean|any> => {
+): Promise<boolean | any> => {
     const algorithm = getAlgorithmJwt(token);
     const missingCredentials = [];
     let extractedPayload: ITokenExtractedWithPubKey | any = null;
@@ -139,7 +139,7 @@ export const verifyHSTokenWithSecretString = async (
         }
     } catch (e) {}
 
-    return isVerified ? decoded?.payload: null;
+    return isVerified ? decoded?.payload : null;
 };
 
 export const checkJwtFields = (
@@ -316,6 +316,6 @@ export const extractAlgFromJwtHeader = (jwt: string) => {
     // Split the JWT into its three parts: header, payload, and signature
     const parts = jwt.split(".");
     const headerJson = atob(parts[0]);
-    const {alg} = JSON.parse(headerJson);
+    const { alg } = JSON.parse(headerJson);
     return alg;
 };
