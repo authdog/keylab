@@ -4,7 +4,6 @@ import {
     checkJwtFields,
     parseJwt,
     checkTokenValidness
-    // checkTokenValidness
 } from "./jwt-verify";
 import {
     JwtAlgorithmsEnum as Algs,
@@ -18,8 +17,6 @@ import nock from "nock";
 const DUMMY_HS256_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 const DUMMY_NON_JWT_TOKEN = "hello-i-am-not-a-jwt";
-
-// import { default as nock } from "nock";
 
 it("extract properly token headers", async () => {
     const headers = parseJwt(DUMMY_HS256_TOKEN, JwtParts.HEADER);
