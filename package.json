@@ -58,6 +58,6 @@
         "typescript": "^4.3.5"
     },
     "dependencies": {
-        "jose": "^5.2.0"
+        "jose": "^5.2.1"
     }
 }
