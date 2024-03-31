@@ -1,9 +1,22 @@
 version: 2.1
+
 orbs:
-  node: circleci/node@4.7
-workflows:
-  unit_test:
-    jobs:
-      - node/test:
-          version: '19.6.0'
+  node: circleci/node@4.1.0
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - node/install-packages:
           pkg-manager: pnpm
+      - run:
+          name: Run tests
+          command: pnpm test
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
