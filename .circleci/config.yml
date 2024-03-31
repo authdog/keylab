@@ -6,4 +6,4 @@ workflows:
     jobs:
       - node/test:
           version: '19.6.0'
-          pkg-manager: yarn
+          pkg-manager: pnpm

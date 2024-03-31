@@ -6,8 +6,8 @@ test_with_coverage:
 
 
 deploy_lib:
-	yarn lib:publish
+	pnpm lib:publish
 
 # documentations
 deploy_docs:
-	yarn docs:deploy
+	pnpm docs:deploy
