@@ -83,17 +83,30 @@ export const checkTokenValidness = async (
             if (!adhoc && !jwksUri) {
                 missingCredentials.push("jwksUri");
             }
+
             if (missingCredentials.length === 0) {
-                extractedPayload = await verifyTokenWithPublicKey(
-                    token,
-                    publicKey,
-                    {
-                        jwksUri,
-                        verifySsl,
-                        adhoc,
-                        requiredScopes
-                    }
-                );
+
+                if (adhoc) {
+                    extractedPayload = await verifyTokenWithPublicKey(
+                        token,
+                        null,
+                        {
+                            adhoc,
+                        }
+                    );
+                } else {
+                    extractedPayload = await verifyTokenWithPublicKey(
+                        token,
+                        publicKey,
+                        {
+                            jwksUri,
+                            verifySsl,
+                            adhoc,
+                            requiredScopes,
+                        }
+                    );
+                
+                }
 
                 // if (!!extractedPayload) {
                 //     isValid = true;
@@ -118,7 +131,7 @@ export const checkTokenValidness = async (
 export const verifyHSTokenWithSecretString = async (
     token: string,
     secret: string,
-    algorithm: enums.JwtAlgorithmsEnum = enums.JwtAlgorithmsEnum.HS256,
+    _: enums.JwtAlgorithmsEnum = enums.JwtAlgorithmsEnum.HS256,
     issuer?: any,
     audience?: any
 ) => {

@@ -3,7 +3,12 @@ import {
     importSPKI,
     jwtVerify,
     createRemoteJWKSet,
-    JWK
+    JWK,
+    JWTVerifyResult,
+    JWTPayload,
+    JWSHeaderParameters,
+    KeyLike,
+    FlattenedJWSInput,
 } from "jose";
 import { extractAlgFromJwtHeader } from "../jwt";
 import { INVALID_PUBLIC_KEY_FORMAT } from "../../errors/messages";
@@ -30,7 +35,7 @@ export interface IVerifyRSATokenCredentials {
     requiredAudiences?: string[];
     requiredIssuer?: string;
     requiredScopes?: string[];
-    adhoc?: IRSAKeyStore;
+    adhoc?: [IJwkRecordVisible];
 }
 
 export interface IRSAKeyStore {
@@ -83,13 +88,12 @@ export const verifyTokenWithPublicKey = async (
     token: string,
     publicKey: string | JWK | null,
     opts: IVerifyRSATokenCredentials = null,
-    adhocJwks: any[] = null
 ): Promise<ITokenExtractedWithPubKey> => {
-    let JWKS = null;
-    let decoded = null;
+    let jwks: (protectedHeader?: JWSHeaderParameters, token?: FlattenedJWSInput) => Promise<KeyLike> = null;
+    let decoded: JWTVerifyResult<JWTPayload> = null;
 
-    if (publicKey || opts?.adhoc || adhocJwks) {
-        let jwk;
+    if (publicKey || opts?.adhoc) {
+        let jwk: JWK = null;
         if (typeof publicKey === "string") {
             const alg = extractAlgFromJwtHeader(token);
             const keyLike = await pemToJwk(publicKey, alg);
@@ -99,20 +103,36 @@ export const verifyTokenWithPublicKey = async (
                 audience: opts?.requiredAudiences
             });
             return decoded;
-        } else if (!!publicKey) {
+        } else if (typeof publicKey === "object") {
             jwk = publicKey;
         }
 
-        let adhocKeys = opts?.adhoc || adhocJwks;
+        let adhocKeys = opts?.adhoc; // adhoc keys
 
-        JWKS = createLocalJWKSet({
-            keys: adhocKeys ? <JWK[]>adhocKeys : [jwk]
-        });
+        if (jwk) {
+            jwks = createLocalJWKSet({
+                keys: [jwk]
+            });
+        } else {
+            jwks = createLocalJWKSet({
+                keys: adhocKeys ? <JWK[]>adhocKeys.map((key) => {
+                    return {
+                        kty: key.kty,
+                        use: key.use,
+                        kid: key.kid,
+                        e: key.e,
+                        n: key.n,
+                        alg: key.alg
+                    };
+                }): []
+            });
+        }
+
     } else if (opts?.jwksUri) {
-        JWKS = createRemoteJWKSet(new URL(opts?.jwksUri), {
+        jwks = createRemoteJWKSet(new URL(opts?.jwksUri), {
             headers: {
                 "Content-Type": "application/json",
-                "User-Agent": "authdog-jwks-rsa"
+                "User-Agent": "authdog-agent"
             }
         });
     } else {
@@ -120,12 +140,11 @@ export const verifyTokenWithPublicKey = async (
     }
 
     try {
-        decoded = await jwtVerify(token, JWKS, {
+        decoded = await jwtVerify(token, jwks, {
             issuer: opts?.requiredIssuer,
             audience: opts?.requiredAudiences
         });
     } catch (e) {
-        // console.log(e)
         throw new Error(e.message);
     }
 

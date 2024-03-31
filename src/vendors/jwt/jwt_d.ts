@@ -1,5 +1,5 @@
-import { IRSAKeyStore } from "../jwks";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
+import { IJwkRecordVisible } from "../jwks/jwks_d";
 
 export interface IcheckTokenValidnessCredentials {
     // HS256 | HS384 | HS512
@@ -7,8 +7,28 @@ export interface IcheckTokenValidnessCredentials {
     // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA | ES256K
     domainUri?: string;
     jwksUri?: string;
+    // used when servers verifying tokens have access to jwks set
+    jwksLocalSet?: {
+        kty?: string;
+        use?: string;
+        kid?: string;
+        e?: string;
+        n?: string;
+        x5c?: string[];
+        x5t?: string;
+        x5tS256?: string;
+        alg?: string;
+        crv?: string;
+        x?: string;
+        y?: string;
+        d?: string;
+        p?: string;
+        q?: string;
+        dp?: string;
+        dq?: string;
+    };
     verifySsl?: boolean;
-    adhoc?: IRSAKeyStore;
+    adhoc?: [IJwkRecordVisible];
     // scopes
     requiredScopes?: string[];
     // public

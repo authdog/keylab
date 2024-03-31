@@ -20,9 +20,5 @@ export interface IVerifyRSATokenCredentials {
     requiredAudiences?: string[];
     requiredIssuer?: string;
     requiredScopes?: string[];
-    adhoc?: IRSAKeyStore;
-}
-
-export interface IRSAKeyStore {
-    keys: [IJwkRecordVisible];
+    adhoc?: [IJwkRecordVisible];
 }
