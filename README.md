@@ -90,6 +90,7 @@ const isValid = await checkTokenValidness(
 
 ## Changelog
 
+- 0.1.32: Leverage Adhoc keys
 - 0.1.31: Bump jose dependency, fix fetch in Jest, enable Ed25519, Ed448
 - 0.1.30: Fix support for adhoc jwks
 - 0.1.26: Remove fetchJwksWithUri, remove node-fetch dependency
