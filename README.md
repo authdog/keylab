@@ -76,7 +76,7 @@ const isVerified = await verifyHSTokenWithSecretString(
 import {checkTokenValidness} from "keylab"
 
 const signedPayloadEs512 = "ey.....";
-const jwksUri = `https://openid.auth.dog/.well-known/jwks.json`;
+const jwksUri = "https://id.authdog.com/oidc/.well-known/jwks.json";
 
 const isValid = await checkTokenValidness(
     signedPayloadEs512,
