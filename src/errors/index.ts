@@ -1,4 +1,3 @@
-// import { JsonWebTokenError } from "jsonwebtoken";
 import { UnauthorizedError } from "./unauthorized";
 import { EnvironmentError } from "./environment";
 import * as c from "../constants";
