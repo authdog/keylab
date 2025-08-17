@@ -27,9 +27,6 @@ importers:
       husky:
         specifier: ^7.0.0
         version: 7.0.4
-      node-fetch:
-        specifier: 2.7.0
-        version: 2.7.0
       prettier:
         specifier: 2.3.2
         version: 2.3.2
