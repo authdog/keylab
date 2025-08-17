@@ -472,27 +472,20 @@ it("verifies Ed448 Key pair", async () => {
     expect(publicKey).toBeTruthy();
     expect(privateKey).toBeTruthy();
 
-    const protectedHeaders = {
-        alg: "EdDSA", // Ed448 uses the EdDSA algorithm
-        typ: "JWT"
-    };
-
     const payload = {
         urn: "urn:test:test"
     };
 
-    const jwt = await new SignJWT(payload)
-        .setProtectedHeader(protectedHeaders)
-        .sign(privateKey);
+    const privatePem: string = privateKey.export({ format: "pem", type: "pkcs8" });
+    const publicPem: string = publicKey.export({ format: "pem", type: "spki" });
 
+    const jwt = await signJwtWithPrivateKey(payload, Algs.EdDSA, privatePem);
     expect(jwt).toBeTruthy();
 
-    const verifiedPayload = await jwtVerify(jwt, publicKey);
-
+    const verifiedPayload: ITokenExtractedWithPubKey = await verifyTokenWithPublicKey(jwt, publicPem);
     expect(verifiedPayload).toBeTruthy();
-
     expect(verifiedPayload?.payload).toMatchObject(payload);
-    expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
+    expect(verifiedPayload?.protectedHeader).toMatchObject({ alg: "EdDSA", typ: "JWT" });
 });
 
 it("verifies correctly token with public uri", async () => {

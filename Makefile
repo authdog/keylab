@@ -1,5 +1,5 @@
 test:
-	npx jest --config jest.config.js --no-cache $(options)
+	pnpm test $(options)
 
 test_with_coverage:
 	make test options="--coverage"
