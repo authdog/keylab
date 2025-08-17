@@ -12,7 +12,20 @@ import {
 } from "../../enums";
 import * as c from "../../constants";
 import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign";
-import nock from "nock";
+import { vi, beforeEach, afterEach, it, expect } from "vitest";
+import createFetchMock from "vitest-fetch-mock";
+
+
+const fetchMock = createFetchMock(vi);
+
+beforeEach(() => {
+    fetchMock.enableMocks();
+    fetchMock.resetMocks();
+});
+
+afterEach(() => {
+    fetchMock.resetMocks();
+});
 
 const DUMMY_HS256_TOKEN =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -270,10 +283,7 @@ it("verifies a token with checkTokenValidness signed with ES512 key - jwk", asyn
         ]
     };
 
-    const scopeNock = nock("https://as.example.com")
-        .get("/jwks")
-        .once()
-        .reply(200, jwks);
+    fetchMock.mockIf("https://as.example.com/jwks", () => ({ status: 200, body: JSON.stringify(jwks) }));
 
     const signedPayloadEs512 = await signJwtWithPrivateKey(
         {
@@ -297,7 +307,7 @@ it("verifies a token with checkTokenValidness signed with ES512 key - jwk", asyn
 
     expect(tokenInJwksStoreValidness).toBeTruthy();
 
-    scopeNock.persist(false);
+    fetchMock.disableMocks();
 });
 
 
@@ -322,10 +332,7 @@ it("verifies a token with checkTokenValidness signed with Ed25519 key - jwk", as
         ]
     };
 
-    const scopeNock = nock("https://as.example.com")
-        .get("/jwks")
-        .once()
-        .reply(200, jwks);
+    fetchMock.mockIf("https://as.example.com/jwks", () => ({ status: 200, body: JSON.stringify(jwks) }));
 
     const signedPayloadEd25519 = await signJwtWithPrivateKey(
         {
@@ -349,7 +356,7 @@ it("verifies a token with checkTokenValidness signed with Ed25519 key - jwk", as
 
     expect(tokenInJwksStoreValidness).toBeTruthy();
 
-    scopeNock.persist(false);
+    fetchMock.disableMocks();
 
 });
 
@@ -375,10 +382,7 @@ it("verifies a token with checkTokenValidness signed with Ed448 key - jwk", asyn
         ]
     };
 
-    const scopeNock = nock("https://as.example.com")
-        .get("/jwks")
-        .once()
-        .reply(200, jwks);
+    fetchMock.mockIf("https://as.example.com/jwks", () => ({ status: 200, body: JSON.stringify(jwks) }));
 
     const signedPayloadEd448 = await signJwtWithPrivateKey(
         {
@@ -402,7 +406,7 @@ it("verifies a token with checkTokenValidness signed with Ed448 key - jwk", asyn
 
     expect(tokenInJwksStoreValidness).toBeTruthy();
 
-    scopeNock.persist(false);
+    fetchMock.disableMocks();
 
 });
 
@@ -425,12 +429,10 @@ it("throws an error while verifying token with public uri whose key is missing f
     const keys = [keyPairES512.publicKey];
     const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 
-    const scopeNock = nock(AUTHDOG_API_ROOT)
-        .persist()
-        .get(regExpPathAppJwks)
-        .reply(200, {
-            keys
-        });
+    const fullRegex = new RegExp(
+        `^${AUTHDOG_API_ROOT.replace(/\\./g, "\\.")}\/${regExpPathAppJwks.source}$`
+    );
+    fetchMock.mockIf(fullRegex, () => ({ status: 200, body: JSON.stringify({ keys }) }));
 
     const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
 
@@ -457,5 +459,5 @@ it("throws an error while verifying token with public uri whose key is missing f
         })
     ).rejects.toThrow(c.JWK_NO_APPLICABLE_KEY);
 
-    scopeNock.persist(false);
+    fetchMock.disableMocks();
 });

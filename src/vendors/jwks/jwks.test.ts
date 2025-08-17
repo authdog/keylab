@@ -6,11 +6,23 @@ import {
 } from "./jwks";
 
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
-import { default as nock } from "nock";
+import createFetchMock from "vitest-fetch-mock";
+
+import { expect, test, beforeEach, afterEach, vi, it, describe } from "vitest"
 
 import * as c from "../../constants";
 import { SignJWT, jwtVerify } from "jose";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
+const fetchMock = createFetchMock(vi);
+
+beforeEach(() => {
+    fetchMock.enableMocks();
+    fetchMock.resetMocks();
+});
+
+afterEach(() => {
+    fetchMock.resetMocks();
+});
 
 it("verifies token with public key - es256k", async () => {
     const keyPairES256k = await getKeyPair({
@@ -497,12 +509,10 @@ it("verifies correctly token with public uri", async () => {
 
     const keys = [keyPairES512.publicKey];
 
-    const scopeNock = nock(AUTHDOG_API_ROOT)
-        .persist()
-        .get(regExpPathAppJwks)
-        .reply(200, {
-            keys
-        });
+    const fullRegex = new RegExp(
+        `^${AUTHDOG_API_ROOT.replace(/\\./g, "\\.")}\/${regExpPathAppJwks.source}$`
+    );
+    fetchMock.mockIf(fullRegex, () => ({ status: 200, body: JSON.stringify({ keys }) }));
 
     const signedPayloadEs512 = await signJwtWithPrivateKey(
         {
@@ -529,7 +539,7 @@ it("verifies correctly token with public uri", async () => {
         kid: keyPairES512?.kid
     });
 
-    scopeNock.persist(false);
+    fetchMock.disableMocks();
 });
 
 describe("pemToJwk", () => {

@@ -129,12 +129,19 @@ export const verifyTokenWithPublicKey = async (
         }
 
     } else if (opts?.jwksUri) {
-        jwks = createRemoteJWKSet(new URL(opts?.jwksUri), {
+        // Fetch JWKS over HTTP(S) using global fetch so tests can mock easily
+        const response = await (globalThis as any).fetch(opts.jwksUri, {
             headers: {
                 "Content-Type": "application/json",
-                "User-Agent": "authdog-agent"
+                "User-Agent": "authdog-agent",
+                ...(opts?.requiredIssuer ? { "X-Issuer": opts.requiredIssuer } : {})
             }
         });
+        if (!response?.ok) {
+            throw new Error('Expected 200 OK from the JSON Web Key Set HTTP response');
+        }
+        const jwksJson = await response.json();
+        jwks = createLocalJWKSet(jwksJson as any);
     } else {
         throw new Error(INVALID_PUBLIC_KEY_FORMAT);
     }

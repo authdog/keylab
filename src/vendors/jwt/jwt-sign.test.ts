@@ -5,6 +5,7 @@ import { JwtAlgorithmsEnum as Algs, JwtParts } from "../../enums";
 import { strToUint8Array, uint8ArrayToStr } from "./utils";
 import { generateKeyPair, randomBytes } from "crypto";
 import { IKeyPair } from "./interfaces";
+import { expect, it } from "vitest";
 
 it("jwt sign with payload fields - HS256", async () => {
     const payload = {
