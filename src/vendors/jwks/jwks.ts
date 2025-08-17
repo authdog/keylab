@@ -7,7 +7,7 @@ import {
     JWTVerifyResult,
     JWTPayload,
     JWSHeaderParameters,
-    KeyLike,
+    CryptoKey,
     FlattenedJWSInput,
 } from "jose";
 import { extractAlgFromJwtHeader } from "../jwt";
@@ -91,7 +91,7 @@ export const verifyTokenWithPublicKey = async (
     publicKey: string | JWK | null,
     opts: IVerifyRSATokenCredentials = null,
 ): Promise<ITokenExtractedWithPubKey> => {
-    let jwks: (protectedHeader?: JWSHeaderParameters, token?: FlattenedJWSInput) => Promise<KeyLike> = null;
+    let jwks: (protectedHeader?: JWSHeaderParameters, token?: FlattenedJWSInput) => Promise<CryptoKey> = null;
     let decoded: JWTVerifyResult<JWTPayload> = null;
     let candidateKeys: any[] = [];
 

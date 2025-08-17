@@ -190,7 +190,11 @@ const algorithmsDict = [
             Algs?.RSAPSS,
             Algs?.PS256,
             Algs?.PS384,
-            Algs?.PS512
+            Algs?.PS512,
+            Algs?.RSA_OAEP,
+            Algs?.RSA_OAEP_256,
+            Algs?.RSA_OAEP_384,
+            Algs?.RSA_OAEP_512
         ])
     },
     {
@@ -199,7 +203,11 @@ const algorithmsDict = [
             Algs?.ES256,
             Algs?.ES384,
             Algs?.ES512,
-            Algs?.ES256K
+            Algs?.ES256K,
+            Algs?.ECDH_ES,
+            Algs?.ECDH_ES_A128KW,
+            Algs?.ECDH_ES_A192KW,
+            Algs?.ECDH_ES_A256KW
         ])
     },
     {
@@ -208,7 +216,7 @@ const algorithmsDict = [
     },
     {
         algType: JwtKeyTypes.OKP,
-        algIds: Object.values([Algs?.EdDSA])
+        algIds: Object.values([Algs?.EdDSA, Algs?.Ed25519, Algs?.Ed448, Algs?.X25519, Algs?.X448])
     }
 ];
 
@@ -232,15 +240,47 @@ export const getKeyPair = async ({
         if (IS_NODE) {
             const { generateKeyPairSync, randomBytes } = require("crypto");
 
-            // For OKP keys (EdDSA), choose the precise algorithm id: 'ed25519' or 'ed448'
-            let algorithmForGenerate: string = (algType ?? algorithmIdentifier?.toLowerCase());
-            if (algType === JwtKeyTypes.OKP) {
-                if (algorithmIdentifier === Algs.Ed448) {
+            // Map algorithm identifiers to Node.js crypto algorithm names
+            let algorithmForGenerate: string;
+            switch (algorithmIdentifier) {
+                case Algs.Ed448:
                     algorithmForGenerate = "ed448";
-                } else {
-                    // default to Ed25519 for generic EdDSA and Ed25519
+                    break;
+                case Algs.Ed25519:
+                case Algs.EdDSA:
                     algorithmForGenerate = "ed25519";
-                }
+                    break;
+                case Algs.X25519:
+                    algorithmForGenerate = "x25519";
+                    break;
+                case Algs.X448:
+                    algorithmForGenerate = "x448";
+                    break;
+                case Algs.ES256:
+                case Algs.ES384:
+                case Algs.ES512:
+                case Algs.ES256K:
+                case Algs.ECDH_ES:
+                case Algs.ECDH_ES_A128KW:
+                case Algs.ECDH_ES_A192KW:
+                case Algs.ECDH_ES_A256KW:
+                    algorithmForGenerate = "ec";
+                    break;
+                case Algs.RS256:
+                case Algs.RS384:
+                case Algs.RS512:
+                case Algs.RSAPSS:
+                case Algs.PS256:
+                case Algs.PS384:
+                case Algs.PS512:
+                case Algs.RSA_OAEP:
+                case Algs.RSA_OAEP_256:
+                case Algs.RSA_OAEP_384:
+                case Algs.RSA_OAEP_512:
+                    algorithmForGenerate = "rsa";
+                    break;
+                default:
+                    algorithmForGenerate = (algType ?? String(algorithmIdentifier).toLowerCase());
             }
 
             const { publicKey, privateKey } = generateKeyPairSync(algorithmForGenerate, {

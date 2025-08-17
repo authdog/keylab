@@ -479,6 +479,35 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
     expect(signedPayloadEs256k).toBeTruthy();
 });
 
+it("generates key pairs for new supported algorithms", async () => {
+    // Test RSA-OAEP
+    const keyPairOAEP = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RSA_OAEP,
+        keySize: 2048
+    });
+    expect(keyPairOAEP?.privateKey).toBeTruthy();
+    expect(keyPairOAEP?.publicKey).toBeTruthy();
+
+    // Test ECDH-ES
+    const keyPairECDH = await getKeyPair({
+        keyFormat: "jwk", 
+        algorithmIdentifier: Algs.ECDH_ES,
+        keySize: 256
+    });
+    expect(keyPairECDH?.privateKey).toBeTruthy();
+    expect(keyPairECDH?.publicKey).toBeTruthy();
+
+    // Test X25519
+    const keyPairX25519 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.X25519,
+        keySize: 256
+    });
+    expect(keyPairX25519?.privateKey).toBeTruthy();
+    expect(keyPairX25519?.publicKey).toBeTruthy();
+});
+
 it("experiment algorithm", async () => {
     const generateKey = async ({ alg }): Promise<IKeyPair> => {
         return new Promise((resolve: Function, reject: Function) => {

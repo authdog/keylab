@@ -15,6 +15,16 @@ type AlgorithmIdentifier =
     | Algs.ES256K
     | Algs.Ed25519
     | Algs.Ed448
+    | Algs.X25519
+    | Algs.X448
+    | Algs.RSA_OAEP
+    | Algs.RSA_OAEP_256
+    | Algs.RSA_OAEP_384
+    | Algs.RSA_OAEP_512
+    | Algs.ECDH_ES
+    | Algs.ECDH_ES_A128KW
+    | Algs.ECDH_ES_A192KW
+    | Algs.ECDH_ES_A256KW
 
 export interface IDecodedJwt {
     iss?: string;
@@ -32,21 +42,21 @@ export interface IGetKeyPair {
 }
 
 export interface IJwkPrivateKey {
-    kty: "RSA" | "EC" | "oct";
+    kty: "RSA" | "EC" | "oct" | "OKP";
     use: "sig" | "enc";
     kid: string;
-    n: string;
-    e: string;
-    d?: string;
-    p?: string;
-    q?: string;
-    dp?: string;
-    dq?: string;
-    qi?: string;
-    k?: string;
-    x?: string;
-    y?: string;
-    crv?: string;
+    n?: string; // RSA modulus
+    e?: string; // RSA exponent
+    d?: string; // RSA/EC private exponent
+    p?: string; // RSA first prime factor
+    q?: string; // RSA second prime factor
+    dp?: string; // RSA first factor CRT exponent
+    dq?: string; // RSA second factor CRT exponent
+    qi?: string; // RSA first CRT coefficient
+    k?: string; // Symmetric key value
+    x?: string; // EC/OKP x coordinate
+    y?: string; // EC y coordinate
+    crv?: string; // Curve name
     x5c?: string[];
     x5t?: string;
     x5tS256?: string;
@@ -54,14 +64,14 @@ export interface IJwkPrivateKey {
 }
 
 export interface IJwkPublicKey {
-    kty: "RSA" | "EC" | "oct";
+    kty: "RSA" | "EC" | "oct" | "OKP";
     use: "sig" | "enc";
     kid: string;
-    n: string;
-    e: string;
-    x?: string;
-    y?: string;
-    crv?: string;
+    n?: string; // RSA modulus
+    e?: string; // RSA exponent
+    x?: string; // EC/OKP x coordinate
+    y?: string; // EC y coordinate
+    crv?: string; // Curve name
     x5c?: string[];
     x5t?: string;
     x5tS256?: string;

@@ -1,9 +1,21 @@
 {
     "name": "keylab",
-    "version": "0.1.32",
+    "version": "0.1.33",
     "type": "module",
     "source": "src/index.ts",
     "main": "dist/index.js",
+    "module": "dist/index.js",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "sideEffects": false,
     "description": "keylab is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
     "scripts": {
         "test": "vitest run",
@@ -12,12 +24,10 @@
         "docs:dev": "pnpm --cwd docs start",
         "docs:build-i18n": "ts-node scripts/build-i18n-docs",
         "docs:deploy": "GIT_USER=dbrrt USE_SSH=true pnpm --cwd docs deploy",
-        "tsdoc:build": "typedoc --out tsdoc lib",
-        "tsdoc:deploy": "NETLIFY_SITE_ID=7a9aa5c4-6218-4d61-b482-999b3a32f38a netlify deploy --dir=tsdoc --prod",
-        "tsdoc:netlify": "pnpm tsdoc:build && pnpm tsdoc:deploy",
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
-        "lib:build:clean": "rm -rf pkg",
-        "build": "pnpm lib:build:clean && tsup src/index.ts",
+        "lib:build:clean": "rm -rf dist",
+        "build": "pnpm lib:build:clean && tsup && pnpm build:optimize",
+        "build:optimize": "node scripts/optimize-build.js",
         "lib:publish": "pnpm build && pnpm publish --no-git-checks",
         "version": "npm run build"
     },
@@ -49,6 +59,7 @@
         "husky": "^7.0.0",
         "prettier": "2.3.2",
         "raw-loader": "^4.0.2",
+        "terser": "^5.43.1",
         "ts-node": "^10.1.0",
         "tsup": "^6.5.0",
         "typedoc": "^0.21.3",

@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es2020",
         "module": "esnext",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
@@ -12,7 +12,7 @@
         "moduleResolution": "node",
         "outDir": "dist",
         "baseUrl": ".",
-        "lib": ["es6"],
+        "lib": ["es2020", "dom"],
         "sourceMap": true,
         "strictNullChecks": false,
         "noUnusedLocals": true,

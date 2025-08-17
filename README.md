@@ -89,6 +89,12 @@ const isValid = await checkTokenValidness(
 
 ## Changelog
 
+- 0.1.33: 
+  - Upgrade to jose v6 with full compatibility
+  - Add support for all JOSE standard algorithms (RSA-OAEP, ECDH-ES, X25519, X448)
+  - Implement Node.js crypto fallbacks for ES256K and EdDSA variants
+  - Add ESM support to eliminate Vite CJS deprecation warning
+  - Enhanced JWK handling with proper curve normalization
 - 0.1.32: Leverage Adhoc keys
 - 0.1.31: Bump jose dependency, fix fetch in Jest, enable Ed25519, Ed448
 - 0.1.30: Fix support for adhoc jwks

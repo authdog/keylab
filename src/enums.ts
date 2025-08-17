@@ -20,6 +20,16 @@ export enum JwtAlgorithmsEnum {
     X25519 = "X25519",
     Ed448 = "Ed448",
     X448 = "X448",
+    // RSA-OAEP algorithms for key wrapping/encryption
+    RSA_OAEP = "RSA-OAEP",
+    RSA_OAEP_256 = "RSA-OAEP-256",
+    RSA_OAEP_384 = "RSA-OAEP-384",
+    RSA_OAEP_512 = "RSA-OAEP-512",
+    // ECDH key agreement algorithms
+    ECDH_ES = "ECDH-ES",
+    ECDH_ES_A128KW = "ECDH-ES+A128KW",
+    ECDH_ES_A192KW = "ECDH-ES+A192KW",
+    ECDH_ES_A256KW = "ECDH-ES+A256KW",
     // web crypto
     RSA_PKCS1 = "RSASSA-PKCS1-v1_5",
     RSA_PSS = "RSA-PSS", // similar to RSAPSS

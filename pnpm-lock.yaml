@@ -33,6 +33,9 @@ importers:
       raw-loader:
         specifier: ^4.0.2
         version: 4.0.2(webpack@5.101.2(@swc/core@1.13.3)(esbuild@0.17.19))
+      terser:
+        specifier: ^5.43.1
+        version: 5.43.1
       ts-node:
         specifier: ^10.1.0
         version: 10.9.2(@swc/core@1.13.3)(@types/node@16.18.126)(typescript@4.9.5)

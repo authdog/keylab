@@ -52,7 +52,12 @@ export const namedCurves = {
     es384: "P-384",
     es512: "P-521",
     eddsa: "ED25519",
-    es256k: "secp256k1"
+    es256k: "secp256k1",
+    // ECDH-ES algorithms use the same curves as their ES counterparts
+    "ecdh-es": "P-256", // Default curve for ECDH-ES
+    "ecdh-es+a128kw": "P-256",
+    "ecdh-es+a192kw": "P-256", 
+    "ecdh-es+a256kw": "P-256"
 };
 
 export const PEM_CHARS = {
