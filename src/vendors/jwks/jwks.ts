@@ -7,13 +7,12 @@ import {
     JWTVerifyResult,
     JWTPayload,
     JWSHeaderParameters,
-    CryptoKey,
     FlattenedJWSInput,
 } from "jose";
 import { extractAlgFromJwtHeader } from "../jwt";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
 import { INVALID_PUBLIC_KEY_FORMAT } from "../../errors/messages";
-import { createPublicKey, createVerify, KeyObject } from "crypto";
+import { createPublicKey, createVerify, KeyObject, verify } from "crypto";
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -129,7 +128,6 @@ export const verifyTokenWithPublicKey = async (
                 // Node verification fallback for algorithms not supported by importSPKI (e.g., Ed448)
                 const [h, p, s] = token.split(".");
                 const signingInput = `${h}.${p}`;
-                const { verify } = require("crypto");
                 const ok = verify(null, Buffer.from(signingInput), createPublicKey(publicKey), Buffer.from(s, "base64url"));
                 if (!ok) throw _;
                 const payload = JSON.parse(Buffer.from(p, "base64url").toString("utf8"));
@@ -251,7 +249,6 @@ export const verifyTokenWithPublicKey = async (
                 }
                 if (alg === Algs.EdDSA) {
                     const keyObj: KeyObject = typeof publicKey === "string" ? createPublicKey(publicKey) : createPublicKey({ key: jwkForFallback, format: "jwk" as any });
-                    const { verify } = require("crypto");
                     return verify(null, Buffer.from(signingInput), keyObj, Buffer.from(sigB64, "base64url"));
                 }
             } catch (_) {}

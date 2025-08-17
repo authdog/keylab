@@ -4,7 +4,7 @@ import { importPKCS8, importJWK, SignJWT, JWTHeaderParameters } from "jose";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
 import * as c from "../../constants";
 import { isNodeJs, strToUint8Array } from "./utils";
-import { createSign, createPrivateKey, KeyObject } from "crypto";
+import { createSign, createPrivateKey, KeyObject, sign, generateKeyPairSync, randomBytes } from "crypto";
 
 interface ISignJwtOpts {
     kid?: string;
@@ -170,7 +170,6 @@ const signWithNodeFallback = (
         sigB64 = b64url(joseSig);
     } else {
         try {
-            const { sign } = require("crypto");
             const rawSig: Buffer = sign(null, Buffer.from(signingInput), keyObj ?? pemKey);
             sigB64 = b64url(rawSig);
         } catch {
@@ -238,7 +237,6 @@ export const getKeyPair = async ({
 
         const IS_NODE = isNodeJs();
         if (IS_NODE) {
-            const { generateKeyPairSync, randomBytes } = require("crypto");
 
             // Map algorithm identifiers to Node.js crypto algorithm names
             let algorithmForGenerate: string;
@@ -283,7 +281,7 @@ export const getKeyPair = async ({
                     algorithmForGenerate = (algType ?? String(algorithmIdentifier).toLowerCase());
             }
 
-            const { publicKey, privateKey } = generateKeyPairSync(algorithmForGenerate, {
+            const { publicKey, privateKey } = generateKeyPairSync(algorithmForGenerate as any, {
                 namedCurve: useCurve
                     ? c.namedCurves?.[algorithmIdentifier.toLowerCase()]
                     : undefined,
