@@ -125,3 +125,5 @@ tsdoc
 build
 
 pkg/
+
+*.js

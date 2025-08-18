@@ -26,7 +26,7 @@
         "docs:deploy": "GIT_USER=dbrrt USE_SSH=true pnpm --cwd docs deploy",
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
         "lib:build:clean": "rm -rf dist",
-        "build": "pnpm lib:build:clean && tsup && pnpm build:optimize",
+        "build": "pnpm lib:build:clean && tsup",
         "build:optimize": "node scripts/optimize-build.js",
         "lib:publish": "pnpm build && pnpm publish --no-git-checks",
         "version": "npm run build"
