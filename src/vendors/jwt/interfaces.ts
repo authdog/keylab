@@ -1,6 +1,9 @@
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
 
 type AlgorithmIdentifier =
+    | Algs.HS256
+    | Algs.HS384
+    | Algs.HS512
     | Algs.RS256
     | Algs.RS384
     | Algs.RS512
@@ -12,6 +15,7 @@ type AlgorithmIdentifier =
     | Algs.PS512
     | Algs.EdDSA
     | Algs.RSAPSS
+    | Algs.RSA_PSS
     | Algs.ES256K
     | Algs.Ed25519
     | Algs.Ed448
@@ -25,6 +29,17 @@ type AlgorithmIdentifier =
     | Algs.ECDH_ES_A128KW
     | Algs.ECDH_ES_A192KW
     | Algs.ECDH_ES_A256KW
+    | Algs.RSA1_5
+    | Algs.A128KW
+    | Algs.A192KW
+    | Algs.A256KW
+    | Algs.DIR
+    | Algs.A128GCMKW
+    | Algs.A192GCMKW
+    | Algs.A256GCMKW
+    | Algs.PBES2_HS256_A128KW
+    | Algs.PBES2_HS384_A192KW
+    | Algs.PBES2_HS512_A256KW;
 
 export interface IDecodedJwt {
     iss?: string;

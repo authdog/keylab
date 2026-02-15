@@ -98,21 +98,22 @@ const derToJoseConcat = (der: Buffer, size: number) => {
     if (der[offset++] !== 0x30) throw new Error("Invalid DER signature");
     offset++; // skip sequence length
     if (der[offset++] !== 0x02) throw new Error("Invalid DER signature");
-    let rLen = der[offset++];
-    let r = der.slice(offset, offset + rLen);
+    const rLen = der[offset++];
+    let r = der.subarray(offset, offset + rLen);
     offset += rLen;
     if (der[offset++] !== 0x02) throw new Error("Invalid DER signature");
-    let sLen = der[offset++];
-    let s = der.slice(offset, offset + sLen);
+    const sLen = der[offset++];
+    let s = der.subarray(offset, offset + sLen);
 
     // Remove leading zeros and pad to size
     const strip = (b: Buffer) => {
-        while (b.length > 0 && b[0] === 0x00) b = b.slice(1);
+        while (b.length > size && b[0] === 0x00) b = b.subarray(1);
+        if (b.length > size) throw new Error("Invalid r/s length");
         return b;
     };
     r = strip(r);
     s = strip(s);
-    if (r.length > size || s.length > size) throw new Error("Invalid r/s length");
+
     const rPadded = Buffer.concat([Buffer.alloc(size - r.length, 0), r]);
     const sPadded = Buffer.concat([Buffer.alloc(size - s.length, 0), s]);
     return Buffer.concat([rPadded, sPadded]);
@@ -187,13 +188,15 @@ const algorithmsDict = [
             Algs?.RS384,
             Algs?.RS512,
             Algs?.RSAPSS,
+            Algs?.RSA_PSS,
             Algs?.PS256,
             Algs?.PS384,
             Algs?.PS512,
             Algs?.RSA_OAEP,
             Algs?.RSA_OAEP_256,
             Algs?.RSA_OAEP_384,
-            Algs?.RSA_OAEP_512
+            Algs?.RSA_OAEP_512,
+            Algs?.RSA1_5
         ])
     },
     {
@@ -211,7 +214,21 @@ const algorithmsDict = [
     },
     {
         algType: JwtKeyTypes.OCTET,
-        algIds: Object.values([Algs?.HS256, Algs?.HS384, Algs?.HS512])
+        algIds: Object.values([
+            Algs?.HS256,
+            Algs?.HS384,
+            Algs?.HS512,
+            Algs?.A128KW,
+            Algs?.A192KW,
+            Algs?.A256KW,
+            Algs?.DIR,
+            Algs?.A128GCMKW,
+            Algs?.A192GCMKW,
+            Algs?.A256GCMKW,
+            Algs?.PBES2_HS256_A128KW,
+            Algs?.PBES2_HS384_A192KW,
+            Algs?.PBES2_HS512_A256KW
+        ])
     },
     {
         algType: JwtKeyTypes.OKP,
@@ -237,6 +254,15 @@ export const getKeyPair = async ({
 
         const IS_NODE = isNodeJs();
         if (IS_NODE) {
+            if (algType === JwtKeyTypes.OCTET) {
+                const secret = randomBytes(keySize ? keySize / 8 : 32);
+                const kid = randomBytes(16).toString("hex");
+                return resolve({
+                    publicKey: secret.toString("hex"),
+                    privateKey: secret.toString("hex"),
+                    kid
+                });
+            }
 
             // Map algorithm identifiers to Node.js crypto algorithm names
             let algorithmForGenerate: string;
@@ -275,6 +301,7 @@ export const getKeyPair = async ({
                 case Algs.RSA_OAEP_256:
                 case Algs.RSA_OAEP_384:
                 case Algs.RSA_OAEP_512:
+                case Algs.RSA1_5:
                     algorithmForGenerate = "rsa";
                     break;
                 default:

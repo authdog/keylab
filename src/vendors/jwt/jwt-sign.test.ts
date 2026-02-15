@@ -479,33 +479,57 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
     expect(signedPayloadEs256k).toBeTruthy();
 });
 
-it("generates key pairs for new supported algorithms", async () => {
-    // Test RSA-OAEP
-    const keyPairOAEP = await getKeyPair({
-        keyFormat: "jwk",
-        algorithmIdentifier: Algs.RSA_OAEP,
-        keySize: 2048
-    });
-    expect(keyPairOAEP?.privateKey).toBeTruthy();
-    expect(keyPairOAEP?.publicKey).toBeTruthy();
+it("generates key pairs for all supported algorithms", async () => {
+    const testAlgs = async (algs: Algs[], options: any = {}) => {
+        for (const alg of algs) {
+            const keyPair = await getKeyPair({
+                algorithmIdentifier: alg,
+                keySize: options.keySize || 2048,
+                keyFormat: options.keyFormat || "jwk"
+            });
+            expect(keyPair?.privateKey).toBeTruthy();
+            if (options.expectPublic !== false) {
+                expect(keyPair?.publicKey).toBeTruthy();
+            }
+        }
+    };
 
-    // Test ECDH-ES
-    const keyPairECDH = await getKeyPair({
-        keyFormat: "jwk", 
-        algorithmIdentifier: Algs.ECDH_ES,
-        keySize: 256
-    });
-    expect(keyPairECDH?.privateKey).toBeTruthy();
-    expect(keyPairECDH?.publicKey).toBeTruthy();
+    // RSA-OAEP variants
+    await testAlgs([
+        Algs.RSA_OAEP,
+        Algs.RSA_OAEP_256,
+        Algs.RSA_OAEP_384,
+        Algs.RSA_OAEP_512,
+        Algs.RSA1_5
+    ], { keySize: 2048 });
 
-    // Test X25519
-    const keyPairX25519 = await getKeyPair({
-        keyFormat: "jwk",
-        algorithmIdentifier: Algs.X25519,
-        keySize: 256
-    });
-    expect(keyPairX25519?.privateKey).toBeTruthy();
-    expect(keyPairX25519?.publicKey).toBeTruthy();
+    // ECDH-ES variants
+    await testAlgs([
+        Algs.ECDH_ES,
+        Algs.ECDH_ES_A128KW,
+        Algs.ECDH_ES_A192KW,
+        Algs.ECDH_ES_A256KW
+    ], { keySize: 256 });
+
+    // OKP variants
+    await testAlgs([
+        Algs.X25519,
+        Algs.X448
+    ], { keySize: 256 });
+
+    // Symmetric/OCTET variants (KW, GCMKW, DIR, PBES2)
+    await testAlgs([
+        Algs.A128KW,
+        Algs.A192KW,
+        Algs.A256KW,
+        Algs.DIR,
+        Algs.A128GCMKW,
+        Algs.A192GCMKW,
+        Algs.A256GCMKW,
+        Algs.PBES2_HS256_A128KW,
+        Algs.PBES2_HS384_A192KW,
+        Algs.PBES2_HS512_A256KW
+    ], { keySize: 256, expectPublic: false });
 });
 
 it("experiment algorithm", async () => {
