@@ -80,6 +80,17 @@ export const checkTokenValidness = async (
         case algEnums.ES256K:
         case algEnums.Ed25519:
         case algEnums.Ed448:
+        case algEnums.RSA1_5:
+        case algEnums.A128KW:
+        case algEnums.A192KW:
+        case algEnums.A256KW:
+        case algEnums.DIR:
+        case algEnums.A128GCMKW:
+        case algEnums.A192GCMKW:
+        case algEnums.A256GCMKW:
+        case algEnums.PBES2_HS256_A128KW:
+        case algEnums.PBES2_HS384_A192KW:
+        case algEnums.PBES2_HS512_A256KW:
             if (!adhoc && !jwksUri) {
                 missingCredentials.push("jwksUri");
             }
@@ -105,7 +116,7 @@ export const checkTokenValidness = async (
                             requiredScopes,
                         }
                     );
-                
+
                 }
 
                 // if (!!extractedPayload) {
@@ -152,7 +163,7 @@ export const verifyHSTokenWithSecretString = async (
                 isVerified = now < exp;
             }
         }
-    } catch (e) {}
+    } catch (e) { }
 
     return isVerified ? decoded?.payload : null;
 };
@@ -307,6 +318,17 @@ export const createSignedJwt = async (
         case algEnums.ES512:
         case algEnums.EdDSA:
         case algEnums.ES256K:
+        case algEnums.RSA1_5:
+        case algEnums.A128KW:
+        case algEnums.A192KW:
+        case algEnums.A256KW:
+        case algEnums.DIR:
+        case algEnums.A128GCMKW:
+        case algEnums.A192GCMKW:
+        case algEnums.A256GCMKW:
+        case algEnums.PBES2_HS256_A128KW:
+        case algEnums.PBES2_HS384_A192KW:
+        case algEnums.PBES2_HS512_A256KW:
             if (signinOptions?.pemPrivateKey) {
                 token = await signJwtWithPrivateKey(
                     jwtClaims,

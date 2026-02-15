@@ -14,6 +14,7 @@ export enum JwtAlgorithmsEnum {
     PS384 = "PS384",
     PS512 = "PS512",
     RSAPSS = "RSA-PSS",
+    RSA_PSS = "RSA-PSS",
     EdDSA = "EdDSA",
     ES256K = "ES256K",
     Ed25519 = "Ed25519",
@@ -25,17 +26,27 @@ export enum JwtAlgorithmsEnum {
     RSA_OAEP_256 = "RSA-OAEP-256",
     RSA_OAEP_384 = "RSA-OAEP-384",
     RSA_OAEP_512 = "RSA-OAEP-512",
+    // RSA1_5
+    RSA1_5 = "RSA1_5",
     // ECDH key agreement algorithms
     ECDH_ES = "ECDH-ES",
     ECDH_ES_A128KW = "ECDH-ES+A128KW",
     ECDH_ES_A192KW = "ECDH-ES+A192KW",
     ECDH_ES_A256KW = "ECDH-ES+A256KW",
-    // web crypto
-    RSA_PKCS1 = "RSASSA-PKCS1-v1_5",
-    RSA_PSS = "RSA-PSS", // similar to RSAPSS
-    EC_P256 = "PS256",
-    EC_P384 = "PS384",
-    EC_P521 = "PS512"
+    // AES Key Wrap
+    A128KW = "A128KW",
+    A192KW = "A192KW",
+    A256KW = "A256KW",
+    // Direct
+    DIR = "dir",
+    // AES GCM Key Wrap
+    A128GCMKW = "A128GCMKW",
+    A192GCMKW = "A192GCMKW",
+    A256GCMKW = "A256GCMKW",
+    // PBES2
+    PBES2_HS256_A128KW = "PBES2-HS256+A128KW",
+    PBES2_HS384_A192KW = "PBES2-HS384+A192KW",
+    PBES2_HS512_A256KW = "PBES2-HS512+A256KW"
 }
 
 // https://datatracker.ietf.org/doc/html/rfc7517#section-4.2
