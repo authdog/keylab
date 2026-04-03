@@ -397,6 +397,63 @@ it("throws when jwks endpoint does not return ok", async () => {
     ).rejects.toThrow("Expected 200 OK from the JSON Web Key Set HTTP response")
 })
 
+it("rethrows portable verification errors when no jose candidates exist", async () => {
+    const signingKeyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.Ed448,
+        keySize: 456,
+    })
+    const wrongKeyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.Ed448,
+        keySize: 456,
+    })
+
+    const token = await signJwtWithPrivateKey(
+        { urn: "urn:test:ed448" },
+        Algs.EdDSA,
+        signingKeyPair.privateKey,
+        {
+            kid: signingKeyPair.kid,
+        },
+    )
+
+    await expect(
+        verifyTokenWithPublicKey(token, {
+            ...(wrongKeyPair.publicKey as any),
+            kid: signingKeyPair.kid,
+        }),
+    ).rejects.toThrow("Invalid signature")
+})
+
+it("throws no applicable key when jwks response has no matching keys", async () => {
+    const keyPairRS256 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RS256,
+        keySize: 2048,
+    })
+
+    const token = await signJwtWithPrivateKey(
+        { urn: "urn:test:no-key" },
+        Algs.RS256,
+        keyPairRS256.privateKey,
+        {
+            kid: keyPairRS256.kid,
+        },
+    )
+
+    fetchMock.mockIf("https://as.example.com/empty-jwks", () => ({
+        status: 200,
+        body: JSON.stringify({ keys: [] }),
+    }))
+
+    await expect(
+        verifyTokenWithPublicKey(token, null, {
+            jwksUri: "https://as.example.com/empty-jwks",
+        }),
+    ).rejects.toThrow(c.JWK_NO_APPLICABLE_KEY)
+})
+
 it("verifies token with public key - ES512", async () => {
     const keyPairES512 = await getKeyPair({
         algorithmIdentifier: Algs.ES512,

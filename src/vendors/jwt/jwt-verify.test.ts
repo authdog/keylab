@@ -128,6 +128,23 @@ it("verifies HS256 token", async () => {
     expect(shouldNotVerifyWithoutExp).toBeFalsy()
 })
 
+it("verifies HS token through checkTokenValidness", async () => {
+    const token = await signJwtWithPrivateKey(
+        {
+            exp: Math.floor(Date.now() / 1000) + 60,
+            data: "foobar",
+        },
+        Algs.HS256,
+        "secret",
+    )
+
+    await expect(
+        checkTokenValidness(token, {
+            secret: "secret",
+        }),
+    ).resolves.toBeTruthy()
+})
+
 it("verifies token audience", async () => {
     // invalid token
     const token = "dummy-string"
@@ -268,6 +285,19 @@ it("verifies string scope formats and rejects invalid scope field types", async 
     expect(
         checkJwtFields(tokenWithSingleScope, {
             requiredScopes: ["foo"],
+        }),
+    ).toBeTruthy()
+
+    const tokenWithSpaceScopes = await signJwtWithPrivateKey(
+        {
+            scp: "foo bar",
+        },
+        Algs.HS256,
+        "secret",
+    )
+    expect(
+        checkJwtFields(tokenWithSpaceScopes, {
+            requiredScopes: ["foo", "bar"],
         }),
     ).toBeTruthy()
 
@@ -579,6 +609,13 @@ it("rejects unsupported algorithms in createSignedJwt", async () => {
             },
         ),
     ).rejects.toThrow(c.JWT_NON_IMPLEMENTED_ALGORITHM)
+})
+
+it("rejects non-supported algorithms in checkTokenValidness", async () => {
+    const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url")
+    const token = `${encode({ alg: "NOPE", typ: "JWT" })}.${encode({ sub: "123" })}.sig`
+
+    await expect(checkTokenValidness(token, {} as any)).rejects.toThrow(c.JWT_NON_SUPPORTED_ALGORITHM)
 })
 
 it("throws an error while verifying token with public uri whose key is missing from set", async () => {

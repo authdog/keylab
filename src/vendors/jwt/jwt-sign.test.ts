@@ -12,6 +12,7 @@ const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined
 afterEach(() => {
     vi.resetModules()
     vi.unmock("jose")
+    vi.unmock("crypto")
 })
 
 it("jwt sign with payload fields - HS256", async () => {
@@ -542,6 +543,13 @@ it("generates key pairs for all supported algorithms", async () => {
 })
 
 it("generates symmetric keys with default sizes and metadata", async () => {
+    const hs384Pem = await getKeyPair({
+        algorithmIdentifier: Algs.HS384,
+        keyFormat: "pem",
+    } as any)
+    expect(hs384Pem.privateKey).toEqual(hs384Pem.publicKey)
+    expect(hs384Pem.privateKey).toHaveLength(96)
+
     const hs512Pem = await getKeyPair({
         algorithmIdentifier: Algs.HS512,
         keyFormat: "pem",
@@ -596,7 +604,39 @@ it("throws on unsupported key generation algorithm", async () => {
     ).rejects.toThrow("Unsupported algorithm unsupported")
 })
 
+it("rethrows jose key generation errors when node fallback cannot recover", async () => {
+    vi.doMock("jose", async () => {
+        const actual = await vi.importActual<typeof import("jose")>("jose")
+        return {
+            ...actual,
+            generateKeyPair: vi.fn(async () => {
+                throw new Error("mock jose failure")
+            }),
+        }
+    })
+    vi.doMock("crypto", async () => {
+        const actual = await vi.importActual<typeof import("crypto")>("crypto")
+        return {
+            ...actual,
+            generateKeyPairSync: vi.fn(() => {
+                throw new Error("mock node fallback failure")
+            }),
+        }
+    })
+
+    const { getKeyPair: getKeyPairWithFailure } = await import("./jwt-sign")
+
+    await expect(
+        getKeyPairWithFailure({
+            algorithmIdentifier: Algs.RS256,
+            keyFormat: "pem",
+            keySize: 2048,
+        }),
+    ).rejects.toThrow("mock node fallback failure")
+})
+
 it("falls back to node crypto when jose key generation fails", async () => {
+    vi.doUnmock("crypto")
     vi.doMock("jose", async () => {
         const actual = await vi.importActual<typeof import("jose")>("jose")
         return {
