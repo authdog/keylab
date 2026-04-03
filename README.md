@@ -1,7 +1,8 @@
 # keylab
 
 [![CI](https://github.com/authdog/keylab/actions/workflows/ci.yml/badge.svg)](https://github.com/authdog/keylab/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/authdog/keylab/branch/master/graph/badge.svg?token=6XA3OTMTAT)](https://codecov.io/gh/authdog/keylab)
+[![CodeQL](https://github.com/authdog/keylab/actions/workflows/codeql.yml/badge.svg)](https://github.com/authdog/keylab/actions/workflows/codeql.yml)
+[![Coverage](badges/coverage.svg)](md/README.md)
 [![npm version](https://badge.fury.io/js/keylab.svg)](https://badge.fury.io/js/keylab)
 [![code style: biome](https://img.shields.io/badge/code_style-biome-60a5fa.svg?style=flat-square)](https://biomejs.dev/)
 ![bundle size](https://img.shields.io/bundlephobia/minzip/keylab?label=zipped)

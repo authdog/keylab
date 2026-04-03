@@ -21,6 +21,7 @@
     "scripts": {
         "test": "vitest run",
         "test-with-coverage": "vitest run --coverage",
+        "coverage:badge": "node scripts/generate-coverage-badge.js",
         "format": "biome format --write .",
         "lint": "biome check .",
         "pretty": "bun run format",
