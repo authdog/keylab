@@ -521,7 +521,6 @@ it("experiment algorithm", async () => {
             generateKeyPair(
                 alg as any,
                 {
-                    modulusLength: 530,
                     publicKeyEncoding: {
                         ...c.publicKeyEncodingPem,
                     },

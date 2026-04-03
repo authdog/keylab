@@ -1,4 +1,5 @@
 import { extractBearerTokenFromHeaders } from "./headers"
+import { expect, it } from "vitest"
 import * as c from "../../constants"
 
 it("extracts properly Bearer token from req", () => {
@@ -29,5 +30,21 @@ it("throws an exception is credentials scheme is incorrect", () => {
 
     expect(() => {
         extractBearerTokenFromHeaders({})
+    }).toThrowError(c.HEADERS_CREDENTIALS_FORMAT)
+})
+
+it("throws an exception when authorization header format is invalid", () => {
+    expect(() => {
+        extractBearerTokenFromHeaders({
+            authorization: "Bearer only-token extra-part",
+        })
+    }).toThrowError(c.HEADERS_CREDENTIALS_FORMAT)
+})
+
+it("throws an exception when scheme is not bearer", () => {
+    expect(() => {
+        extractBearerTokenFromHeaders({
+            authorization: "Basic abc123",
+        })
     }).toThrowError(c.HEADERS_CREDENTIALS_FORMAT)
 })

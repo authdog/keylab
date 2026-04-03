@@ -4,6 +4,8 @@ import {
     checkJwtFields,
     parseJwt,
     checkTokenValidness,
+    createSignedJwt,
+    extractAlgFromJwtHeader,
 } from "./jwt-verify"
 import { JwtAlgorithmsEnum as Algs, JwtParts, JwtKeyTypes as Kty } from "../../enums"
 import * as c from "../../constants"
@@ -38,9 +40,23 @@ it("extract properly algorithm from token", async () => {
     expect(getAlgorithmJwt(DUMMY_HS256_TOKEN)).toEqual(Algs.HS256)
 })
 
+it("extracts algorithm directly from jwt header", () => {
+    expect(extractAlgFromJwtHeader(DUMMY_HS256_TOKEN)).toEqual(Algs.HS256)
+})
+
 it("should throw an exception if token is malformed", async () => {
     expect(() => {
         parseJwt(DUMMY_NON_JWT_TOKEN, JwtParts.HEADER)
+    }).toThrow(c.MALFORMED_URI)
+})
+
+it("throws on unknown jwt part and malformed signature part", () => {
+    expect(() => {
+        parseJwt(DUMMY_HS256_TOKEN, "unknown" as JwtParts)
+    }).toThrow("unknown jwt part")
+
+    expect(() => {
+        parseJwt(DUMMY_HS256_TOKEN, JwtParts.SIGNATURE)
     }).toThrow(c.MALFORMED_URI)
 })
 
@@ -96,6 +112,20 @@ it("verifies HS256 token", async () => {
         Algs.HS256,
     )
     expect(shouldVerifysignedTokenNotExpired).toBeTruthy()
+
+    const signedTokenWithoutExp = await signJwtWithPrivateKey(
+        {
+            data: "foobar",
+        },
+        Algs.HS256,
+        SECRET_STRING,
+    )
+    const shouldNotVerifyWithoutExp = await verifyHSTokenWithSecretString(
+        signedTokenWithoutExp,
+        SECRET_STRING,
+        Algs.HS256,
+    )
+    expect(shouldNotVerifyWithoutExp).toBeFalsy()
 })
 
 it("verifies token audience", async () => {
@@ -212,6 +242,49 @@ it("verifies token scopes", async () => {
     })
 
     expect(tokenMissesAScope2).toBeFalsy()
+})
+
+it("verifies string scope formats and rejects invalid scope field types", async () => {
+    const tokenWithCommaScopes = await signJwtWithPrivateKey(
+        {
+            scp: "foo,bar",
+        },
+        Algs.HS256,
+        "secret",
+    )
+    expect(
+        checkJwtFields(tokenWithCommaScopes, {
+            requiredScopes: ["foo", "bar"],
+        }),
+    ).toBeTruthy()
+
+    const tokenWithSingleScope = await signJwtWithPrivateKey(
+        {
+            scp: "foo",
+        },
+        Algs.HS256,
+        "secret",
+    )
+    expect(
+        checkJwtFields(tokenWithSingleScope, {
+            requiredScopes: ["foo"],
+        }),
+    ).toBeTruthy()
+
+    const tokenWithInvalidScopeType = await signJwtWithPrivateKey(
+        {
+            scp: {
+                foo: true,
+            },
+        },
+        Algs.HS256,
+        "secret",
+    )
+    expect(
+        checkJwtFields(tokenWithInvalidScopeType, {
+            requiredScopes: ["foo"],
+        }),
+    ).toBeFalsy()
 })
 
 it("parses token (payload and header)", async () => {
@@ -378,6 +451,134 @@ it("verifies a token with checkTokenValidness signed with Ed448 key - jwk", asyn
     expect(tokenInJwksStoreValidness).toBeTruthy()
 
     fetchMock.disableMocks()
+})
+
+it("throws when validation credentials are missing", async () => {
+    await expect(checkTokenValidness(DUMMY_HS256_TOKEN, {} as any)).rejects.toThrow(
+        c.JWT_MISSING_VALIDATION_CREDENTIALS,
+    )
+
+    const keyPairRS256 = await getKeyPair({
+        algorithmIdentifier: Algs.RS256,
+        keyFormat: "jwk",
+        keySize: 2048,
+    })
+    const token = await signJwtWithPrivateKey({ urn: "urn:test:test" }, Algs.RS256, keyPairRS256.privateKey)
+
+    await expect(checkTokenValidness(token, {} as any)).rejects.toThrow(
+        c.JWT_MISSING_VALIDATION_CREDENTIALS,
+    )
+})
+
+it("verifies a token with adhoc jwk credentials", async () => {
+    const keyPairES256 = await getKeyPair({
+        algorithmIdentifier: Algs.ES256,
+        keyFormat: "jwk",
+        keySize: 2048,
+    })
+
+    const token = await signJwtWithPrivateKey(
+        { urn: "urn:test:adhoc" },
+        Algs.ES256,
+        keyPairES256.privateKey,
+        {
+            kid: keyPairES256.kid,
+        },
+    )
+
+    const verified = await checkTokenValidness(token, {
+        adhoc: [keyPairES256.publicKey as any],
+    })
+
+    expect(verified?.payload?.urn).toEqual("urn:test:adhoc")
+})
+
+it("creates signed jwt tokens for symmetric and asymmetric flows", async () => {
+    const hsToken = await createSignedJwt(
+        { feature: "hs" },
+        {
+            algorithm: Algs.HS256,
+            claims: {
+                iss: "issuer",
+                aud: ["audience"],
+                scp: "scope:one",
+                aid: "aid-1",
+                sub: "sub-1",
+            },
+            signinOptions: {
+                secret: "secret",
+                sessionDuration: 5,
+            } as any,
+        },
+    )
+    expect(extractAlgFromJwtHeader(hsToken)).toEqual(Algs.HS256)
+    expect(parseJwt(hsToken).feature).toEqual("hs")
+
+    const pemKeyPair = await getKeyPair({
+        algorithmIdentifier: Algs.RS256,
+        keyFormat: "pem",
+        keySize: 2048,
+    })
+    const pemToken = await createSignedJwt(
+        { feature: "pem" },
+        {
+            algorithm: Algs.RS256,
+            claims: {
+                iss: "issuer",
+                aud: ["audience"],
+                scp: "scope:one",
+                sub: "sub-1",
+            },
+            signinOptions: {
+                pemPrivateKey: pemKeyPair.privateKey,
+                sessionDuration: 5,
+            } as any,
+        },
+    )
+    expect(extractAlgFromJwtHeader(pemToken)).toEqual(Algs.RS256)
+
+    const jwkKeyPair = await getKeyPair({
+        algorithmIdentifier: Algs.RS256,
+        keyFormat: "jwk",
+        keySize: 2048,
+    })
+    const jwkToken = await createSignedJwt(
+        { feature: "jwk" },
+        {
+            algorithm: Algs.RS256,
+            claims: {
+                iss: "issuer",
+                aud: ["audience"],
+                scp: "scope:one",
+                sub: "sub-1",
+            },
+            signinOptions: {
+                jwkPrivateKey: jwkKeyPair.privateKey,
+                sessionDuration: 5,
+            } as any,
+        },
+    )
+    expect(extractAlgFromJwtHeader(jwkToken)).toEqual(Algs.RS256)
+})
+
+it("rejects unsupported algorithms in createSignedJwt", async () => {
+    await expect(
+        createSignedJwt(
+            {},
+            {
+                algorithm: "unsupported" as Algs,
+                claims: {
+                    iss: "issuer",
+                    aud: ["audience"],
+                    scp: "scope:one",
+                    sub: "sub-1",
+                },
+                signinOptions: {
+                    sessionDuration: 5,
+                } as any,
+            },
+        ),
+    ).rejects.toThrow(c.JWT_NON_IMPLEMENTED_ALGORITHM)
 })
 
 it("throws an error while verifying token with public uri whose key is missing from set", async () => {

@@ -1,5 +1,10 @@
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign"
-import { ITokenExtractedWithPubKey, pemToJwk, verifyTokenWithPublicKey } from "./jwks"
+import {
+    ITokenExtractedWithPubKey,
+    makePublicKey,
+    pemToJwk,
+    verifyTokenWithPublicKey,
+} from "./jwks"
 
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums"
 import createFetchMock from "vitest-fetch-mock"
@@ -20,6 +25,26 @@ beforeEach(() => {
 
 afterEach(() => {
     fetchMock.resetMocks()
+})
+
+it("creates a public jwk without private fields", () => {
+    expect(
+        makePublicKey({
+            kty: "RSA",
+            kid: "kid-1",
+            alg: Algs.RS256,
+            n: "modulus",
+            e: "AQAB",
+            d: "private-part",
+            x5u: undefined,
+        }),
+    ).toEqual({
+        kty: "RSA",
+        kid: "kid-1",
+        alg: Algs.RS256,
+        n: "modulus",
+        e: "AQAB",
+    })
 })
 
 it("verifies token with public key - es256k", async () => {
@@ -87,6 +112,28 @@ it("verifies token with public key - rs256", async () => {
         alg: Algs.RS256,
         type: Kty.JWT,
     })
+})
+
+it("verifies token with pem public key", async () => {
+    const keyPairRS256 = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs.RS256,
+        keySize: 2048,
+    })
+
+    const token = await signJwtWithPrivateKey(
+        {
+            urn: "urn:test:pem",
+        },
+        Algs.RS256,
+        keyPairRS256.privateKey,
+        {
+            kid: keyPairRS256.kid,
+        },
+    )
+
+    const verified = await verifyTokenWithPublicKey(token, keyPairRS256.publicKey)
+    expect(verified?.payload?.urn).toEqual("urn:test:pem")
 })
 
 it("verifies token with public key - rs384", async () => {
@@ -310,6 +357,44 @@ it("verifies token with public key - ES384", async () => {
         alg: Algs?.ES384,
         type: Kty.JWT,
     })
+})
+
+it("throws for invalid public key input", async () => {
+    const keyPairRS256 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RS256,
+        keySize: 2048,
+    })
+    const token = await signJwtWithPrivateKey({ urn: "urn:test:test" }, Algs.RS256, keyPairRS256.privateKey)
+
+    await expect(verifyTokenWithPublicKey(token, null)).rejects.toThrow(c.INVALID_PUBLIC_KEY_FORMAT)
+})
+
+it("throws when jwks endpoint does not return ok", async () => {
+    const keyPairRS256 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RS256,
+        keySize: 2048,
+    })
+    const token = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        Algs.RS256,
+        keyPairRS256.privateKey,
+        {
+            kid: keyPairRS256.kid,
+        },
+    )
+
+    fetchMock.mockIf("https://as.example.com/bad-jwks", () => ({
+        status: 500,
+        body: "error",
+    }))
+
+    await expect(
+        verifyTokenWithPublicKey(token, null, {
+            jwksUri: "https://as.example.com/bad-jwks",
+        }),
+    ).rejects.toThrow("Expected 200 OK from the JSON Web Key Set HTTP response")
 })
 
 it("verifies token with public key - ES512", async () => {
