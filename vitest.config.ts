@@ -9,6 +9,7 @@ export default defineConfig({
         testTimeout: 25000,
         setupFiles: ["./vitest.setup.ts"],
         coverage: {
+            all: false,
             provider: "v8",
             reporter: ["text", "html", "json-summary"],
             exclude: [
