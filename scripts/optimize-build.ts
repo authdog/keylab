@@ -3,10 +3,38 @@ import { join } from "node:path"
 import { gzipSync } from "node:zlib"
 import { minify, type MinifyOptions } from "terser"
 
-const distDir = "dist"
-const files = ["index.js", "index.cjs"]
+export const distDir = "dist"
+export const files = ["index.js", "index.cjs"]
 
-const getErrorMessage = (error: unknown) => {
+interface StatsLike {
+    size: number
+}
+
+interface MinifyResult {
+    code?: string | null
+}
+
+export interface OptimizeBuildDependencies {
+    readFileSync: typeof readFileSync
+    statSync: (path: string) => StatsLike
+    writeFileSync: typeof writeFileSync
+    gzipSync: typeof gzipSync
+    minify: (code: string, options: MinifyOptions) => Promise<MinifyResult>
+    log: (...args: unknown[]) => void
+    error: (...args: unknown[]) => void
+}
+
+const defaultDependencies: OptimizeBuildDependencies = {
+    readFileSync,
+    statSync,
+    writeFileSync,
+    gzipSync,
+    minify,
+    log: console.log,
+    error: console.error,
+}
+
+export const getErrorMessage = (error: unknown) => {
     if (error instanceof Error) {
         return error.message
     }
@@ -14,7 +42,7 @@ const getErrorMessage = (error: unknown) => {
     return String(error)
 }
 
-const firstPassOptions = (filePath: string): MinifyOptions => ({
+export const firstPassOptions = (filePath: string): MinifyOptions => ({
     compress: {
         arguments: true,
         arrows: true,
@@ -111,7 +139,7 @@ const firstPassOptions = (filePath: string): MinifyOptions => ({
     toplevel: true,
 })
 
-const secondPassOptions = (filePath: string): MinifyOptions => ({
+export const secondPassOptions = (filePath: string): MinifyOptions => ({
     compress: {
         passes: 3,
         toplevel: true,
@@ -161,60 +189,68 @@ const secondPassOptions = (filePath: string): MinifyOptions => ({
     toplevel: true,
 })
 
-async function optimizeFile(filePath: string) {
+export async function optimizeFile(
+    filePath: string,
+    dependencies: OptimizeBuildDependencies = defaultDependencies,
+) {
     try {
         const fullPath = join(distDir, filePath)
-        const originalCode = readFileSync(fullPath, "utf8")
-        const originalSize = statSync(fullPath).size
+        const originalCode = dependencies.readFileSync(fullPath, "utf8")
+        const originalSize = dependencies.statSync(fullPath).size
 
-        const firstPass = await minify(originalCode, firstPassOptions(filePath))
+        const firstPass = await dependencies.minify(originalCode, firstPassOptions(filePath))
         if (!firstPass.code) {
-            console.error(`Error in first pass for ${filePath}: no output generated`)
+            dependencies.error(`Error in first pass for ${filePath}: no output generated`)
             return
         }
 
-        const result = await minify(firstPass.code, secondPassOptions(filePath))
+        const result = await dependencies.minify(firstPass.code, secondPassOptions(filePath))
         if (!result.code) {
-            console.error(`Error optimizing ${filePath}: no output generated`)
+            dependencies.error(`Error optimizing ${filePath}: no output generated`)
             return
         }
 
-        writeFileSync(fullPath, result.code)
-        const newSize = statSync(fullPath).size
+        dependencies.writeFileSync(fullPath, result.code)
+        const newSize = dependencies.statSync(fullPath).size
         const savings = (((originalSize - newSize) / originalSize) * 100).toFixed(1)
 
-        const originalGzipped = gzipSync(originalCode).length
-        const optimizedGzipped = gzipSync(result.code).length
+        const originalGzipped = dependencies.gzipSync(originalCode).length
+        const optimizedGzipped = dependencies.gzipSync(result.code).length
         const gzipSavings = (((originalGzipped - optimizedGzipped) / originalGzipped) * 100).toFixed(1)
 
-        console.log(`Optimized ${filePath}:`)
-        console.log(
+        dependencies.log(`Optimized ${filePath}:`)
+        dependencies.log(
             `  Original: ${(originalSize / 1024).toFixed(1)}KB (${(originalGzipped / 1024).toFixed(1)}KB gzipped)`,
         )
-        console.log(
+        dependencies.log(
             `  Optimized: ${(newSize / 1024).toFixed(1)}KB (${(optimizedGzipped / 1024).toFixed(1)}KB gzipped)`,
         )
-        console.log(`  Savings: ${savings}% (${gzipSavings}% gzipped)`)
+        dependencies.log(`  Savings: ${savings}% (${gzipSavings}% gzipped)`)
     } catch (error) {
-        console.error(`Error processing ${filePath}:`, getErrorMessage(error))
+        dependencies.error(`Error processing ${filePath}:`, getErrorMessage(error))
     }
 }
 
-async function main() {
-    console.log("Starting additional build optimization.\n")
+export async function optimizeBuild(
+    targetFiles: string[] = files,
+    dependencies: OptimizeBuildDependencies = defaultDependencies,
+) {
+    dependencies.log("Starting additional build optimization.\n")
 
-    for (const file of files) {
+    for (const file of targetFiles) {
         try {
-            await optimizeFile(file)
+            await optimizeFile(file, dependencies)
         } catch (error) {
-            console.log(`Skipping ${file} (not found or error):`, getErrorMessage(error))
+            dependencies.log(`Skipping ${file} (not found or error):`, getErrorMessage(error))
         }
     }
 
-    console.log("\nBuild optimization complete.")
+    dependencies.log("\nBuild optimization complete.")
 }
 
-void main().catch((error) => {
-    console.error(getErrorMessage(error))
-    process.exitCode = 1
-})
+if (import.meta.main) {
+    void optimizeBuild().catch((error) => {
+        console.error(getErrorMessage(error))
+        process.exitCode = 1
+    })
+}

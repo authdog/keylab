@@ -14,7 +14,6 @@ export default defineConfig({
             exclude: [
                 "coverage/**",
                 "dist/**",
-                "scripts/**",
                 "src/index.ts",
                 "src/errors/index.ts",
                 "src/vendors/index.ts",
