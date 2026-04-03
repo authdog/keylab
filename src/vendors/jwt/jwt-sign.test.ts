@@ -5,9 +5,14 @@ import { JwtAlgorithmsEnum as Algs, JwtParts } from "../../enums"
 import { strToUint8Array, uint8ArrayToStr } from "./utils"
 import { generateKeyPair, randomBytes } from "crypto"
 import { IKeyPair } from "./interfaces"
-import { expect, it } from "vitest"
+import { afterEach, expect, it, vi } from "vitest"
 
 const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined"
+
+afterEach(() => {
+    vi.resetModules()
+    vi.unmock("jose")
+})
 
 it("jwt sign with payload fields - HS256", async () => {
     const payload = {
@@ -423,6 +428,23 @@ it("signs payload with pkcs8 private key - Ed25519", async () => {
     expect(signedPayloadEd25519).toBeTruthy()
 })
 
+it("signs payload with jwk private key - Ed25519 alias", async () => {
+    const keyPairEd25519 = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.Ed25519,
+        keySize: 256,
+    })
+
+    const signedPayloadEd25519 = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        Algs.Ed25519,
+        keyPairEd25519.privateKey,
+    )
+
+    const { alg } = parseJwt(signedPayloadEd25519, JwtParts.HEADER)
+    expect(alg).toEqual(Algs.EdDSA)
+})
+
 it("signs payload with pkcs8 private key - Ed448", async () => {
     const keyPairEd448 = await getKeyPair({
         keyFormat: isBunRuntime ? "jwk" : "pem",
@@ -460,6 +482,16 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
         },
     )
     expect(signedPayloadEs256k).toBeTruthy()
+})
+
+it("throws when a non-HS string key is not valid PKCS8", async () => {
+    await expect(
+        signJwtWithPrivateKey(
+            { urn: "urn:test:test" },
+            Algs.RS256,
+            "definitely-not-a-private-key",
+        ),
+    ).rejects.toBeTruthy()
 })
 
 it("generates key pairs for all supported algorithms", async () => {
@@ -507,6 +539,146 @@ it("generates key pairs for all supported algorithms", async () => {
         ],
         { keySize: 256, expectPublic: false },
     )
+})
+
+it("generates symmetric keys with default sizes and metadata", async () => {
+    const hs512Pem = await getKeyPair({
+        algorithmIdentifier: Algs.HS512,
+        keyFormat: "pem",
+    } as any)
+    expect(hs512Pem.privateKey).toEqual(hs512Pem.publicKey)
+    expect(hs512Pem.privateKey).toHaveLength(128)
+
+    const a128KwJwk = await getKeyPair({
+        algorithmIdentifier: Algs.A128KW,
+        keyFormat: "jwk",
+    } as any)
+    expect(a128KwJwk.privateKey).toMatchObject({
+        kty: "oct",
+        use: "enc",
+        alg: Algs.A128KW,
+    })
+
+    const a192KwJwk = await getKeyPair({
+        algorithmIdentifier: Algs.A192KW,
+        keyFormat: "jwk",
+    } as any)
+    expect(a192KwJwk.privateKey).toMatchObject({
+        kty: "oct",
+        use: "enc",
+        alg: Algs.A192KW,
+    })
+
+    const a256KwJwk = await getKeyPair({
+        algorithmIdentifier: Algs.A256KW,
+        keyFormat: "jwk",
+    } as any)
+    expect(a256KwJwk.privateKey).toMatchObject({
+        kty: "oct",
+        use: "enc",
+        alg: Algs.A256KW,
+    })
+
+    const dirPem = await getKeyPair({
+        algorithmIdentifier: Algs.DIR,
+        keyFormat: "pem",
+    } as any)
+    expect(dirPem.privateKey).toEqual(dirPem.publicKey)
+    expect(dirPem.privateKey).toHaveLength(64)
+})
+
+it("throws on unsupported key generation algorithm", async () => {
+    await expect(
+        getKeyPair({
+            algorithmIdentifier: "unsupported" as any,
+            keyFormat: "jwk",
+        } as any),
+    ).rejects.toThrow("Unsupported algorithm unsupported")
+})
+
+it("falls back to node crypto when jose key generation fails", async () => {
+    vi.doMock("jose", async () => {
+        const actual = await vi.importActual<typeof import("jose")>("jose")
+        return {
+            ...actual,
+            generateKeyPair: vi.fn(async () => {
+                throw new Error("mock jose failure")
+            }),
+        }
+    })
+
+    const { getKeyPair: getKeyPairWithFallback } = await import("./jwt-sign")
+
+    const rsaKeyPair = await getKeyPairWithFallback({
+        algorithmIdentifier: Algs.RS256,
+        keyFormat: "pem",
+        keySize: 2048,
+    })
+    expect(rsaKeyPair.privateKey).toContain("PRIVATE KEY")
+
+    const es256KeyPair = await getKeyPairWithFallback({
+        algorithmIdentifier: Algs.ES256,
+        keyFormat: "jwk",
+        keySize: 256,
+    })
+    expect(es256KeyPair.publicKey).toMatchObject({
+        kty: "EC",
+        crv: "P-256",
+    })
+
+    const es384KeyPair = await getKeyPairWithFallback({
+        algorithmIdentifier: Algs.ES384,
+        keyFormat: "jwk",
+        keySize: 384,
+    })
+    expect(es384KeyPair.publicKey).toMatchObject({
+        kty: "EC",
+        crv: "P-384",
+    })
+
+    const es512KeyPair = await getKeyPairWithFallback({
+        algorithmIdentifier: Algs.ES512,
+        keyFormat: "jwk",
+        keySize: 521,
+    })
+    expect(es512KeyPair.publicKey).toMatchObject({
+        kty: "EC",
+        crv: "P-521",
+    })
+
+    const ecdhKeyPair = await getKeyPairWithFallback({
+        algorithmIdentifier: Algs.ECDH_ES,
+        keyFormat: "jwk",
+        keySize: 256,
+    })
+    expect(ecdhKeyPair.publicKey).toMatchObject({
+        kty: "EC",
+        crv: "P-256",
+    })
+
+    const ed25519KeyPair = await getKeyPairWithFallback({
+        algorithmIdentifier: Algs.Ed25519,
+        keyFormat: "jwk",
+        keySize: 256,
+    })
+    expect(ed25519KeyPair.publicKey).toMatchObject({
+        kty: "OKP",
+        crv: "Ed25519",
+        alg: Algs.EdDSA,
+        use: "sig",
+    })
+
+    const x25519KeyPair = await getKeyPairWithFallback({
+        algorithmIdentifier: Algs.X25519,
+        keyFormat: "jwk",
+        keySize: 256,
+    })
+    expect(x25519KeyPair.publicKey).toMatchObject({
+        kty: "OKP",
+        crv: "X25519",
+        alg: Algs.X25519,
+        use: "enc",
+    })
 })
 
 it("experiment algorithm", async () => {
