@@ -365,7 +365,11 @@ it("throws for invalid public key input", async () => {
         algorithmIdentifier: Algs.RS256,
         keySize: 2048,
     })
-    const token = await signJwtWithPrivateKey({ urn: "urn:test:test" }, Algs.RS256, keyPairRS256.privateKey)
+    const token = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        Algs.RS256,
+        keyPairRS256.privateKey,
+    )
 
     await expect(verifyTokenWithPublicKey(token, null)).rejects.toThrow(c.INVALID_PUBLIC_KEY_FORMAT)
 })

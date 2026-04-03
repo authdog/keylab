@@ -493,7 +493,11 @@ it("throws when validation credentials are missing", async () => {
         keyFormat: "jwk",
         keySize: 2048,
     })
-    const token = await signJwtWithPrivateKey({ urn: "urn:test:test" }, Algs.RS256, keyPairRS256.privateKey)
+    const token = await signJwtWithPrivateKey(
+        { urn: "urn:test:test" },
+        Algs.RS256,
+        keyPairRS256.privateKey,
+    )
 
     await expect(checkTokenValidness(token, {} as any)).rejects.toThrow(
         c.JWT_MISSING_VALIDATION_CREDENTIALS,
@@ -615,7 +619,9 @@ it("rejects non-supported algorithms in checkTokenValidness", async () => {
     const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url")
     const token = `${encode({ alg: "NOPE", typ: "JWT" })}.${encode({ sub: "123" })}.sig`
 
-    await expect(checkTokenValidness(token, {} as any)).rejects.toThrow(c.JWT_NON_SUPPORTED_ALGORITHM)
+    await expect(checkTokenValidness(token, {} as any)).rejects.toThrow(
+        c.JWT_NON_SUPPORTED_ALGORITHM,
+    )
 })
 
 it("throws an error while verifying token with public uri whose key is missing from set", async () => {

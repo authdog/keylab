@@ -22,11 +22,7 @@ const getColor = (value) => {
 }
 
 const escapeXml = (value) =>
-    value
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
+    value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 
 const measureWidth = (text) => Math.max(44, text.length * 7 + 10)
 

@@ -487,11 +487,7 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
 
 it("throws when a non-HS string key is not valid PKCS8", async () => {
     await expect(
-        signJwtWithPrivateKey(
-            { urn: "urn:test:test" },
-            Algs.RS256,
-            "definitely-not-a-private-key",
-        ),
+        signJwtWithPrivateKey({ urn: "urn:test:test" }, Algs.RS256, "definitely-not-a-private-key"),
     ).rejects.toBeTruthy()
 })
 
