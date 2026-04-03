@@ -74,7 +74,7 @@ jobs:
       - name: Generate coverage badge
         id: coverage-badge
         run: |
-          COVERAGE=$(node scripts/generate-coverage-badge.js)
+          COVERAGE=$(bun scripts/generate-coverage-badge.ts)
           echo "coverage=$COVERAGE" >> "$GITHUB_OUTPUT"
           echo "## Coverage" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"

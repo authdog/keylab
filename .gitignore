@@ -127,7 +127,6 @@ build
 pkg/
 
 *.js
-!scripts/generate-coverage-badge.js
 llm-docs/.vitepress/cache
 llm-docs/.vitepress/dist
 public

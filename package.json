@@ -21,7 +21,7 @@
     "scripts": {
         "test": "vitest run",
         "test-with-coverage": "vitest run --coverage",
-        "coverage:badge": "node scripts/generate-coverage-badge.js",
+        "coverage:badge": "bun scripts/generate-coverage-badge.ts",
         "format": "biome format --write .",
         "lint": "biome check .",
         "pretty": "bun run format",
@@ -32,7 +32,7 @@
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
         "lib:build:clean": "rm -rf dist",
         "build": "bun run lib:build:clean && tsup",
-        "build:optimize": "node scripts/optimize-build.js",
+        "build:optimize": "bun scripts/optimize-build.ts",
         "lib:publish": "bun run build && bun publish",
         "version": "bun run build"
     },

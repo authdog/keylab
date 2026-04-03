@@ -1,19 +1,25 @@
-#!/usr/bin/env node
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname, resolve } from "node:path"
 
-import { mkdirSync, readFileSync, writeFileSync } from "fs"
-import { dirname, resolve } from "path"
+interface CoverageSummary {
+    total?: {
+        lines?: {
+            pct?: number
+        }
+    }
+}
 
 const coverageSummaryPath = resolve("coverage/coverage-summary.json")
 const badgePath = resolve("badges/coverage.svg")
 
-const summary = JSON.parse(readFileSync(coverageSummaryPath, "utf8"))
-const coverage = Number(summary?.total?.lines?.pct ?? 0)
+const summary = JSON.parse(readFileSync(coverageSummaryPath, "utf8")) as CoverageSummary
+const coverage = Number(summary.total?.lines?.pct ?? 0)
 const roundedCoverage = Math.round(coverage * 10) / 10
 const coverageLabel = Number.isInteger(roundedCoverage)
     ? `${roundedCoverage.toFixed(0)}%`
     : `${roundedCoverage.toFixed(1)}%`
 
-const getColor = (value) => {
+const getColor = (value: number) => {
     if (value >= 90) return "#16a34a"
     if (value >= 80) return "#65a30d"
     if (value >= 70) return "#ca8a04"
@@ -21,10 +27,10 @@ const getColor = (value) => {
     return "#dc2626"
 }
 
-const escapeXml = (value) =>
+const escapeXml = (value: string) =>
     value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 
-const measureWidth = (text) => Math.max(44, text.length * 7 + 10)
+const measureWidth = (text: string) => Math.max(44, text.length * 7 + 10)
 
 const label = "coverage"
 const leftWidth = measureWidth(label)
