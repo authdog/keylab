@@ -7,6 +7,8 @@ import { generateKeyPair, randomBytes } from "crypto";
 import { IKeyPair } from "./interfaces";
 import { expect, it } from "vitest";
 
+const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined";
+
 it("jwt sign with payload fields - HS256", async () => {
     const payload = {
         sub: "12345",
@@ -441,7 +443,7 @@ it("signs payload with pkcs8 private key - Ed25519", async () => {
 
 it("signs payload with pkcs8 private key - Ed448", async () => {
     const keyPairEd448 = await getKeyPair({
-        keyFormat: "pem",
+        keyFormat: isBunRuntime ? "jwk" : "pem",
         algorithmIdentifier: Algs.Ed448,
         keySize: 4096
     });
@@ -460,7 +462,7 @@ it("signs payload with pkcs8 private key - Ed448", async () => {
 
 it("signs payload with pkcs8 private key - ES256k", async () => {
     const keyPairES256k = await getKeyPair({
-        keyFormat: "pem",
+        keyFormat: isBunRuntime ? "jwk" : "pem",
         algorithmIdentifier: Algs.ES256K,
         keySize: 4096
     });
@@ -533,10 +535,16 @@ it("generates key pairs for all supported algorithms", async () => {
 });
 
 it("experiment algorithm", async () => {
-    const generateKey = async ({ alg }): Promise<IKeyPair> => {
+    const generateKey = async ({
+        alg,
+        fallbackAlg
+    }: {
+        alg: string;
+        fallbackAlg: Algs;
+    }): Promise<IKeyPair> => {
         return new Promise((resolve: Function, reject: Function) => {
             generateKeyPair(
-                alg,
+                alg as any,
                 {
                     modulusLength: 530,
                     publicKeyEncoding: {
@@ -558,15 +566,42 @@ it("experiment algorithm", async () => {
         });
     };
 
-    const keyEd25519 = await generateKey({ alg: Algs.Ed25519.toLowerCase() });
+    const generateKeyWithFallback = async (args: {
+        alg: string;
+        fallbackAlg: Algs;
+    }): Promise<IKeyPair> => {
+        try {
+            return await generateKey(args);
+        } catch {
+            return await getKeyPair({
+                algorithmIdentifier: args.fallbackAlg,
+                keySize: 256,
+                keyFormat: "jwk"
+            });
+        }
+    };
+
+    const keyEd25519 = await generateKeyWithFallback({
+        alg: Algs.Ed25519.toLowerCase(),
+        fallbackAlg: Algs.Ed25519
+    });
     expect(keyEd25519?.privateKey).toBeTruthy();
 
-    const keyEd448 = await generateKey({ alg: "ed448" });
+    const keyEd448 = await generateKeyWithFallback({
+        alg: "ed448",
+        fallbackAlg: Algs.Ed448
+    });
     expect(keyEd448?.privateKey).toBeTruthy();
 
-    const keyX25519 = await generateKey({ alg: "x25519" });
+    const keyX25519 = await generateKeyWithFallback({
+        alg: "x25519",
+        fallbackAlg: Algs.X25519
+    });
     expect(keyX25519?.privateKey).toBeTruthy();
 
-    const keyX448 = await generateKey({ alg: "x448" });
+    const keyX448 = await generateKeyWithFallback({
+        alg: "x448",
+        fallbackAlg: Algs.X448
+    });
     expect(keyX448?.privateKey).toBeTruthy();
 });

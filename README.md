@@ -14,9 +14,9 @@ Keylab is a Node.js/TypeScript library designed to simplify the creation and val
 
 `yarn add keylab`
 
-### with pnpm
+### with bun
 
-`pnpm add keylab`
+`bun add keylab`
 
 ### with npm
 
@@ -32,6 +32,12 @@ Keylab is a Node.js/TypeScript library designed to simplify the creation and val
 - 📋 **JWKS Integration**: Built-in support for JWKS endpoints and verification
 - ⚡ **Zero Dependencies**: Lightweight with minimal external dependencies
 - 🔒 **Cryptographically Secure**: Built on industry-standard jose library
+
+## Runtime Compatibility
+
+Keylab now uses WebCrypto-friendly `jose` flows for standard JOSE algorithms so the package can run in Node.js, Cloudflare Workers, and browsers without importing Node-only crypto modules at load time.
+
+For algorithms that modern `jose` no longer implements, namely `ES256K`, `Ed448`, and `X448`, keylab uses a portable fallback layer. In non-Node runtimes, prefer JWK input and output for those algorithms. PEM for those curves still requires a Node.js runtime.
 
 ## TypeScript Support
 
@@ -162,6 +168,11 @@ Keylab exports all TypeScript interfaces and types for comprehensive type safety
 
 ## Changelog
 
+- 0.1.36:
+  - Switch the codebase from `pnpm` to Bun, including lockfile, CI, and local scripts
+  - Upgrade `jose` to `6.2.2` and add portable curve support for `ES256K`, `Ed448`, and `X448`
+  - Remove Node-only crypto assumptions at module load so keylab works in Node.js, Cloudflare Workers, modern browsers, and Bun
+  - Add Bun-compatible key generation fallbacks and runtime-aware tests for unsupported native OpenSSL algorithms
 - 0.1.34: **Major Type Export Release**
   - Comprehensive TypeScript type exports for all interfaces and functions
   - Fix dynamic require error for crypto module (bundler compatibility)

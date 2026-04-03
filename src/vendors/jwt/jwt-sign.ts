@@ -1,14 +1,315 @@
-/* global window crypto */
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums";
-import { importPKCS8, importJWK, SignJWT, JWTHeaderParameters } from "jose";
+import type { KeyObject } from "crypto";
+import {
+    exportJWK,
+    exportPKCS8,
+    exportSPKI,
+    generateKeyPair as generateJoseKeyPair,
+    importJWK,
+    importPKCS8,
+    JWTHeaderParameters,
+    SignJWT
+} from "jose";
 import { IGetKeyPair, IKeyPair } from "./interfaces";
-import * as c from "../../constants";
-import { isNodeJs, strToUint8Array } from "./utils";
-import { createSign, createPrivateKey, KeyObject, sign, generateKeyPairSync, randomBytes } from "crypto";
+import {
+    bytesToBase64Url,
+    bytesToHex,
+    getRandomBytes,
+    normalizeJwk,
+    strToUint8Array
+} from "./utils";
+import {
+    createPortableKeyPair,
+    isPortableAlgorithm,
+    needsPortableEdDsa,
+    signPortableJwt
+} from "./portable-algorithms";
 
 interface ISignJwtOpts {
     kid?: string;
 }
+
+const normalizedJwtAlg = (alg: Algs) =>
+    alg === Algs.Ed25519 || alg === Algs.Ed448 ? Algs.EdDSA : alg;
+
+const getJwkUse = (algorithmIdentifier: Algs) => {
+    if (
+        [
+            Algs.RSA_OAEP,
+            Algs.RSA_OAEP_256,
+            Algs.RSA_OAEP_384,
+            Algs.RSA_OAEP_512,
+            Algs.RSA1_5,
+            Algs.ECDH_ES,
+            Algs.ECDH_ES_A128KW,
+            Algs.ECDH_ES_A192KW,
+            Algs.ECDH_ES_A256KW,
+            Algs.X25519,
+            Algs.X448,
+            Algs.A128KW,
+            Algs.A192KW,
+            Algs.A256KW,
+            Algs.DIR,
+            Algs.A128GCMKW,
+            Algs.A192GCMKW,
+            Algs.A256GCMKW,
+            Algs.PBES2_HS256_A128KW,
+            Algs.PBES2_HS384_A192KW,
+            Algs.PBES2_HS512_A256KW
+        ].includes(algorithmIdentifier)
+    ) {
+        return "enc";
+    }
+
+    return "sig";
+};
+
+const getJoseImportAlgorithm = (alg: Algs) => {
+    switch (alg) {
+        case Algs.Ed25519:
+            return Algs.EdDSA;
+        case Algs.RSAPSS:
+        case Algs.RSA_PSS:
+            return Algs.PS256;
+        case Algs.RSA1_5:
+            return Algs.RSA_OAEP;
+        case Algs.X25519:
+            return Algs.ECDH_ES;
+        default:
+            return alg;
+    }
+};
+
+const getJoseKeyGenerationConfig = (algorithmIdentifier: Algs, keySize?: number) => {
+    switch (algorithmIdentifier) {
+        case Algs.RS256:
+        case Algs.RS384:
+        case Algs.RS512:
+        case Algs.PS256:
+        case Algs.PS384:
+        case Algs.PS512:
+        case Algs.RSA_OAEP:
+        case Algs.RSA_OAEP_256:
+        case Algs.RSA_OAEP_384:
+        case Algs.RSA_OAEP_512:
+            return {
+                alg: algorithmIdentifier,
+                options: {
+                    extractable: true,
+                    modulusLength: keySize || 2048
+                }
+            };
+        case Algs.RSAPSS:
+        case Algs.RSA_PSS:
+            return {
+                alg: Algs.PS256,
+                options: {
+                    extractable: true,
+                    modulusLength: keySize || 2048
+                }
+            };
+        case Algs.RSA1_5:
+            return {
+                alg: Algs.RSA_OAEP,
+                options: {
+                    extractable: true,
+                    modulusLength: keySize || 2048
+                }
+            };
+        case Algs.ES256:
+        case Algs.ES384:
+        case Algs.ES512:
+            return {
+                alg: algorithmIdentifier,
+                options: {
+                    extractable: true
+                }
+            };
+        case Algs.EdDSA:
+        case Algs.Ed25519:
+            return {
+                alg: Algs.EdDSA,
+                options: {
+                    extractable: true,
+                    crv: "Ed25519"
+                }
+            };
+        case Algs.X25519:
+            return {
+                alg: Algs.ECDH_ES,
+                options: {
+                    extractable: true,
+                    crv: "X25519"
+                }
+            };
+        case Algs.ECDH_ES:
+        case Algs.ECDH_ES_A128KW:
+        case Algs.ECDH_ES_A192KW:
+        case Algs.ECDH_ES_A256KW:
+            return {
+                alg: Algs.ECDH_ES,
+                options: {
+                    extractable: true
+                }
+            };
+        default:
+            return null;
+    }
+};
+
+const getNodeKeyGenerationConfig = (algorithmIdentifier: Algs, keySize?: number) => {
+    switch (algorithmIdentifier) {
+        case Algs.RS256:
+        case Algs.RS384:
+        case Algs.RS512:
+        case Algs.PS256:
+        case Algs.PS384:
+        case Algs.PS512:
+        case Algs.RSAPSS:
+        case Algs.RSA_PSS:
+        case Algs.RSA_OAEP:
+        case Algs.RSA_OAEP_256:
+        case Algs.RSA_OAEP_384:
+        case Algs.RSA_OAEP_512:
+        case Algs.RSA1_5:
+            return {
+                type: "rsa",
+                options: {
+                    modulusLength: keySize || 2048
+                }
+            };
+        case Algs.ES256:
+            return {
+                type: "ec",
+                options: {
+                    namedCurve: "prime256v1"
+                }
+            };
+        case Algs.ES384:
+            return {
+                type: "ec",
+                options: {
+                    namedCurve: "secp384r1"
+                }
+            };
+        case Algs.ES512:
+            return {
+                type: "ec",
+                options: {
+                    namedCurve: "secp521r1"
+                }
+            };
+        case Algs.ECDH_ES:
+        case Algs.ECDH_ES_A128KW:
+        case Algs.ECDH_ES_A192KW:
+        case Algs.ECDH_ES_A256KW:
+            return {
+                type: "ec",
+                options: {
+                    namedCurve: "prime256v1"
+                }
+            };
+        case Algs.EdDSA:
+        case Algs.Ed25519:
+            return {
+                type: "ed25519",
+                options: {}
+            };
+        case Algs.X25519:
+            return {
+                type: "x25519",
+                options: {}
+            };
+        default:
+            return null;
+    }
+};
+
+const getKeyPairWithNodeCrypto = async (
+    algorithmIdentifier: Algs,
+    keyFormat: "pem" | "jwk",
+    keySize?: number
+): Promise<IKeyPair | null> => {
+    const nodeConfig = getNodeKeyGenerationConfig(algorithmIdentifier, keySize);
+    if (!nodeConfig) {
+        return null;
+    }
+
+    const crypto = await import("crypto");
+    const { publicKey, privateKey } = crypto.generateKeyPairSync(
+        nodeConfig.type as any,
+        nodeConfig.options as any
+    ) as unknown as {
+        publicKey: KeyObject;
+        privateKey: KeyObject;
+    };
+    const kid = bytesToHex(getRandomBytes(16));
+
+    if (keyFormat === "pem") {
+        return {
+            publicKey: publicKey.export({
+                format: "pem",
+                type: "spki"
+            }) as any,
+            privateKey: privateKey.export({
+                format: "pem",
+                type: "pkcs8"
+            }) as any,
+            kid
+        };
+    }
+
+    const metadata = createKeyMetadata(algorithmIdentifier, kid);
+    return {
+        publicKey: {
+            ...(publicKey.export({
+                format: "jwk"
+            }) as any),
+            ...metadata
+        } as any,
+        privateKey: {
+            ...(privateKey.export({
+                format: "jwk"
+            }) as any),
+            ...metadata
+        } as any,
+        kid
+    };
+};
+
+const createKeyMetadata = (algorithmIdentifier: Algs, kid: string) => ({
+    kid,
+    use: getJwkUse(algorithmIdentifier),
+    alg: normalizedJwtAlg(algorithmIdentifier)
+});
+
+const getSymmetricKeySize = (algorithmIdentifier: Algs, keySize?: number) => {
+    if (keySize) {
+        return Math.max(Math.floor(keySize / 8), 16);
+    }
+
+    switch (algorithmIdentifier) {
+        case Algs.HS384:
+            return 48;
+        case Algs.HS512:
+            return 64;
+        case Algs.A192KW:
+        case Algs.A192GCMKW:
+        case Algs.PBES2_HS384_A192KW:
+            return 24;
+        case Algs.A256KW:
+        case Algs.A256GCMKW:
+        case Algs.PBES2_HS512_A256KW:
+            return 32;
+        case Algs.HS256:
+        case Algs.A128KW:
+        case Algs.A128GCMKW:
+        case Algs.PBES2_HS256_A128KW:
+            return 32;
+        default:
+            return 32;
+    }
+};
 
 export const signJwtWithPrivateKey = async (
     payload: any,
@@ -17,65 +318,37 @@ export const signJwtWithPrivateKey = async (
     opts: ISignJwtOpts = {},
     altOpts: any = {}
 ) => {
-    let privateKeyObj;
-    // Use JWA names for imports. For EdDSA curves always use 'EdDSA'.
-    let importAlg: any = alg === Algs.EdDSA || alg === (Algs as any).Ed25519 || alg === (Algs as any).Ed448 ? Algs.EdDSA : alg;
-
-    // Prefer Node fallback for EdDSA/ES256K to avoid subtle runtime support issues
-    if (alg === Algs.EdDSA || alg === (Algs as any).Ed25519 || alg === (Algs as any).Ed448 || alg === Algs.ES256K) {
-        const token = signWithNodeFallback(payload, alg, privateKey, opts, altOpts);
-        if (token) return token;
-    }
-
-    if (privateKey?.kty) {
-        // Some runtimes/JWKs include an incompatible "alg" parameter. Remove it to avoid v6 import errors.
-        const { alg: _algIgnored, crv, ...rest } = privateKey;
-        // Ensure correct crv casing for OKP and EC
-        const normalizedCrv = (() => {
-            const v = String(crv || "");
-            if (/^ed25519$/i.test(v)) return "Ed25519";
-            if (/^ed448$/i.test(v)) return "Ed448";
-            if (/^secp256k1$/i.test(v)) return "secp256k1";
-            if (/^p-256$/i.test(v)) return "P-256";
-            if (/^p-384$/i.test(v)) return "P-384";
-            if (/^p-521$/i.test(v)) return "P-521";
-            return crv;
-        })();
-        const sanitizedJwk = crv ? { ...rest, crv: normalizedCrv } : rest;
-        try {
-            privateKeyObj = await importJWK(sanitizedJwk, importAlg);
-        } catch (e) {
-            if (alg === Algs.ES256K || alg === Algs.EdDSA) {
-                // Node-crypto fallback
-                const token = signWithNodeFallback(payload, alg, privateKey, opts, altOpts);
-                if (token) return token;
-            }
-            throw e;
-        }
-    } else {
-        try {
-            privateKeyObj = await importPKCS8(privateKey, importAlg);
-        } catch (e) {
-            if ([Algs.HS256, Algs.HS384, Algs.HS512].includes(alg)) {
-                privateKeyObj = strToUint8Array(privateKey);
-            } else if (alg === Algs.ES256K || alg === Algs.EdDSA) {
-                // Node-crypto fallback for ES256K (not supported by WebCrypto in many runtimes)
-                const token = signWithNodeFallback(payload, alg, privateKey, opts, altOpts);
-                if (token) return token;
-                throw new Error(`Invalid private key for algorithm ${alg}`);
-            } else {
-                throw new Error(`Invalid private key for algorithm ${alg}`);
-            }
-        }
-    }
-
-    let protectedHeaders: JWTHeaderParameters = {
-        alg,
+    const protectedHeaders: JWTHeaderParameters = {
+        alg: normalizedJwtAlg(alg),
         type: JwtKeyTypes?.JWT
     };
 
     if (altOpts?.keyId) {
-        protectedHeaders = { ...protectedHeaders, kid: altOpts.keyId };
+        protectedHeaders.kid = altOpts.keyId;
+    }
+
+    if (isPortableAlgorithm(alg) || (await needsPortableEdDsa(alg, privateKey))) {
+        return signPortableJwt({
+            payload: { ...payload, ...opts },
+            alg,
+            privateKey,
+            protectedHeaders
+        });
+    }
+
+    let privateKeyObj;
+    if (privateKey?.kty) {
+        privateKeyObj = await importJWK(normalizeJwk(privateKey), getJoseImportAlgorithm(alg));
+    } else {
+        try {
+            privateKeyObj = await importPKCS8(privateKey, getJoseImportAlgorithm(alg));
+        } catch (error) {
+            if ([Algs.HS256, Algs.HS384, Algs.HS512].includes(alg)) {
+                privateKeyObj = strToUint8Array(privateKey);
+            } else {
+                throw error;
+            }
+        }
     }
 
     return await new SignJWT({ ...payload, ...opts })
@@ -83,248 +356,100 @@ export const signJwtWithPrivateKey = async (
         .sign(privateKeyObj);
 };
 
-// --- Node-crypto fallback helpers (ES256K only) ---
-const b64url = (buf: Buffer) =>
-    buf
-        .toString("base64")
-        .replace(/=/g, "")
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_");
-
-const derToJoseConcat = (der: Buffer, size: number) => {
-    // Basic DER ECDSA signature decoding
-    // DER: 0x30 len 0x02 rLen r 0x02 sLen s
-    let offset = 0;
-    if (der[offset++] !== 0x30) throw new Error("Invalid DER signature");
-    offset++; // skip sequence length
-    if (der[offset++] !== 0x02) throw new Error("Invalid DER signature");
-    const rLen = der[offset++];
-    let r = der.subarray(offset, offset + rLen);
-    offset += rLen;
-    if (der[offset++] !== 0x02) throw new Error("Invalid DER signature");
-    const sLen = der[offset++];
-    let s = der.subarray(offset, offset + sLen);
-
-    // Remove leading zeros and pad to size
-    const strip = (b: Buffer) => {
-        while (b.length > size && b[0] === 0x00) b = b.subarray(1);
-        if (b.length > size) throw new Error("Invalid r/s length");
-        return b;
-    };
-    r = strip(r);
-    s = strip(s);
-
-    const rPadded = Buffer.concat([Buffer.alloc(size - r.length, 0), r]);
-    const sPadded = Buffer.concat([Buffer.alloc(size - s.length, 0), s]);
-    return Buffer.concat([rPadded, sPadded]);
-};
-
-const signWithNodeFallback = (
-    payload: any,
-    alg: Algs,
-    privateKey: string | any,
-    opts: ISignJwtOpts,
-    altOpts: any
-): string | null => {
-    const supportsES256K = alg === Algs.ES256K;
-    const supportsEdDSA = alg === Algs.EdDSA || (Algs as any).Ed25519 === alg || (Algs as any).Ed448 === alg;
-    if (!supportsES256K && !supportsEdDSA) return null;
-
-    // Ensure we have a PEM PKCS8 or JWK private key
-    let pemKey: string | undefined;
-    let keyObj: KeyObject | undefined;
-    if (typeof privateKey === "string") {
-        try {
-            keyObj = createPrivateKey(privateKey);
-            pemKey = privateKey;
-        } catch (_) {
-            // not a PEM string we can load
-        }
-    } else if (privateKey?.kty) {
-        try {
-            keyObj = createPrivateKey({ key: privateKey, format: "jwk" as any });
-            pemKey = keyObj.export({ format: "pem", type: "pkcs8" }) as unknown as string;
-        } catch (e) {
-            return null;
-        }
-    } else {
-        return null;
-    }
-
-    // Build header
-    const header: any = { alg: supportsES256K ? Algs.ES256K : Algs.EdDSA, type: JwtKeyTypes?.JWT };
-    if (altOpts?.keyId) header.kid = altOpts.keyId;
-
-    const headerB64 = b64url(Buffer.from(JSON.stringify(header)));
-    const payloadB64 = b64url(Buffer.from(JSON.stringify({ ...payload, ...opts })));
-    const signingInput = `${headerB64}.${payloadB64}`;
-
-    let sigB64: string;
-    if (supportsES256K) {
-        if (!pemKey) return null;
-        const signer = createSign("SHA256");
-        signer.update(signingInput);
-        signer.end();
-        const derSig = signer.sign({ key: pemKey, dsaEncoding: "der" });
-        // secp256k1 size is 32 bytes for r and s
-        const joseSig = derToJoseConcat(derSig, 32);
-        sigB64 = b64url(joseSig);
-    } else {
-        try {
-            const rawSig: Buffer = sign(null, Buffer.from(signingInput), keyObj ?? pemKey);
-            sigB64 = b64url(rawSig);
-        } catch {
-            return null;
-        }
-    }
-    return `${signingInput}.${sigB64}`;
-};
-
-const algorithmsDict = [
-    {
-        algType: JwtKeyTypes.RSA,
-        algIds: Object.values([
-            Algs?.RS256,
-            Algs?.RS384,
-            Algs?.RS512,
-            Algs?.RSAPSS,
-            Algs?.RSA_PSS,
-            Algs?.PS256,
-            Algs?.PS384,
-            Algs?.PS512,
-            Algs?.RSA_OAEP,
-            Algs?.RSA_OAEP_256,
-            Algs?.RSA_OAEP_384,
-            Algs?.RSA_OAEP_512,
-            Algs?.RSA1_5
-        ])
-    },
-    {
-        algType: JwtKeyTypes.EC,
-        algIds: Object.values([
-            Algs?.ES256,
-            Algs?.ES384,
-            Algs?.ES512,
-            Algs?.ES256K,
-            Algs?.ECDH_ES,
-            Algs?.ECDH_ES_A128KW,
-            Algs?.ECDH_ES_A192KW,
-            Algs?.ECDH_ES_A256KW
-        ])
-    },
-    {
-        algType: JwtKeyTypes.OCTET,
-        algIds: Object.values([
-            Algs?.HS256,
-            Algs?.HS384,
-            Algs?.HS512,
-            Algs?.A128KW,
-            Algs?.A192KW,
-            Algs?.A256KW,
-            Algs?.DIR,
-            Algs?.A128GCMKW,
-            Algs?.A192GCMKW,
-            Algs?.A256GCMKW,
-            Algs?.PBES2_HS256_A128KW,
-            Algs?.PBES2_HS384_A192KW,
-            Algs?.PBES2_HS512_A256KW
-        ])
-    },
-    {
-        algType: JwtKeyTypes.OKP,
-        algIds: Object.values([Algs?.EdDSA, Algs?.Ed25519, Algs?.Ed448, Algs?.X25519, Algs?.X448])
-    }
-];
-
 export const getKeyPair = async ({
     keyFormat = "jwk",
     algorithmIdentifier,
     keySize
 }: IGetKeyPair): Promise<IKeyPair> => {
-    return new Promise((resolve: Function, reject: Function) => {
-        let algType: any;
+    if (isPortableAlgorithm(algorithmIdentifier)) {
+        return createPortableKeyPair(algorithmIdentifier, keyFormat) as Promise<IKeyPair>;
+    }
 
-        algorithmsDict.map((el) => {
-            if (el.algIds.includes(algorithmIdentifier)) {
-                algType = el.algType;
-            }
-        });
-
-        const useCurve = algType === JwtKeyTypes.EC;
-
-        const IS_NODE = isNodeJs();
-        if (IS_NODE) {
-            if (algType === JwtKeyTypes.OCTET) {
-                const secret = randomBytes(keySize ? keySize / 8 : 32);
-                const kid = randomBytes(16).toString("hex");
-                return resolve({
-                    publicKey: secret.toString("hex"),
-                    privateKey: secret.toString("hex"),
-                    kid
-                });
-            }
-
-            // Map algorithm identifiers to Node.js crypto algorithm names
-            let algorithmForGenerate: string;
-            switch (algorithmIdentifier) {
-                case Algs.Ed448:
-                    algorithmForGenerate = "ed448";
-                    break;
-                case Algs.Ed25519:
-                case Algs.EdDSA:
-                    algorithmForGenerate = "ed25519";
-                    break;
-                case Algs.X25519:
-                    algorithmForGenerate = "x25519";
-                    break;
-                case Algs.X448:
-                    algorithmForGenerate = "x448";
-                    break;
-                case Algs.ES256:
-                case Algs.ES384:
-                case Algs.ES512:
-                case Algs.ES256K:
-                case Algs.ECDH_ES:
-                case Algs.ECDH_ES_A128KW:
-                case Algs.ECDH_ES_A192KW:
-                case Algs.ECDH_ES_A256KW:
-                    algorithmForGenerate = "ec";
-                    break;
-                case Algs.RS256:
-                case Algs.RS384:
-                case Algs.RS512:
-                case Algs.RSAPSS:
-                case Algs.PS256:
-                case Algs.PS384:
-                case Algs.PS512:
-                case Algs.RSA_OAEP:
-                case Algs.RSA_OAEP_256:
-                case Algs.RSA_OAEP_384:
-                case Algs.RSA_OAEP_512:
-                case Algs.RSA1_5:
-                    algorithmForGenerate = "rsa";
-                    break;
-                default:
-                    algorithmForGenerate = (algType ?? String(algorithmIdentifier).toLowerCase());
-            }
-
-            const { publicKey, privateKey } = generateKeyPairSync(algorithmForGenerate as any, {
-                namedCurve: useCurve
-                    ? c.namedCurves?.[algorithmIdentifier.toLowerCase()]
-                    : undefined,
-                modulusLength: keySize,
-                publicKeyEncoding: {
-                    ...c.publicKeyEncodingPem,
-                    format: keyFormat
-                },
-                privateKeyEncoding: {
-                    ...c.privateKeyEncodingPem,
-                    format: keyFormat
-                }
-            });
-
-            const kid = randomBytes(16).toString("hex");
-            return resolve({ publicKey, privateKey, kid });
+    if (
+        [
+            Algs.HS256,
+            Algs.HS384,
+            Algs.HS512,
+            Algs.A128KW,
+            Algs.A192KW,
+            Algs.A256KW,
+            Algs.DIR,
+            Algs.A128GCMKW,
+            Algs.A192GCMKW,
+            Algs.A256GCMKW,
+            Algs.PBES2_HS256_A128KW,
+            Algs.PBES2_HS384_A192KW,
+            Algs.PBES2_HS512_A256KW
+        ].includes(algorithmIdentifier)
+    ) {
+        const kid = bytesToHex(getRandomBytes(16));
+        if (keyFormat === "pem") {
+            const secret = bytesToHex(getRandomBytes(getSymmetricKeySize(algorithmIdentifier, keySize)));
+            return {
+                publicKey: secret as any,
+                privateKey: secret as any,
+                kid
+            };
         }
-    });
+
+        const secret = bytesToBase64Url(getRandomBytes(getSymmetricKeySize(algorithmIdentifier, keySize)));
+        const jwk = {
+            kty: JwtKeyTypes.OCTET,
+            k: secret,
+            ...createKeyMetadata(algorithmIdentifier, kid),
+        };
+
+        return {
+            publicKey: jwk as any,
+            privateKey: jwk as any,
+            kid
+        };
+    }
+
+    const joseConfig = getJoseKeyGenerationConfig(algorithmIdentifier, keySize);
+    if (!joseConfig) {
+        throw new Error(`Unsupported algorithm ${algorithmIdentifier}`);
+    }
+
+    let publicKey;
+    let privateKey;
+
+    try {
+        ({ publicKey, privateKey } = await generateJoseKeyPair(
+            joseConfig.alg,
+            joseConfig.options
+        ));
+    } catch (error) {
+        const fallbackKeyPair = await getKeyPairWithNodeCrypto(
+            algorithmIdentifier,
+            keyFormat,
+            keySize
+        );
+        if (fallbackKeyPair) {
+            return fallbackKeyPair;
+        }
+        throw error;
+    }
+    const kid = bytesToHex(getRandomBytes(16));
+
+    if (keyFormat === "pem") {
+        return {
+            publicKey: (await exportSPKI(publicKey)) as any,
+            privateKey: (await exportPKCS8(privateKey)) as any,
+            kid
+        };
+    }
+
+    const metadata = createKeyMetadata(algorithmIdentifier, kid);
+    return {
+        publicKey: {
+            ...(await exportJWK(publicKey)),
+            ...metadata
+        } as any,
+        privateKey: {
+            ...(await exportJWK(privateKey)),
+            ...metadata
+        } as any,
+        kid
+    };
 };

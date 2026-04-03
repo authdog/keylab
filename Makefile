@@ -1,12 +1,12 @@
 test:
-	pnpm test $(options)
+	bun run test $(options)
 
 test_with_coverage:
 	make test options="--coverage"
 
 deploy_lib:
-	pnpm lib:publish
+	bun run lib:publish
 
 # documentations
 deploy_docs:
-	pnpm docs:deploy
+	bun run docs:deploy

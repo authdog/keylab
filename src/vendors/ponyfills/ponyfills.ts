@@ -1,9 +1,14 @@
 import * as e from "../../errors";
 import * as c from "../../constants";
+import {
+    base64ToBytes,
+    binaryStringToBytes,
+    bytesToBase64,
+    bytesToBinaryString
+} from "../jwt/utils";
 
 export const isServer = (): boolean => {
-    // @ts-ignore
-    return !(typeof window !== "undefined" && window.document);
+    return typeof document === "undefined";
 };
 
 /**
@@ -17,18 +22,16 @@ export const IS_NODEJS = isServer();
  * @returns browserImplementation
  */
 export const getClientWindowMethod = (method: string) => {
-    let browserImplementation;
-    if (!IS_NODEJS) {
-        // @ts-ignore
-        browserImplementation = window[method];
-        if (browserImplementation) {
-            return browserImplementation;
-        } else {
-            throw new Error(c.GLOBAL_FUNCTION_NOT_IMPLEMENTED);
-        }
-    } else {
+    if (IS_NODEJS) {
         e.throwEnvironmentError();
     }
+
+    const browserImplementation = (globalThis as any)?.[method];
+    if (browserImplementation) {
+        return browserImplementation;
+    }
+
+    throw new Error(c.GLOBAL_FUNCTION_NOT_IMPLEMENTED);
 };
 
 /**
@@ -38,7 +41,7 @@ export const getClientWindowMethod = (method: string) => {
  * nodejs: returns buffer based `atob` implementation
  */
 export const atob = IS_NODEJS
-    ? (a: string) => Buffer.from(a, "base64").toString("binary")
+    ? (value: string) => bytesToBinaryString(base64ToBytes(value))
     : getClientWindowMethod("atob");
 
 /**
@@ -48,5 +51,5 @@ export const atob = IS_NODEJS
  * nodejs: returns buffer based btoa implementation
  */
 export const btoa = IS_NODEJS
-    ? (b: string) => Buffer.from(b).toString("base64")
+    ? (value: string) => bytesToBase64(binaryStringToBytes(value))
     : getClientWindowMethod("btoa");

@@ -11,7 +11,7 @@ import {
 import { signJwtWithPrivateKey } from "./jwt-sign";
 import { ITokenExtractedWithPubKey, verifyTokenWithPublicKey } from "../jwks";
 import { jwtVerify } from "jose";
-import { TextEncoder } from "util";
+import { base64UrlToBase64, base64UrlToUtf8 } from "./utils";
 
 /**
  *
@@ -261,19 +261,26 @@ export const parseJwt = (
             throw throwJwtError("unknown jwt part");
     }
 
-    var base64Url = token.split(".")[indexPart];
-    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const base64Url = token.split(".")[indexPart]?.trim();
+    if (!base64Url) {
+        throw new URIError(c.MALFORMED_URI);
+    }
 
-    var jsonPayload = decodeURIComponent(
-        atob(base64)
-            .split(c.EMPTY_STRING)
-            .map((c: string) => {
-                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-            })
-            .join(c.EMPTY_STRING)
-    );
+    try {
+        const base64 = base64UrlToBase64(base64Url);
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split(c.EMPTY_STRING)
+                .map((char: string) => {
+                    return "%" + ("00" + char.charCodeAt(0).toString(16)).slice(-2);
+                })
+                .join(c.EMPTY_STRING)
+        );
 
-    return JSON.parse(jsonPayload);
+        return JSON.parse(jsonPayload);
+    } catch {
+        throw new URIError(c.MALFORMED_URI);
+    }
 };
 
 export const createSignedJwt = async (
@@ -352,7 +359,7 @@ export const createSignedJwt = async (
 export const extractAlgFromJwtHeader = (jwt: string) => {
     // Split the JWT into its three parts: header, payload, and signature
     const parts = jwt.split(".");
-    const headerJson = atob(parts[0]);
+    const headerJson = base64UrlToUtf8(parts[0]);
     const { alg } = JSON.parse(headerJson);
     return alg;
 };

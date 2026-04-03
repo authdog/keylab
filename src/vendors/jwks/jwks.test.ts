@@ -14,6 +14,8 @@ import * as c from "../../constants";
 import { SignJWT, jwtVerify } from "jose";
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
 const fetchMock = createFetchMock(vi);
+const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined";
+const nodeOnlyIt = isBunRuntime ? it.skip : it;
 
 beforeEach(() => {
     fetchMock.enableMocks();
@@ -411,7 +413,7 @@ it("verifies token with public key - EdDSA", async () => {
 
 it("verifies token with public key - ES256k / pem", async () => {
     const keyPairES256k = await getKeyPair({
-        keyFormat: "pem",
+        keyFormat: isBunRuntime ? "jwk" : "pem",
         algorithmIdentifier: Algs.ES256K,
         keySize: 4096
     });
@@ -466,7 +468,7 @@ it("signs with Ed25519 key pair", async () => {
     expect(verifiedPayload?.payload).toMatchObject(payload);
     expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
 });
-it("verifies Ed448 Key pair", async () => {
+nodeOnlyIt("verifies Ed448 Key pair", async () => {
     const crypto = require("crypto");
     const { publicKey, privateKey } = crypto.generateKeyPairSync("ed448");
     expect(publicKey).toBeTruthy();

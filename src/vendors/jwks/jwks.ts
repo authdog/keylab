@@ -2,17 +2,13 @@ import {
     createLocalJWKSet,
     importSPKI,
     jwtVerify,
-    // createRemoteJWKSet,
     JWK,
-    JWTVerifyResult,
-    JWTPayload,
-    JWSHeaderParameters,
-    FlattenedJWSInput,
 } from "jose";
-import { extractAlgFromJwtHeader } from "../jwt";
+import { extractAlgFromJwtHeader } from "../jwt/jwt-verify";
 import { JwtAlgorithmsEnum as Algs } from "../../enums";
-import { INVALID_PUBLIC_KEY_FORMAT } from "../../errors/messages";
-import { createPublicKey, createVerify, KeyObject, verify } from "crypto";
+import { INVALID_PUBLIC_KEY_FORMAT, JWK_NO_APPLICABLE_KEY } from "../../errors/messages";
+import { needsPortableEdDsa, verifyPortableJwt } from "../jwt/portable-algorithms";
+import { normalizeCurveName, normalizeJwk } from "../jwt/utils";
 
 export interface IJwksClient {
     jwksUri?: string; // required for RS256
@@ -90,86 +86,50 @@ export const verifyTokenWithPublicKey = async (
     publicKey: string | JWK | null,
     opts: IVerifyRSATokenCredentials = null,
 ): Promise<ITokenExtractedWithPubKey> => {
-    let jwks: (protectedHeader?: JWSHeaderParameters, token?: FlattenedJWSInput) => Promise<CryptoKey> = null;
-    let decoded: JWTVerifyResult<JWTPayload> = null;
-    let candidateKeys: any[] = [];
+    const tokenAlg = extractAlgFromJwtHeader(token);
+    const joseCandidates: any[] = [];
+    const portableCandidates: any[] = [];
+
+    const pushCandidate = (candidate: any) => {
+        const normalized = normalizeJwk(candidate);
+        const curve = normalizeCurveName(normalized?.crv);
+        const isPortableCandidate =
+            tokenAlg === Algs.ES256K
+                ? curve === "secp256k1"
+                : tokenAlg === Algs.EdDSA && curve === "Ed448";
+
+        if (isPortableCandidate) {
+            portableCandidates.push(normalized);
+            return;
+        }
+
+        joseCandidates.push(normalized);
+    };
 
     if (publicKey || opts?.adhoc) {
-        let jwk: JWK = null;
         if (typeof publicKey === "string") {
-            let alg = extractAlgFromJwtHeader(token);
-            // Use EdDSA for Ed25519/Ed448 imports
-            if (alg === (Algs as any)?.Ed25519 || alg === (Algs as any)?.Ed448) alg = "EdDSA" as any;
-            
-            // For ES256K or other unsupported algorithms, go straight to Node fallback
-            if (alg === Algs.ES256K) {
-                const [h, p, s] = token.split(".");
-                const signingInput = `${h}.${p}`;
-                const derSig = joseConcatToDer(Buffer.from(s, "base64url"));
-                const verifier = createVerify("SHA256");
-                verifier.update(signingInput);
-                verifier.end();
-                const ok = verifier.verify({ key: publicKey, dsaEncoding: "der" }, derSig);
-                if (!ok) throw new Error("Invalid signature");
-                const payload = JSON.parse(Buffer.from(p, "base64url").toString("utf8"));
-                const protectedHeaderRaw = JSON.parse(Buffer.from(h, "base64url").toString("utf8"));
-                const protectedHeader = { ...protectedHeaderRaw, typ: protectedHeaderRaw.typ || "JWT" };
-                return { payload, protectedHeader } as any;
-            }
-            
-            try {
-                const keyLike = await pemToJwk(publicKey, alg);
-                decoded = await jwtVerify(token, keyLike, {
-                    issuer: opts?.requiredIssuer,
-                    audience: opts?.requiredAudiences
+            if (tokenAlg === Algs.ES256K || (await needsPortableEdDsa(tokenAlg, publicKey))) {
+                return verifyPortableJwt({
+                    token,
+                    publicKeys: [publicKey]
                 });
-                return decoded;
-            } catch (_) {
-                // Node verification fallback for algorithms not supported by importSPKI (e.g., Ed448)
-                const [h, p, s] = token.split(".");
-                const signingInput = `${h}.${p}`;
-                const ok = verify(null, Buffer.from(signingInput), createPublicKey(publicKey), Buffer.from(s, "base64url"));
-                if (!ok) throw _;
-                const payload = JSON.parse(Buffer.from(p, "base64url").toString("utf8"));
-                const protectedHeaderRaw = JSON.parse(Buffer.from(h, "base64url").toString("utf8"));
-                const protectedHeader = { ...protectedHeaderRaw, typ: protectedHeaderRaw.typ || "JWT" };
-                return { payload, protectedHeader } as any;
             }
-        } else if (typeof publicKey === "object") {
-            // Drop conflicting alg on JWKs to avoid jose v6 errors and normalize crv
-            const { alg: _algIgnored, crv, ...rest } = publicKey as any;
-            const normalizedCrv = (() => {
-                const v = String(crv || "");
-                if (/^ed25519$/i.test(v)) return "Ed25519";
-                if (/^ed448$/i.test(v)) return "Ed448";
-                if (/^secp256k1$/i.test(v)) return "secp256k1";
-                if (/^p-256$/i.test(v)) return "P-256";
-                if (/^p-384$/i.test(v)) return "P-384";
-                if (/^p-521$/i.test(v)) return "P-521";
-                return crv;
-            })();
-            jwk = (crv ? { ...rest, crv: normalizedCrv } : rest) as any;
+
+            const keyLike = await pemToJwk(publicKey, tokenAlg);
+            return (await jwtVerify(token, keyLike, {
+                issuer: opts?.requiredIssuer,
+                audience: opts?.requiredAudiences
+            })) as any;
         }
 
-        let adhocKeys = opts?.adhoc; // adhoc keys
-
-        if (jwk) {
-            jwks = createLocalJWKSet({
-                keys: [jwk]
-            });
-            candidateKeys = [jwk as any];
-        } else {
-            jwks = createLocalJWKSet({
-                keys: adhocKeys ? <JWK[]>adhocKeys.map((key) => {
-                    const { alg: _algIgnored2, ...rest } = key as any;
-                    return rest as any;
-                }): []
-            });
-            candidateKeys = adhocKeys as any || [];
+        if (publicKey && typeof publicKey === "object") {
+            pushCandidate(publicKey);
         }
 
+        for (const adhocKey of opts?.adhoc || []) {
+            pushCandidate(adhocKey);
+        }
     } else if (opts?.jwksUri) {
-        // Fetch JWKS over HTTP(S) using global fetch so tests can mock easily
         const response = await (globalThis as any).fetch(opts.jwksUri, {
             headers: {
                 "Content-Type": "application/json",
@@ -177,102 +137,46 @@ export const verifyTokenWithPublicKey = async (
                 ...(opts?.requiredIssuer ? { "X-Issuer": opts.requiredIssuer } : {})
             }
         });
+
         if (!response?.ok) {
-            throw new Error('Expected 200 OK from the JSON Web Key Set HTTP response');
+            throw new Error("Expected 200 OK from the JSON Web Key Set HTTP response");
         }
+
         const jwksJson = await response.json();
-        // Sanitize alg field from fetched JWKs which can cause v6 errors
-        const sanitized = {
-            keys: Array.isArray((jwksJson as any)?.keys)
-                ? (jwksJson as any).keys.map((k: any) => {
-                      const { alg: _algIgnored, crv, ...rest } = k || {};
-                      const normalizedCrv = (() => {
-                          const v = String(crv || "");
-                          if (/^ed25519$/i.test(v)) return "Ed25519";
-                          if (/^ed448$/i.test(v)) return "Ed448";
-                          if (/^secp256k1$/i.test(v)) return "secp256k1";
-                          if (/^p-256$/i.test(v)) return "P-256";
-                          if (/^p-384$/i.test(v)) return "P-384";
-                          if (/^p-521$/i.test(v)) return "P-521";
-                          return crv;
-                      })();
-                      return crv ? { ...rest, crv: normalizedCrv } : rest;
-                  })
-                : []
-        } as any;
-        jwks = createLocalJWKSet(sanitized);
-        candidateKeys = sanitized.keys as any;
+        for (const key of Array.isArray((jwksJson as any)?.keys) ? (jwksJson as any).keys : []) {
+            pushCandidate(key);
+        }
     } else {
         throw new Error(INVALID_PUBLIC_KEY_FORMAT);
     }
 
-    try {
-        decoded = await jwtVerify(token, jwks, {
-            issuer: opts?.requiredIssuer,
-            audience: opts?.requiredAudiences
-        });
-    } catch (e) {
-        // Attempt Node-crypto fallbacks for ES256K and Ed448
-        const headerB64 = token.split(".")[0];
-        const payloadB64 = token.split(".")[1];
-        const sigB64 = token.split(".")[2];
-        const protectedHeader = JSON.parse(Buffer.from(headerB64, "base64url").toString("utf8"));
-        const signingInput = `${headerB64}.${payloadB64}`;
-
-        const alg = protectedHeader?.alg as string;
-
-        const getFirstMatchingJwk = (): any => {
-            if (publicKey && typeof publicKey === "object") return publicKey;
-            const keysArr: any[] = candidateKeys || [];
-            if (alg === Algs.ES256K) {
-                return keysArr.find((k) => k.kty === "EC" && /secp256k1/i.test(k.crv || ""));
+    if (portableCandidates.length > 0) {
+        try {
+            return await verifyPortableJwt({
+                token,
+                publicKeys: portableCandidates
+            });
+        } catch (error) {
+            if (joseCandidates.length === 0) {
+                throw error;
             }
-            if (alg === Algs.EdDSA) {
-                // prefer Ed448
-                return keysArr.find((k) => /Ed448/i.test(k.crv || "")) || keysArr.find((k) => /Ed25519/i.test(k.crv || ""));
-            }
-            return undefined;
-        };
-
-        const jwkForFallback = getFirstMatchingJwk();
-
-        const verifyWithNode = (): boolean => {
-            try {
-                if (alg === Algs.ES256K) {
-                    // ES256K: ecdsa with sha256, signature provided is JOSE (r||s), convert to DER
-                    const publicKeyPem = typeof publicKey === "string" ? publicKey : createPublicKey({ key: jwkForFallback, format: "jwk" as any }).export({ format: "pem", type: "spki" }) as unknown as string;
-                    const derSig = joseConcatToDer(Buffer.from(sigB64, "base64url"));
-                    const verifier = createVerify("SHA256");
-                    verifier.update(signingInput);
-                    verifier.end();
-                    return verifier.verify({ key: publicKeyPem, dsaEncoding: "der" }, derSig);
-                }
-                if (alg === Algs.EdDSA) {
-                    const keyObj: KeyObject = typeof publicKey === "string" ? createPublicKey(publicKey) : createPublicKey({ key: jwkForFallback, format: "jwk" as any });
-                    return verify(null, Buffer.from(signingInput), keyObj, Buffer.from(sigB64, "base64url"));
-                }
-            } catch (_) {}
-            return false;
-        };
-
-        const ok = verifyWithNode();
-        if (!ok) {
-            const msg = (e as any)?.message || String(e);
-            if (/Invalid or unsupported JWK "alg"/i.test(msg)) {
-                throw new Error("no applicable key found in the JSON Web Key Set");
-            }
-            throw new Error(msg);
         }
-
-        // Build decoded result manually
-        const payload = JSON.parse(Buffer.from(payloadB64, "base64url").toString("utf8"));
-        return {
-            payload,
-            protectedHeader
-        } as any;
     }
 
-    return decoded;
+    if (tokenAlg === Algs.ES256K && portableCandidates.length === 0) {
+        throw new Error(JWK_NO_APPLICABLE_KEY);
+    }
+
+    if (joseCandidates.length === 0) {
+        throw new Error(JWK_NO_APPLICABLE_KEY);
+    }
+
+    return (await jwtVerify(token, createLocalJWKSet({
+        keys: joseCandidates as JWK[]
+    }), {
+        issuer: opts?.requiredIssuer,
+        audience: opts?.requiredAudiences
+    })) as any;
 };
 
 /**
@@ -282,35 +186,8 @@ export const verifyTokenWithPublicKey = async (
  * @returns
  */
 export const pemToJwk = async (pemString: string, algorithm: string) => {
-    // jose v6 expects JWA identifiers here (e.g., RS256, ES256, EdDSA)
-    try {
-        return await importSPKI(pemString, algorithm === "Ed25519" || algorithm === "Ed448" ? "EdDSA" : algorithm);
-    } catch (e) {
-        // Some algorithms like ES256K may not be supported by importSPKI in all environments
-        // This will be handled by Node-crypto fallbacks in the calling code
-        throw e;
-    }
-};
-
-// Convert JOSE r||s signature (64 bytes) to DER encoded ECDSA signature
-const joseConcatToDer = (jose: Buffer): Buffer => {
-    const size = jose.length / 2;
-    const r = jose.slice(0, size);
-    const s = jose.slice(size);
-    const toUnsigned = (buf: Buffer) => {
-        let i = 0;
-        while (i < buf.length && buf[i] === 0) i++;
-        let out = buf.slice(i);
-        if (out[0] & 0x80) out = Buffer.concat([Buffer.from([0]), out]);
-        return out.length === 0 ? Buffer.from([0]) : out;
-    };
-    const rU = toUnsigned(r);
-    const sU = toUnsigned(s);
-    const sequenceLen = 2 + rU.length + 2 + sU.length;
-    return Buffer.concat([
-        Buffer.from([0x30, sequenceLen, 0x02, rU.length]),
-        rU,
-        Buffer.from([0x02, sU.length]),
-        sU,
-    ]);
+    return await importSPKI(
+        pemString,
+        algorithm === "Ed25519" ? "EdDSA" : algorithm
+    );
 };
