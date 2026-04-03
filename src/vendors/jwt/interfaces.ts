@@ -1,4 +1,4 @@
-import { JwtAlgorithmsEnum as Algs } from "../../enums";
+import { JwtAlgorithmsEnum as Algs } from "../../enums"
 
 type AlgorithmIdentifier =
     | Algs.HS256
@@ -39,62 +39,62 @@ type AlgorithmIdentifier =
     | Algs.A256GCMKW
     | Algs.PBES2_HS256_A128KW
     | Algs.PBES2_HS384_A192KW
-    | Algs.PBES2_HS512_A256KW;
+    | Algs.PBES2_HS512_A256KW
 
 export interface IDecodedJwt {
-    iss?: string;
-    aud?: string[] | string;
-    sub?: string;
-    iat: number;
-    exp: number;
-    scp?: string[] | string; // scopes can be separated by space or comma
+    iss?: string
+    aud?: string[] | string
+    sub?: string
+    iat: number
+    exp: number
+    scp?: string[] | string // scopes can be separated by space or comma
 }
 
 export interface IGetKeyPair {
-    algorithmIdentifier: AlgorithmIdentifier;
-    keySize: number;
-    keyFormat?: "pem" | "jwk"; // can also be a binary certificate
+    algorithmIdentifier: AlgorithmIdentifier
+    keySize: number
+    keyFormat?: "pem" | "jwk" // can also be a binary certificate
 }
 
 export interface IJwkPrivateKey {
-    kty: "RSA" | "EC" | "oct" | "OKP";
-    use: "sig" | "enc";
-    kid: string;
-    n?: string; // RSA modulus
-    e?: string; // RSA exponent
-    d?: string; // RSA/EC private exponent
-    p?: string; // RSA first prime factor
-    q?: string; // RSA second prime factor
-    dp?: string; // RSA first factor CRT exponent
-    dq?: string; // RSA second factor CRT exponent
-    qi?: string; // RSA first CRT coefficient
-    k?: string; // Symmetric key value
-    x?: string; // EC/OKP x coordinate
-    y?: string; // EC y coordinate
-    crv?: string; // Curve name
-    x5c?: string[];
-    x5t?: string;
-    x5tS256?: string;
-    ext?: any;
+    kty: "RSA" | "EC" | "oct" | "OKP"
+    use: "sig" | "enc"
+    kid: string
+    n?: string // RSA modulus
+    e?: string // RSA exponent
+    d?: string // RSA/EC private exponent
+    p?: string // RSA first prime factor
+    q?: string // RSA second prime factor
+    dp?: string // RSA first factor CRT exponent
+    dq?: string // RSA second factor CRT exponent
+    qi?: string // RSA first CRT coefficient
+    k?: string // Symmetric key value
+    x?: string // EC/OKP x coordinate
+    y?: string // EC y coordinate
+    crv?: string // Curve name
+    x5c?: string[]
+    x5t?: string
+    x5tS256?: string
+    ext?: any
 }
 
 export interface IJwkPublicKey {
-    kty: "RSA" | "EC" | "oct" | "OKP";
-    use: "sig" | "enc";
-    kid: string;
-    n?: string; // RSA modulus
-    e?: string; // RSA exponent
-    x?: string; // EC/OKP x coordinate
-    y?: string; // EC y coordinate
-    crv?: string; // Curve name
-    x5c?: string[];
-    x5t?: string;
-    x5tS256?: string;
-    ext?: any;
+    kty: "RSA" | "EC" | "oct" | "OKP"
+    use: "sig" | "enc"
+    kid: string
+    n?: string // RSA modulus
+    e?: string // RSA exponent
+    x?: string // EC/OKP x coordinate
+    y?: string // EC y coordinate
+    crv?: string // Curve name
+    x5c?: string[]
+    x5t?: string
+    x5tS256?: string
+    ext?: any
 }
 
 export interface IKeyPair {
-    publicKey: string & IJwkPublicKey;
-    privateKey: string & IJwkPrivateKey;
-    kid: string;
+    publicKey: string & IJwkPublicKey
+    privateKey: string & IJwkPrivateKey
+    kid: string
 }

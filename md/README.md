@@ -3,7 +3,7 @@
 [![CI](https://github.com/authdog/keylab/actions/workflows/ci.yml/badge.svg)](https://github.com/authdog/keylab/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/authdog/keylab/branch/master/graph/badge.svg?token=6XA3OTMTAT)](https://codecov.io/gh/authdog/keylab)
 [![npm version](https://badge.fury.io/js/keylab.svg)](https://badge.fury.io/js/keylab)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![code style: biome](https://img.shields.io/badge/code_style-biome-60a5fa.svg?style=flat-square)](https://biomejs.dev/)
 ![bundle size](https://img.shields.io/bundlephobia/minzip/keylab?label=zipped)
 
 Keylab is a Node.js/TypeScript library designed to simplify the creation and validation of JSON Web Tokens, eliminating the need for prior knowledge in cryptography. Built with full TypeScript support and comprehensive type exports for enhanced developer experience.

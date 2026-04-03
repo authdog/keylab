@@ -1,1 +1,1 @@
-export * from "./ponyfills";
+export * from "./ponyfills"

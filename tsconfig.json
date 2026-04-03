@@ -20,14 +20,6 @@
         "skipLibCheck": true
     },
     "include": ["src"],
-    "exclude": [
-        "node_modules",
-        "dist",
-        "docs",
-        "tsdoc",
-        "coverage"
-    ],
-    "typeRoots": [
-      "index.d.ts"
-    ]
+    "exclude": ["node_modules", "dist", "docs", "tsdoc", "coverage"],
+    "typeRoots": ["index.d.ts"]
 }

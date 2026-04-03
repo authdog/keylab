@@ -1,14 +1,14 @@
-import * as enums from "./enums";
+import * as enums from "./enums"
 
-export * from "./errors/messages";
+export * from "./errors/messages"
 
-export const JWT_SUPPORTED_ALGS = Object.values(enums.JwtAlgorithmsEnum);
-export const JWT_PUBLIC_KEY_USES = Object.values(enums.JwtPublicKeyUse);
+export const JWT_SUPPORTED_ALGS = Object.values(enums.JwtAlgorithmsEnum)
+export const JWT_PUBLIC_KEY_USES = Object.values(enums.JwtPublicKeyUse)
 
-export const AUTHDOG_ID_ISSUER = "https://id.authdog.com";
-export const AUTHDOG_JWKS_API_ID = "v1";
+export const AUTHDOG_ID_ISSUER = "https://id.authdog.com"
+export const AUTHDOG_JWKS_API_ID = "v1"
 
-export const EMPTY_STRING = "";
+export const EMPTY_STRING = ""
 
 export const CHARS = {
     SPACE: " ",
@@ -16,7 +16,7 @@ export const CHARS = {
     NEW_LINE: "\n",
     TAB: "\t",
     CARRIAGE_RETURN: "\r",
-    COMMA: ","
+    COMMA: ",",
     // COLON: ":",
     // SEMICOLON: ";",
     // DOT: ".",
@@ -35,17 +35,17 @@ export const CHARS = {
     // CLOSE_PARENTHESIS: ")",
     // OPEN_ANGLE_BRACKET: "<",
     // CLOSE_ANGLE_BRACKET: ">",
-};
+}
 
 export const publicKeyEncodingPem = {
     type: "spki",
-    format: "pem"
-};
+    format: "pem",
+}
 
 export const privateKeyEncodingPem = {
     type: "pkcs8",
-    format: "jwk"
-};
+    format: "jwk",
+}
 
 export const namedCurves = {
     es256: "P-256",
@@ -56,11 +56,11 @@ export const namedCurves = {
     // ECDH-ES algorithms use the same curves as their ES counterparts
     "ecdh-es": "P-256", // Default curve for ECDH-ES
     "ecdh-es+a128kw": "P-256",
-    "ecdh-es+a192kw": "P-256", 
-    "ecdh-es+a256kw": "P-256"
-};
+    "ecdh-es+a192kw": "P-256",
+    "ecdh-es+a256kw": "P-256",
+}
 
 export const PEM_CHARS = {
     start: "-----BEGIN",
-    end: "-----"
-};
+    end: "-----",
+}

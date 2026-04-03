@@ -1,20 +1,20 @@
-import * as e from "../../errors";
-import * as c from "../../constants";
+import * as e from "../../errors"
+import * as c from "../../constants"
 import {
     base64ToBytes,
     binaryStringToBytes,
     bytesToBase64,
-    bytesToBinaryString
-} from "../jwt/utils";
+    bytesToBinaryString,
+} from "../jwt/utils"
 
 export const isServer = (): boolean => {
-    return typeof document === "undefined";
-};
+    return typeof document === "undefined"
+}
 
 /**
  * set to true if the code if executed on the server
  */
-export const IS_NODEJS = isServer();
+export const IS_NODEJS = isServer()
 
 /**
  * native browser function following the method passed a parameter if it exists
@@ -23,16 +23,16 @@ export const IS_NODEJS = isServer();
  */
 export const getClientWindowMethod = (method: string) => {
     if (IS_NODEJS) {
-        e.throwEnvironmentError();
+        e.throwEnvironmentError()
     }
 
-    const browserImplementation = (globalThis as any)?.[method];
+    const browserImplementation = (globalThis as any)?.[method]
     if (browserImplementation) {
-        return browserImplementation;
+        return browserImplementation
     }
 
-    throw new Error(c.GLOBAL_FUNCTION_NOT_IMPLEMENTED);
-};
+    throw new Error(c.GLOBAL_FUNCTION_NOT_IMPLEMENTED)
+}
 
 /**
  * `atob` is an helper function to decode a payload to base64
@@ -42,7 +42,7 @@ export const getClientWindowMethod = (method: string) => {
  */
 export const atob = IS_NODEJS
     ? (value: string) => bytesToBinaryString(base64ToBytes(value))
-    : getClientWindowMethod("atob");
+    : getClientWindowMethod("atob")
 
 /**
  * btoa is an helper function to encode a payload to base64
@@ -52,4 +52,4 @@ export const atob = IS_NODEJS
  */
 export const btoa = IS_NODEJS
     ? (value: string) => bytesToBase64(binaryStringToBytes(value))
-    : getClientWindowMethod("btoa");
+    : getClientWindowMethod("btoa")

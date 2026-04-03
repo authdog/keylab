@@ -1,61 +1,57 @@
-import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign";
-import { parseJwt } from "./jwt-verify";
-import * as c from "../../constants";
-import { JwtAlgorithmsEnum as Algs, JwtParts } from "../../enums";
-import { strToUint8Array, uint8ArrayToStr } from "./utils";
-import { generateKeyPair, randomBytes } from "crypto";
-import { IKeyPair } from "./interfaces";
-import { expect, it } from "vitest";
+import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign"
+import { parseJwt } from "./jwt-verify"
+import * as c from "../../constants"
+import { JwtAlgorithmsEnum as Algs, JwtParts } from "../../enums"
+import { strToUint8Array, uint8ArrayToStr } from "./utils"
+import { generateKeyPair, randomBytes } from "crypto"
+import { IKeyPair } from "./interfaces"
+import { expect, it } from "vitest"
 
-const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined";
+const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined"
 
 it("jwt sign with payload fields - HS256", async () => {
     const payload = {
         sub: "12345",
-        aud: [c.AUTHDOG_ID_ISSUER]
-    };
-    const token = await signJwtWithPrivateKey(
-        payload,
-        Algs.HS256,
-        "secret",
-        undefined,
-        { keyId: "some-key" }
-    );
-    expect(token).toBeTruthy();
-    const { alg, kid } = parseJwt(token, JwtParts?.HEADER);
-    expect(alg).toEqual(Algs.HS256);
-    expect(kid).toEqual("some-key");
-});
+        aud: [c.AUTHDOG_ID_ISSUER],
+    }
+    const token = await signJwtWithPrivateKey(payload, Algs.HS256, "secret", undefined, {
+        keyId: "some-key",
+    })
+    expect(token).toBeTruthy()
+    const { alg, kid } = parseJwt(token, JwtParts?.HEADER)
+    expect(alg).toEqual(Algs.HS256)
+    expect(kid).toEqual("some-key")
+})
 
 it("jwt sign with payload fields - HS384", async () => {
     const payload = {
         sub: "12345",
-        aud: [c.AUTHDOG_ID_ISSUER]
-    };
-    const token = await signJwtWithPrivateKey(payload, Algs.HS384, "secret");
-    expect(token).toBeTruthy();
-    const { alg } = parseJwt(token, JwtParts?.HEADER);
-    expect(alg).toEqual(Algs.HS384);
-});
+        aud: [c.AUTHDOG_ID_ISSUER],
+    }
+    const token = await signJwtWithPrivateKey(payload, Algs.HS384, "secret")
+    expect(token).toBeTruthy()
+    const { alg } = parseJwt(token, JwtParts?.HEADER)
+    expect(alg).toEqual(Algs.HS384)
+})
 
 it("jwt sign with payload fields - HS512", async () => {
     const payload = {
         sub: "12345",
-        aud: [c.AUTHDOG_ID_ISSUER]
-    };
-    const token = await signJwtWithPrivateKey(payload, Algs.HS512, "secret");
-    expect(token).toBeTruthy();
-    const { alg } = parseJwt(token, JwtParts?.HEADER);
-    expect(alg).toEqual(Algs.HS512);
-});
+        aud: [c.AUTHDOG_ID_ISSUER],
+    }
+    const token = await signJwtWithPrivateKey(payload, Algs.HS512, "secret")
+    expect(token).toBeTruthy()
+    const { alg } = parseJwt(token, JwtParts?.HEADER)
+    expect(alg).toEqual(Algs.HS512)
+})
 
 it("jwt sign with payload fields - RS256", async () => {
     // RS256
     const keyPairRS256 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS256,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadRs256 = await signJwtWithPrivateKey(
         {
@@ -63,28 +59,26 @@ it("jwt sign with payload fields - RS256", async () => {
             sub: "sub:12345",
             iss: "issuer:12345",
             aud: ["aud:12345"],
-            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
-                " "
-            )
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(" "),
         },
         Algs.RS256,
-        keyPairRS256.privateKey
-    );
+        keyPairRS256.privateKey,
+    )
 
-    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs256);
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs256)
 
-    expect(iss).toEqual("issuer:12345");
-    expect(aud).toEqual(["aud:12345"]);
-    expect(sub).toEqual("sub:12345");
-    expect(aid).toEqual("12345");
-});
+    expect(iss).toEqual("issuer:12345")
+    expect(aud).toEqual(["aud:12345"])
+    expect(sub).toEqual("sub:12345")
+    expect(aid).toEqual("12345")
+})
 
 it("jwt sign with payload fields - RS384", async () => {
     const keyPairRS384 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS384,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadRs384 = await signJwtWithPrivateKey(
         {
@@ -92,28 +86,26 @@ it("jwt sign with payload fields - RS384", async () => {
             sub: "sub:12345",
             iss: "issuer:12345",
             aud: ["aud:12345"],
-            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
-                " "
-            )
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(" "),
         },
         Algs.RS384,
-        keyPairRS384.privateKey
-    );
+        keyPairRS384.privateKey,
+    )
 
-    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs384);
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs384)
 
-    expect(iss).toEqual("issuer:12345");
-    expect(aud).toEqual(["aud:12345"]);
-    expect(sub).toEqual("sub:12345");
-    expect(aid).toEqual("12345");
-});
+    expect(iss).toEqual("issuer:12345")
+    expect(aud).toEqual(["aud:12345"])
+    expect(sub).toEqual("sub:12345")
+    expect(aid).toEqual("12345")
+})
 
 it("jwt sign with payload fields - RS512", async () => {
     const keyPairRS512 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadRs512 = await signJwtWithPrivateKey(
         {
@@ -121,29 +113,27 @@ it("jwt sign with payload fields - RS512", async () => {
             sub: "sub:12345",
             iss: "issuer:12345",
             aud: ["aud:12345"],
-            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
-                " "
-            )
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(" "),
         },
         Algs.RS512,
-        keyPairRS512.privateKey
-    );
+        keyPairRS512.privateKey,
+    )
 
-    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs512);
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadRs512)
 
-    expect(iss).toEqual("issuer:12345");
-    expect(aud).toEqual(["aud:12345"]);
-    expect(sub).toEqual("sub:12345");
-    expect(aid).toEqual("12345");
-});
+    expect(iss).toEqual("issuer:12345")
+    expect(aud).toEqual(["aud:12345"])
+    expect(sub).toEqual("sub:12345")
+    expect(aid).toEqual("12345")
+})
 
 it("jwt sign with payload fields - ES256", async () => {
     // ES256
     const keyPairES256 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.ES256,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadEs256 = await signJwtWithPrivateKey(
         {
@@ -151,29 +141,27 @@ it("jwt sign with payload fields - ES256", async () => {
             sub: "sub:12345",
             iss: "issuer:12345",
             aud: ["aud:12345"],
-            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
-                " "
-            )
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(" "),
         },
         Algs.ES256,
-        keyPairES256.privateKey
-    );
+        keyPairES256.privateKey,
+    )
 
-    const { iss, aud, sub, aid } = parseJwt(signedPayloadEs256);
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadEs256)
 
-    expect(iss).toEqual("issuer:12345");
-    expect(aud).toEqual(["aud:12345"]);
-    expect(sub).toEqual("sub:12345");
-    expect(aid).toEqual("12345");
-});
+    expect(iss).toEqual("issuer:12345")
+    expect(aud).toEqual(["aud:12345"])
+    expect(sub).toEqual("sub:12345")
+    expect(aid).toEqual("12345")
+})
 
 it("jwt sign with payload fields - EDDSA", async () => {
     // EDDSA
     const keyPairEDDSA = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.EdDSA,
-        keySize: 256
-    });
+        keySize: 256,
+    })
 
     const signedPayloadEdDSA = await signJwtWithPrivateKey(
         {
@@ -181,305 +169,298 @@ it("jwt sign with payload fields - EDDSA", async () => {
             sub: "sub:12345",
             iss: "issuer:12345",
             aud: ["aud:12345"],
-            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(
-                " "
-            )
+            scp: [["a", "b:c", "d"].map((el: any) => el.permission?.name)].join(" "),
         },
         Algs.EdDSA,
-        keyPairEDDSA.privateKey
-    );
+        keyPairEDDSA.privateKey,
+    )
 
-    const { iss, aud, sub, aid } = parseJwt(signedPayloadEdDSA);
+    const { iss, aud, sub, aid } = parseJwt(signedPayloadEdDSA)
 
-    expect(iss).toEqual("issuer:12345");
-    expect(aud).toEqual(["aud:12345"]);
-    expect(sub).toEqual("sub:12345");
-    expect(aid).toEqual("12345");
-});
+    expect(iss).toEqual("issuer:12345")
+    expect(aud).toEqual(["aud:12345"])
+    expect(sub).toEqual("sub:12345")
+    expect(aid).toEqual("12345")
+})
 
 it("it converts string to uint8 and vice versa", async () => {
-    const superSecret = "Lapsus$";
-    const buffer: Uint8Array = strToUint8Array(superSecret);
-    const debufferedString: string = uint8ArrayToStr(buffer);
-    expect(debufferedString).toEqual(superSecret);
-});
+    const superSecret = "Lapsus$"
+    const buffer: Uint8Array = strToUint8Array(superSecret)
+    const debufferedString: string = uint8ArrayToStr(buffer)
+    expect(debufferedString).toEqual(superSecret)
+})
 
 it("generate promisified key pair - rsa", async () => {
     const keyPair = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS256,
-        keySize: 4096
-    });
-    expect(keyPair?.publicKey).toBeTruthy();
-    expect(keyPair?.privateKey).toBeTruthy();
+        keySize: 4096,
+    })
+    expect(keyPair?.publicKey).toBeTruthy()
+    expect(keyPair?.privateKey).toBeTruthy()
 
     const keyPairRsa384 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS384,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairRsa384?.publicKey).toBeTruthy();
-    expect(keyPairRsa384?.privateKey).toBeTruthy();
+    expect(keyPairRsa384?.publicKey).toBeTruthy()
+    expect(keyPairRsa384?.privateKey).toBeTruthy()
 
     const keyPairRsa512 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairRsa512?.publicKey).toBeTruthy();
-    expect(keyPairRsa512?.privateKey).toBeTruthy();
-});
+    expect(keyPairRsa512?.publicKey).toBeTruthy()
+    expect(keyPairRsa512?.privateKey).toBeTruthy()
+})
 
 it("generate promisified key pair - ec", async () => {
     const keyPair = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.ES256,
-        keySize: 4096
-    });
-    expect(keyPair?.publicKey).toBeTruthy();
-    expect(keyPair?.privateKey).toBeTruthy();
+        keySize: 4096,
+    })
+    expect(keyPair?.publicKey).toBeTruthy()
+    expect(keyPair?.privateKey).toBeTruthy()
 
     const keyPairEs384 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.ES384,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairEs384?.publicKey).toBeTruthy();
-    expect(keyPairEs384?.privateKey).toBeTruthy();
+    expect(keyPairEs384?.publicKey).toBeTruthy()
+    expect(keyPairEs384?.privateKey).toBeTruthy()
 
     const keyPairEs512 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.ES512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairEs512?.publicKey).toBeTruthy();
-    expect(keyPairEs512?.privateKey).toBeTruthy();
-});
+    expect(keyPairEs512?.publicKey).toBeTruthy()
+    expect(keyPairEs512?.privateKey).toBeTruthy()
+})
 
 it("signs payload with pkcs8 private key", async () => {
     // RS256
     const keyPairRS256 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS256,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadRs256 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.RS256,
-        keyPairRS256.privateKey
-    );
+        keyPairRS256.privateKey,
+    )
 
-    expect(signedPayloadRs256).toBeTruthy();
+    expect(signedPayloadRs256).toBeTruthy()
 
     // RS384
     const keyPairRS384 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS384,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadRs384 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs?.RS384,
-        keyPairRS384.privateKey
-    );
+        keyPairRS384.privateKey,
+    )
 
-    expect(signedPayloadRs384).toBeTruthy();
+    expect(signedPayloadRs384).toBeTruthy()
 
     // RS512
     const keyPairRS512 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RS512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadRs512 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.RS512,
-        keyPairRS512.privateKey
-    );
+        keyPairRS512.privateKey,
+    )
 
-    expect(signedPayloadRs512).toBeTruthy();
+    expect(signedPayloadRs512).toBeTruthy()
 
     // ES256
     const keyPairES256 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.ES256,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadEs256 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.ES256,
-        keyPairES256.privateKey
-    );
+        keyPairES256.privateKey,
+    )
 
-    expect(signedPayloadEs256).toBeTruthy();
+    expect(signedPayloadEs256).toBeTruthy()
 
     // ES384
     const keyPairES384 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.ES384,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadEs384 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.ES384,
-        keyPairES384.privateKey
-    );
+        keyPairES384.privateKey,
+    )
 
-    expect(signedPayloadEs384).toBeTruthy();
+    expect(signedPayloadEs384).toBeTruthy()
 
     // ES512
     const keyPairES512 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.ES512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadEs512 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.ES512,
-        keyPairES512.privateKey
-    );
+        keyPairES512.privateKey,
+    )
 
-    expect(signedPayloadEs512).toBeTruthy();
-});
+    expect(signedPayloadEs512).toBeTruthy()
+})
 
 it("signs payload with pkcs8 private key - RSA-PSS", async () => {
     // PS256
     const keyPairPS256 = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs?.RSAPSS,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadPs256 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.PS256,
-        keyPairPS256.privateKey
-    );
+        keyPairPS256.privateKey,
+    )
 
-    expect(signedPayloadPs256).toBeTruthy();
+    expect(signedPayloadPs256).toBeTruthy()
 
     // PS384
     const keyPairPS384 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RSAPSS,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadPs384 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.PS384,
-        keyPairPS384.privateKey
-    );
+        keyPairPS384.privateKey,
+    )
 
-    expect(signedPayloadPs384).toBeTruthy();
+    expect(signedPayloadPs384).toBeTruthy()
 
     // PS512
 
     const keyPairPS512 = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs?.RSAPSS,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const signedPayloadPs512 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.PS512,
-        keyPairPS512.privateKey
-    );
+        keyPairPS512.privateKey,
+    )
 
-    expect(signedPayloadPs512).toBeTruthy();
-});
+    expect(signedPayloadPs512).toBeTruthy()
+})
 
 it("signs payload with pkcs8 private key - EdDSA", async () => {
     const keyPairEddsa = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs.EdDSA,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairEddsa?.privateKey).toBeTruthy();
+    expect(keyPairEddsa?.privateKey).toBeTruthy()
 
     const signedPayloadEddsa = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.EdDSA,
-        keyPairEddsa.privateKey
-    );
+        keyPairEddsa.privateKey,
+    )
 
-    expect(signedPayloadEddsa).toBeTruthy();
-});
+    expect(signedPayloadEddsa).toBeTruthy()
+})
 
 it("signs payload with pkcs8 private key - Ed25519", async () => {
-    const {
-        privateKey,
-        publicKey
-    } = await getKeyPair({
+    const { privateKey, publicKey } = await getKeyPair({
         keyFormat: "pem",
         algorithmIdentifier: Algs.Ed25519,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(privateKey).toBeTruthy();
-    expect(publicKey).toBeTruthy();
+    expect(privateKey).toBeTruthy()
+    expect(publicKey).toBeTruthy()
 
     const signedPayloadEd25519 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.EdDSA,
-        privateKey
-    );
+        privateKey,
+    )
 
-    expect(signedPayloadEd25519).toBeTruthy();
-});
-
+    expect(signedPayloadEd25519).toBeTruthy()
+})
 
 it("signs payload with pkcs8 private key - Ed448", async () => {
     const keyPairEd448 = await getKeyPair({
         keyFormat: isBunRuntime ? "jwk" : "pem",
         algorithmIdentifier: Algs.Ed448,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairEd448?.privateKey).toBeTruthy();
+    expect(keyPairEd448?.privateKey).toBeTruthy()
 
     const signedPayloadEd448 = await signJwtWithPrivateKey(
         { urn: "urn:test:test" },
         Algs.EdDSA,
-        keyPairEd448.privateKey
-    );
+        keyPairEd448.privateKey,
+    )
 
-    expect(signedPayloadEd448).toBeTruthy();
-});
-
+    expect(signedPayloadEd448).toBeTruthy()
+})
 
 it("signs payload with pkcs8 private key - ES256k", async () => {
     const keyPairES256k = await getKeyPair({
         keyFormat: isBunRuntime ? "jwk" : "pem",
         algorithmIdentifier: Algs.ES256K,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairES256k?.privateKey).toBeTruthy();
+    expect(keyPairES256k?.privateKey).toBeTruthy()
     const signedPayloadEs256k = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.ES256K,
         keyPairES256k.privateKey,
         {
-            kid: keyPairES256k?.kid
-        }
-    );
-    expect(signedPayloadEs256k).toBeTruthy();
-});
+            kid: keyPairES256k?.kid,
+        },
+    )
+    expect(signedPayloadEs256k).toBeTruthy()
+})
 
 it("generates key pairs for all supported algorithms", async () => {
     const testAlgs = async (algs: Algs[], options: any = {}) => {
@@ -487,60 +468,54 @@ it("generates key pairs for all supported algorithms", async () => {
             const keyPair = await getKeyPair({
                 algorithmIdentifier: alg,
                 keySize: options.keySize || 2048,
-                keyFormat: options.keyFormat || "jwk"
-            });
-            expect(keyPair?.privateKey).toBeTruthy();
+                keyFormat: options.keyFormat || "jwk",
+            })
+            expect(keyPair?.privateKey).toBeTruthy()
             if (options.expectPublic !== false) {
-                expect(keyPair?.publicKey).toBeTruthy();
+                expect(keyPair?.publicKey).toBeTruthy()
             }
         }
-    };
+    }
 
     // RSA-OAEP variants
-    await testAlgs([
-        Algs.RSA_OAEP,
-        Algs.RSA_OAEP_256,
-        Algs.RSA_OAEP_384,
-        Algs.RSA_OAEP_512,
-        Algs.RSA1_5
-    ], { keySize: 2048 });
+    await testAlgs(
+        [Algs.RSA_OAEP, Algs.RSA_OAEP_256, Algs.RSA_OAEP_384, Algs.RSA_OAEP_512, Algs.RSA1_5],
+        { keySize: 2048 },
+    )
 
     // ECDH-ES variants
-    await testAlgs([
-        Algs.ECDH_ES,
-        Algs.ECDH_ES_A128KW,
-        Algs.ECDH_ES_A192KW,
-        Algs.ECDH_ES_A256KW
-    ], { keySize: 256 });
+    await testAlgs([Algs.ECDH_ES, Algs.ECDH_ES_A128KW, Algs.ECDH_ES_A192KW, Algs.ECDH_ES_A256KW], {
+        keySize: 256,
+    })
 
     // OKP variants
-    await testAlgs([
-        Algs.X25519,
-        Algs.X448
-    ], { keySize: 256 });
+    await testAlgs([Algs.X25519, Algs.X448], { keySize: 256 })
 
     // Symmetric/OCTET variants (KW, GCMKW, DIR, PBES2)
-    await testAlgs([
-        Algs.A128KW,
-        Algs.A192KW,
-        Algs.A256KW,
-        Algs.DIR,
-        Algs.A128GCMKW,
-        Algs.A192GCMKW,
-        Algs.A256GCMKW,
-        Algs.PBES2_HS256_A128KW,
-        Algs.PBES2_HS384_A192KW,
-        Algs.PBES2_HS512_A256KW
-    ], { keySize: 256, expectPublic: false });
-});
+    await testAlgs(
+        [
+            Algs.A128KW,
+            Algs.A192KW,
+            Algs.A256KW,
+            Algs.DIR,
+            Algs.A128GCMKW,
+            Algs.A192GCMKW,
+            Algs.A256GCMKW,
+            Algs.PBES2_HS256_A128KW,
+            Algs.PBES2_HS384_A192KW,
+            Algs.PBES2_HS512_A256KW,
+        ],
+        { keySize: 256, expectPublic: false },
+    )
+})
 
 it("experiment algorithm", async () => {
     const generateKey = async ({
         alg,
-        fallbackAlg
+        fallbackAlg,
     }: {
-        alg: string;
-        fallbackAlg: Algs;
+        alg: string
+        fallbackAlg: Algs
     }): Promise<IKeyPair> => {
         return new Promise((resolve: Function, reject: Function) => {
             generateKeyPair(
@@ -548,60 +523,60 @@ it("experiment algorithm", async () => {
                 {
                     modulusLength: 530,
                     publicKeyEncoding: {
-                        ...c.publicKeyEncodingPem
+                        ...c.publicKeyEncodingPem,
                     },
                     privateKeyEncoding: {
-                        ...c.privateKeyEncodingPem
-                    }
+                        ...c.privateKeyEncodingPem,
+                    },
                 },
                 (err, publicKey, privateKey) => {
-                    if (err) return reject(err);
+                    if (err) return reject(err)
 
                     // TODO: define kid length in constants
-                    const kid = randomBytes(16).toString("hex");
+                    const kid = randomBytes(16).toString("hex")
 
-                    resolve({ publicKey, privateKey, kid });
-                }
-            );
-        });
-    };
+                    resolve({ publicKey, privateKey, kid })
+                },
+            )
+        })
+    }
 
     const generateKeyWithFallback = async (args: {
-        alg: string;
-        fallbackAlg: Algs;
+        alg: string
+        fallbackAlg: Algs
     }): Promise<IKeyPair> => {
         try {
-            return await generateKey(args);
+            return await generateKey(args)
         } catch {
             return await getKeyPair({
                 algorithmIdentifier: args.fallbackAlg,
                 keySize: 256,
-                keyFormat: "jwk"
-            });
+                keyFormat: "jwk",
+            })
         }
-    };
+    }
 
     const keyEd25519 = await generateKeyWithFallback({
         alg: Algs.Ed25519.toLowerCase(),
-        fallbackAlg: Algs.Ed25519
-    });
-    expect(keyEd25519?.privateKey).toBeTruthy();
+        fallbackAlg: Algs.Ed25519,
+    })
+    expect(keyEd25519?.privateKey).toBeTruthy()
 
     const keyEd448 = await generateKeyWithFallback({
         alg: "ed448",
-        fallbackAlg: Algs.Ed448
-    });
-    expect(keyEd448?.privateKey).toBeTruthy();
+        fallbackAlg: Algs.Ed448,
+    })
+    expect(keyEd448?.privateKey).toBeTruthy()
 
     const keyX25519 = await generateKeyWithFallback({
         alg: "x25519",
-        fallbackAlg: Algs.X25519
-    });
-    expect(keyX25519?.privateKey).toBeTruthy();
+        fallbackAlg: Algs.X25519,
+    })
+    expect(keyX25519?.privateKey).toBeTruthy()
 
     const keyX448 = await generateKeyWithFallback({
         alg: "x448",
-        fallbackAlg: Algs.X448
-    });
-    expect(keyX448?.privateKey).toBeTruthy();
-});
+        fallbackAlg: Algs.X448,
+    })
+    expect(keyX448?.privateKey).toBeTruthy()
+})

@@ -1,541 +1,508 @@
-import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign";
-import {
-    ITokenExtractedWithPubKey,
-    pemToJwk,
-    verifyTokenWithPublicKey
-} from "./jwks";
+import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign"
+import { ITokenExtractedWithPubKey, pemToJwk, verifyTokenWithPublicKey } from "./jwks"
 
-import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums";
-import createFetchMock from "vitest-fetch-mock";
+import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums"
+import createFetchMock from "vitest-fetch-mock"
 
 import { expect, test, beforeEach, afterEach, vi, it, describe } from "vitest"
 
-import * as c from "../../constants";
-import { SignJWT, jwtVerify } from "jose";
-const AUTHDOG_API_ROOT = "https://api.authdog.xyz";
-const fetchMock = createFetchMock(vi);
-const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined";
-const nodeOnlyIt = isBunRuntime ? it.skip : it;
+import * as c from "../../constants"
+import { SignJWT, jwtVerify } from "jose"
+const AUTHDOG_API_ROOT = "https://api.authdog.xyz"
+const fetchMock = createFetchMock(vi)
+const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined"
+const nodeOnlyIt = isBunRuntime ? it.skip : it
 
 beforeEach(() => {
-    fetchMock.enableMocks();
-    fetchMock.resetMocks();
-});
+    fetchMock.enableMocks()
+    fetchMock.resetMocks()
+})
 
 afterEach(() => {
-    fetchMock.resetMocks();
-});
+    fetchMock.resetMocks()
+})
 
 it("verifies token with public key - es256k", async () => {
     const keyPairES256k = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.ES256K,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairES256k?.privateKey).toBeTruthy();
-    expect(keyPairES256k?.publicKey).toBeTruthy();
+    expect(keyPairES256k?.privateKey).toBeTruthy()
+    expect(keyPairES256k?.publicKey).toBeTruthy()
 
     const signedPayloadEs256k = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.ES256K,
         keyPairES256k.privateKey,
         {
-            kid: keyPairES256k?.kid
-        }
-    );
-    expect(signedPayloadEs256k).toBeTruthy();
+            kid: keyPairES256k?.kid,
+        },
+    )
+    expect(signedPayloadEs256k).toBeTruthy()
     const verifiedEs256k = await verifyTokenWithPublicKey(
         signedPayloadEs256k,
-        keyPairES256k.publicKey
-    );
+        keyPairES256k.publicKey,
+    )
     expect(verifiedEs256k?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairES256k?.kid
-    });
+        kid: keyPairES256k?.kid,
+    })
     expect(verifiedEs256k?.protectedHeader).toEqual({
         alg: "ES256K",
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - rs256", async () => {
     const keyPairRS256 = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.RS256,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairRS256?.privateKey).toBeTruthy();
-    expect(keyPairRS256?.publicKey).toBeTruthy();
+    expect(keyPairRS256?.privateKey).toBeTruthy()
+    expect(keyPairRS256?.publicKey).toBeTruthy()
 
     const signedPayloadRs256 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.RS256,
         keyPairRS256.privateKey,
         {
-            kid: keyPairRS256?.kid
-        }
-    );
-    expect(signedPayloadRs256).toBeTruthy();
-    const verifiedRs256 = await verifyTokenWithPublicKey(
-        signedPayloadRs256,
-        keyPairRS256.publicKey
-    );
+            kid: keyPairRS256?.kid,
+        },
+    )
+    expect(signedPayloadRs256).toBeTruthy()
+    const verifiedRs256 = await verifyTokenWithPublicKey(signedPayloadRs256, keyPairRS256.publicKey)
     expect(verifiedRs256?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairRS256?.kid
-    });
+        kid: keyPairRS256?.kid,
+    })
     expect(verifiedRs256?.protectedHeader).toEqual({
         alg: Algs.RS256,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - rs384", async () => {
     const keyPairRS384 = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.RS384,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairRS384?.privateKey).toBeTruthy();
-    expect(keyPairRS384?.publicKey).toBeTruthy();
+    expect(keyPairRS384?.privateKey).toBeTruthy()
+    expect(keyPairRS384?.publicKey).toBeTruthy()
 
     const signedPayloadRs384 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.RS384,
         keyPairRS384.privateKey,
         {
-            kid: keyPairRS384?.kid
-        }
-    );
-    expect(signedPayloadRs384).toBeTruthy();
-    const verifiedRs384 = await verifyTokenWithPublicKey(
-        signedPayloadRs384,
-        keyPairRS384.publicKey
-    );
+            kid: keyPairRS384?.kid,
+        },
+    )
+    expect(signedPayloadRs384).toBeTruthy()
+    const verifiedRs384 = await verifyTokenWithPublicKey(signedPayloadRs384, keyPairRS384.publicKey)
     expect(verifiedRs384?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairRS384?.kid
-    });
+        kid: keyPairRS384?.kid,
+    })
     expect(verifiedRs384?.protectedHeader).toEqual({
         alg: Algs?.RS384,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - rs512", async () => {
     const keyPairRS512 = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.RS512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairRS512?.privateKey).toBeTruthy();
-    expect(keyPairRS512?.publicKey).toBeTruthy();
+    expect(keyPairRS512?.privateKey).toBeTruthy()
+    expect(keyPairRS512?.publicKey).toBeTruthy()
 
     const signedPayloadRs512 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.RS512,
         keyPairRS512.privateKey,
         {
-            kid: keyPairRS512?.kid
-        }
-    );
-    expect(signedPayloadRs512).toBeTruthy();
-    const verifiedRs512 = await verifyTokenWithPublicKey(
-        signedPayloadRs512,
-        keyPairRS512.publicKey
-    );
+            kid: keyPairRS512?.kid,
+        },
+    )
+    expect(signedPayloadRs512).toBeTruthy()
+    const verifiedRs512 = await verifyTokenWithPublicKey(signedPayloadRs512, keyPairRS512.publicKey)
     expect(verifiedRs512?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairRS512?.kid
-    });
+        kid: keyPairRS512?.kid,
+    })
     expect(verifiedRs512?.protectedHeader).toEqual({
         alg: Algs?.RS512,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - ps256", async () => {
     const keyPairPS256 = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.PS256,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairPS256?.privateKey).toBeTruthy();
-    expect(keyPairPS256?.publicKey).toBeTruthy();
+    expect(keyPairPS256?.privateKey).toBeTruthy()
+    expect(keyPairPS256?.publicKey).toBeTruthy()
 
     const signedPayloadPs256 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.PS256,
         keyPairPS256.privateKey,
         {
-            kid: keyPairPS256?.kid
-        }
-    );
-    expect(signedPayloadPs256).toBeTruthy();
-    const verifiedPs256 = await verifyTokenWithPublicKey(
-        signedPayloadPs256,
-        keyPairPS256.publicKey
-    );
+            kid: keyPairPS256?.kid,
+        },
+    )
+    expect(signedPayloadPs256).toBeTruthy()
+    const verifiedPs256 = await verifyTokenWithPublicKey(signedPayloadPs256, keyPairPS256.publicKey)
     expect(verifiedPs256?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairPS256?.kid
-    });
+        kid: keyPairPS256?.kid,
+    })
     expect(verifiedPs256?.protectedHeader).toEqual({
         alg: Algs?.PS256,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - ps384", async () => {
     const keyPairPS384 = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.PS384,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairPS384?.privateKey).toBeTruthy();
-    expect(keyPairPS384?.publicKey).toBeTruthy();
+    expect(keyPairPS384?.privateKey).toBeTruthy()
+    expect(keyPairPS384?.publicKey).toBeTruthy()
 
     const signedPayloadPs384 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.PS384,
         keyPairPS384.privateKey,
         {
-            kid: keyPairPS384?.kid
-        }
-    );
-    expect(signedPayloadPs384).toBeTruthy();
-    const verifiedPs384 = await verifyTokenWithPublicKey(
-        signedPayloadPs384,
-        keyPairPS384.publicKey
-    );
+            kid: keyPairPS384?.kid,
+        },
+    )
+    expect(signedPayloadPs384).toBeTruthy()
+    const verifiedPs384 = await verifyTokenWithPublicKey(signedPayloadPs384, keyPairPS384.publicKey)
     expect(verifiedPs384?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairPS384?.kid
-    });
+        kid: keyPairPS384?.kid,
+    })
     expect(verifiedPs384?.protectedHeader).toEqual({
         alg: Algs?.PS384,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - ps512", async () => {
     const keyPairPS512 = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.PS512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairPS512?.privateKey).toBeTruthy();
-    expect(keyPairPS512?.publicKey).toBeTruthy();
+    expect(keyPairPS512?.privateKey).toBeTruthy()
+    expect(keyPairPS512?.publicKey).toBeTruthy()
 
     const signedPayloadPs512 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.PS512,
         keyPairPS512.privateKey,
         {
-            kid: keyPairPS512?.kid
-        }
-    );
-    expect(signedPayloadPs512).toBeTruthy();
-    const verifiedPs512 = await verifyTokenWithPublicKey(
-        signedPayloadPs512,
-        keyPairPS512.publicKey
-    );
+            kid: keyPairPS512?.kid,
+        },
+    )
+    expect(signedPayloadPs512).toBeTruthy()
+    const verifiedPs512 = await verifyTokenWithPublicKey(signedPayloadPs512, keyPairPS512.publicKey)
     expect(verifiedPs512?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairPS512?.kid
-    });
+        kid: keyPairPS512?.kid,
+    })
     expect(verifiedPs512?.protectedHeader).toEqual({
         alg: Algs?.PS512,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - ES256", async () => {
     const keyPairES256 = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.ES256,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairES256?.privateKey).toBeTruthy();
-    expect(keyPairES256?.publicKey).toBeTruthy();
+    expect(keyPairES256?.privateKey).toBeTruthy()
+    expect(keyPairES256?.publicKey).toBeTruthy()
 
     const signedPayloadEs256 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.ES256,
         keyPairES256.privateKey,
         {
-            kid: keyPairES256?.kid
-        }
-    );
-    expect(signedPayloadEs256).toBeTruthy();
-    const verifiedEs256 = await verifyTokenWithPublicKey(
-        signedPayloadEs256,
-        keyPairES256.publicKey
-    );
+            kid: keyPairES256?.kid,
+        },
+    )
+    expect(signedPayloadEs256).toBeTruthy()
+    const verifiedEs256 = await verifyTokenWithPublicKey(signedPayloadEs256, keyPairES256.publicKey)
     expect(verifiedEs256?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairES256?.kid
-    });
+        kid: keyPairES256?.kid,
+    })
     expect(verifiedEs256?.protectedHeader).toEqual({
         alg: Algs?.ES256,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - ES384", async () => {
     const keyPairES384 = await getKeyPair({
         algorithmIdentifier: Algs.ES384,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairES384?.privateKey).toBeTruthy();
-    expect(keyPairES384?.publicKey).toBeTruthy();
+    expect(keyPairES384?.privateKey).toBeTruthy()
+    expect(keyPairES384?.publicKey).toBeTruthy()
 
     const signedPayloadEs384 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.ES384,
         keyPairES384.privateKey,
         {
-            kid: keyPairES384?.kid
-        }
-    );
-    expect(signedPayloadEs384).toBeTruthy();
-    const verifiedEs384 = await verifyTokenWithPublicKey(
-        signedPayloadEs384,
-        keyPairES384.publicKey
-    );
+            kid: keyPairES384?.kid,
+        },
+    )
+    expect(signedPayloadEs384).toBeTruthy()
+    const verifiedEs384 = await verifyTokenWithPublicKey(signedPayloadEs384, keyPairES384.publicKey)
     expect(verifiedEs384?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairES384?.kid
-    });
+        kid: keyPairES384?.kid,
+    })
     expect(verifiedEs384?.protectedHeader).toEqual({
         alg: Algs?.ES384,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - ES512", async () => {
     const keyPairES512 = await getKeyPair({
         algorithmIdentifier: Algs.ES512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairES512?.privateKey).toBeTruthy();
-    expect(keyPairES512?.publicKey).toBeTruthy();
+    expect(keyPairES512?.privateKey).toBeTruthy()
+    expect(keyPairES512?.publicKey).toBeTruthy()
 
     const signedPayloadEs512 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.ES512,
         keyPairES512.privateKey,
         {
-            kid: keyPairES512?.kid
-        }
-    );
-    expect(signedPayloadEs512).toBeTruthy();
-    const verifiedEs512 = await verifyTokenWithPublicKey(
-        signedPayloadEs512,
-        keyPairES512.publicKey
-    );
+            kid: keyPairES512?.kid,
+        },
+    )
+    expect(signedPayloadEs512).toBeTruthy()
+    const verifiedEs512 = await verifyTokenWithPublicKey(signedPayloadEs512, keyPairES512.publicKey)
     expect(verifiedEs512?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairES512?.kid
-    });
+        kid: keyPairES512?.kid,
+    })
     expect(verifiedEs512?.protectedHeader).toEqual({
         alg: Algs?.ES512,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - EdDSA", async () => {
     const keyPairEDDSA = await getKeyPair({
         algorithmIdentifier: Algs.EdDSA,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairEDDSA?.privateKey).toBeTruthy();
+    expect(keyPairEDDSA?.privateKey).toBeTruthy()
 
     const signedPayloadEdDSA = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.EdDSA,
         keyPairEDDSA.privateKey,
         {
-            kid: keyPairEDDSA?.kid
-        }
-    );
+            kid: keyPairEDDSA?.kid,
+        },
+    )
 
-    expect(signedPayloadEdDSA).toBeTruthy();
+    expect(signedPayloadEdDSA).toBeTruthy()
 
-    const verifiedEdDSA = await verifyTokenWithPublicKey(
-        signedPayloadEdDSA,
-        keyPairEDDSA.publicKey
-    );
+    const verifiedEdDSA = await verifyTokenWithPublicKey(signedPayloadEdDSA, keyPairEDDSA.publicKey)
 
     expect(verifiedEdDSA?.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairEDDSA?.kid
-    });
+        kid: keyPairEDDSA?.kid,
+    })
 
     expect(verifiedEdDSA?.protectedHeader).toEqual({
         alg: Algs?.EdDSA,
-        type: Kty.JWT
-    });
-});
+        type: Kty.JWT,
+    })
+})
 
 it("verifies token with public key - ES256k / pem", async () => {
     const keyPairES256k = await getKeyPair({
         keyFormat: isBunRuntime ? "jwk" : "pem",
         algorithmIdentifier: Algs.ES256K,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
-    expect(keyPairES256k?.privateKey).toBeTruthy();
-    expect(keyPairES256k?.publicKey).toBeTruthy();
+    expect(keyPairES256k?.privateKey).toBeTruthy()
+    expect(keyPairES256k?.publicKey).toBeTruthy()
 
     const signedPayloadEs256k = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.ES256K,
         keyPairES256k.privateKey,
         {
-            kid: keyPairES256k?.kid
-        }
-    );
-    expect(signedPayloadEs256k).toBeTruthy();
+            kid: keyPairES256k?.kid,
+        },
+    )
+    expect(signedPayloadEs256k).toBeTruthy()
 
     await expect(
-        verifyTokenWithPublicKey(signedPayloadEs256k, keyPairES256k.publicKey)
-    ).toBeTruthy();
-});
+        verifyTokenWithPublicKey(signedPayloadEs256k, keyPairES256k.publicKey),
+    ).toBeTruthy()
+})
 
 // Ed25519 is the EdDSA signature scheme using SHA-512 (SHA-2) and Curve25519
 it("signs with Ed25519 key pair", async () => {
-    const crypto = require("crypto");
-    const { publicKey, privateKey } = crypto.generateKeyPairSync("ed25519");
+    const crypto = require("crypto")
+    const { publicKey, privateKey } = crypto.generateKeyPairSync("ed25519")
 
-    expect(publicKey).toBeTruthy();
-    expect(privateKey).toBeTruthy();
+    expect(publicKey).toBeTruthy()
+    expect(privateKey).toBeTruthy()
 
     const protectedHeaders = {
         alg: "EdDSA",
-        typ: "JWT"
-    };
+        typ: "JWT",
+    }
 
     const payload = {
-        urn: "urn:test:test"
-    };
+        urn: "urn:test:test",
+    }
 
-    const jwt = await new SignJWT(payload)
-        .setProtectedHeader(protectedHeaders)
-        .sign(privateKey);
+    const jwt = await new SignJWT(payload).setProtectedHeader(protectedHeaders).sign(privateKey)
 
-    expect(jwt).toBeTruthy();
+    expect(jwt).toBeTruthy()
 
-    const verifiedPayload = await jwtVerify(jwt, publicKey);
+    const verifiedPayload = await jwtVerify(jwt, publicKey)
 
-    expect(verifiedPayload).toBeTruthy();
+    expect(verifiedPayload).toBeTruthy()
 
-    expect(verifiedPayload?.payload).toMatchObject(payload);
-    expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders);
-});
+    expect(verifiedPayload?.payload).toMatchObject(payload)
+    expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders)
+})
 nodeOnlyIt("verifies Ed448 Key pair", async () => {
-    const crypto = require("crypto");
-    const { publicKey, privateKey } = crypto.generateKeyPairSync("ed448");
-    expect(publicKey).toBeTruthy();
-    expect(privateKey).toBeTruthy();
+    const crypto = require("crypto")
+    const { publicKey, privateKey } = crypto.generateKeyPairSync("ed448")
+    expect(publicKey).toBeTruthy()
+    expect(privateKey).toBeTruthy()
 
     const payload = {
-        urn: "urn:test:test"
-    };
+        urn: "urn:test:test",
+    }
 
-    const privatePem: string = privateKey.export({ format: "pem", type: "pkcs8" });
-    const publicPem: string = publicKey.export({ format: "pem", type: "spki" });
+    const privatePem: string = privateKey.export({ format: "pem", type: "pkcs8" })
+    const publicPem: string = publicKey.export({ format: "pem", type: "spki" })
 
-    const jwt = await signJwtWithPrivateKey(payload, Algs.EdDSA, privatePem);
-    expect(jwt).toBeTruthy();
+    const jwt = await signJwtWithPrivateKey(payload, Algs.EdDSA, privatePem)
+    expect(jwt).toBeTruthy()
 
-    const verifiedPayload: ITokenExtractedWithPubKey = await verifyTokenWithPublicKey(jwt, publicPem);
-    expect(verifiedPayload).toBeTruthy();
-    expect(verifiedPayload?.payload).toMatchObject(payload);
-    expect(verifiedPayload?.protectedHeader).toMatchObject({ alg: "EdDSA", typ: "JWT" });
-});
+    const verifiedPayload: ITokenExtractedWithPubKey = await verifyTokenWithPublicKey(
+        jwt,
+        publicPem,
+    )
+    expect(verifiedPayload).toBeTruthy()
+    expect(verifiedPayload?.payload).toMatchObject(payload)
+    expect(verifiedPayload?.protectedHeader).toMatchObject({ alg: "EdDSA", typ: "JWT" })
+})
 
 it("verifies correctly token with public uri", async () => {
-    const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367";
-    const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd";
+    const tenantUuid2 = "d84ddef4-81dd-4ce6-9594-03ac52cac367"
+    const applicationUuid2 = "b867db48-4e11-4cae-bb03-086dc97c8ddd"
     const keyPairES512 = await getKeyPair({
         algorithmIdentifier: Algs.ES512,
-        keySize: 4096
-    });
+        keySize: 4096,
+    })
 
     const regExpPathAppJwks = new RegExp(
-        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`
-    );
+        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`,
+    )
 
-    const keys = [keyPairES512.publicKey];
+    const keys = [keyPairES512.publicKey]
 
     const fullRegex = new RegExp(
-        `^${AUTHDOG_API_ROOT.replace(/\\./g, "\\.")}\/${regExpPathAppJwks.source}$`
-    );
-    fetchMock.mockIf(fullRegex, () => ({ status: 200, body: JSON.stringify({ keys }) }));
+        `^${AUTHDOG_API_ROOT.replace(/\\./g, "\\.")}\/${regExpPathAppJwks.source}$`,
+    )
+    fetchMock.mockIf(fullRegex, () => ({ status: 200, body: JSON.stringify({ keys }) }))
 
     const signedPayloadEs512 = await signJwtWithPrivateKey(
         {
-            urn: "urn:test:test"
+            urn: "urn:test:test",
         },
         Algs.ES512,
         keyPairES512.privateKey,
         {
-            kid: keyPairES512?.kid
-        }
-    );
+            kid: keyPairES512?.kid,
+        },
+    )
 
-    const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`;
+    const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`
 
-    let verified: ITokenExtractedWithPubKey | undefined;
+    let verified: ITokenExtractedWithPubKey | undefined
 
     verified = await verifyTokenWithPublicKey(signedPayloadEs512, null, {
-        jwksUri
-    });
+        jwksUri,
+    })
 
-    expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" });
+    expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" })
     expect(verified.payload).toEqual({
         urn: "urn:test:test",
-        kid: keyPairES512?.kid
-    });
+        kid: keyPairES512?.kid,
+    })
 
-    fetchMock.disableMocks();
-});
+    fetchMock.disableMocks()
+})
 
 describe("pemToJwk", () => {
     test("converts RSA public key PEM to JWK", async () => {
@@ -547,19 +514,19 @@ describe("pemToJwk", () => {
         pGvoT+XQfHklxwtbJfVYhjKcd/7hqG+OwUfJRpUjC6U0N6uN+6aafj+3qkwYzbvM
         Me/qe+TbTstTJgk2rXJzGn7/+gfbj+Yd7Jry70w+/whF7Vodl1nUjdwMYzPXY/yw
         QwIDAQAB
-        -----END PUBLIC KEY-----`;
+        -----END PUBLIC KEY-----`
 
-        const key0 = await pemToJwk(pemString0, "RS256");
-        expect(key0).toBeTruthy();
+        const key0 = await pemToJwk(pemString0, "RS256")
+        expect(key0).toBeTruthy()
 
         const pemString1 = `-----BEGIN PUBLIC KEY-----
       MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFlHHWfLk0gLBbsLTcuCrbCqoHqmM
       YJepMC+Q+Dd6RBmBiA41evUsNMwLeN+PNFqib+xwi9JkJ8qhZkq8Y/IzGg==
-      -----END PUBLIC KEY-----`;
-        const algString1 = "ES256";
+      -----END PUBLIC KEY-----`
+        const algString1 = "ES256"
 
-        const key1 = await pemToJwk(pemString1, algString1);
-        expect(key1).toBeTruthy();
+        const key1 = await pemToJwk(pemString1, algString1)
+        expect(key1).toBeTruthy()
 
         const pemString2 = `-----BEGIN PUBLIC KEY-----
     MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAmqt5Nx9J2GUY/PITEJQc
@@ -575,9 +542,9 @@ describe("pemToJwk", () => {
     vtwSRYOZXbrFw6voU4kS6SKmNlqVwPyUsB98Udrw5Ap1ayjYGSfr5pJ+TzHXvVNo
     u16AxM36rkcCb+ZSdkwL9bsCAwEAAQ==
     -----END PUBLIC KEY-----
-    `;
+    `
 
-        const key2 = await pemToJwk(pemString2, "RS256");
-        expect(key2).toBeTruthy();
-    });
-});
+        const key2 = await pemToJwk(pemString2, "RS256")
+        expect(key2).toBeTruthy()
+    })
+})

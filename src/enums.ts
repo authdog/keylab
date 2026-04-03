@@ -46,13 +46,13 @@ export enum JwtAlgorithmsEnum {
     // PBES2
     PBES2_HS256_A128KW = "PBES2-HS256+A128KW",
     PBES2_HS384_A192KW = "PBES2-HS384+A192KW",
-    PBES2_HS512_A256KW = "PBES2-HS512+A256KW"
+    PBES2_HS512_A256KW = "PBES2-HS512+A256KW",
 }
 
 // https://datatracker.ietf.org/doc/html/rfc7517#section-4.2
 export enum JwtPublicKeyUse {
     SIGNATURE = "sig",
-    ENCRYPTION = "enc"
+    ENCRYPTION = "enc",
 }
 
 export enum JwtKeyTypes {
@@ -60,11 +60,11 @@ export enum JwtKeyTypes {
     RSA = "rsa", // Rivest–Shamir–Adleman
     EC = "ec", // elliptic curve
     OKP = "okp", // Edwards-curve Octet Key Pair: https://datatracker.ietf.org/doc/html/rfc8032
-    JWT = "jwt" // JSON Web Token key type
+    JWT = "jwt", // JSON Web Token key type
 }
 
 export enum JwtParts {
     HEADER = "header",
     PAYLOAD = "payload",
-    SIGNATURE = "signature"
+    SIGNATURE = "signature",
 }
