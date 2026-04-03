@@ -10,6 +10,15 @@ export default defineConfig({
         setupFiles: ["./vitest.setup.ts"],
         coverage: {
             provider: "v8",
+            exclude: [
+                "coverage/**",
+                "dist/**",
+                "scripts/**",
+                "src/index.ts",
+                "src/errors/index.ts",
+                "src/vendors/index.ts",
+                "src/vendors/**/index.ts",
+            ],
         },
     },
 })

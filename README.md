@@ -6,7 +6,8 @@
 [![code style: biome](https://img.shields.io/badge/code_style-biome-60a5fa.svg?style=flat-square)](https://biomejs.dev/)
 ![bundle size](https://img.shields.io/bundlephobia/minzip/keylab?label=zipped)
 
-Minimal JWT and JWKS toolkit for Node.js, Cloudflare Workers, browsers, and Bun.
+Create, sign, verify, and inspect JWTs with PEM, JWK, and JWKS support.
+Works across Node.js, Cloudflare Workers, browsers, and Bun, including portable support for curves modern `jose` no longer handles directly.
 
 Install with `bun add keylab`, `npm install keylab`, or `yarn add keylab`.
 
