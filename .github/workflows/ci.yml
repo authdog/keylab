@@ -1,4 +1,4 @@
-name: adg-keylab-lib
+name: CI
 
 on:
   push:
