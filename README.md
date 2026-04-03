@@ -15,7 +15,7 @@ Install with `bun add keylab`, `npm install keylab`, or `yarn add keylab`.
 ## Docs
 
 - [Full documentation](md/README.md)
-- [Security Policy](md/SECURITY.md)
+- [Security Policy](SECURITY.md)
 - [Code of Conduct](md/CODE_OF_CONDUCT.md)
 
 ## License
