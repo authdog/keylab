@@ -9,4 +9,4 @@ deploy_lib:
 
 # documentations
 deploy_docs:
-	bun run docs:deploy
+	bun run docs:pages
