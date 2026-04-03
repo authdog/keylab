@@ -4,9 +4,31 @@ on:
   push:
     paths:
       - src/**
+      - package.json
+      - bun.lock
+      - .github/workflows/ci.yml
+  pull_request:
+    paths:
+      - src/**
+      - package.json
+      - bun.lock
+      - .github/workflows/ci.yml
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Dependency review
+        uses: actions/dependency-review-action@v4
+
   build:
     runs-on: ubuntu-latest
 
