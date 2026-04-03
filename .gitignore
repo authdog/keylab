@@ -127,3 +127,4 @@ build
 pkg/
 
 *.js
+!scripts/generate-coverage-badge.js
