@@ -61,7 +61,7 @@
         "@types/node": "^25.5.2",
         "@vitest/coverage-v8": "^1.6.0",
         "codecov": "^3.8.3",
-        "husky": "^7.0.0",
+        "husky": "^9.1.7",
         "raw-loader": "^4.0.2",
         "terser": "^5.43.1",
         "ts-node": "^10.1.0",
