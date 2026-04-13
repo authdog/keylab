@@ -70,7 +70,7 @@
         "typedoc": "^0.28.18",
         "typescript": "^6.0.2",
         "vitepress": "^1.6.4",
-        "vitest": "^1.6.0",
+        "vitest": "^4.1.4",
         "vitest-fetch-mock": "^0.4.0"
     },
     "dependencies": {
