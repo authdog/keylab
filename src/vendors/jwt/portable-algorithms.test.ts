@@ -131,6 +131,26 @@ it("throws on malformed jwt token with fewer than 3 parts", async () => {
     ).rejects.toThrow("Malformed JWT.")
 })
 
+it("uses JwtKeyTypes.JWT as default type when protectedHeaders has no type field", async () => {
+    const keyPair = await getKeyPair({ keyFormat: "jwk", algorithmIdentifier: Algs.Ed448 })
+    const token = await signPortableJwt({
+        payload: { sub: "test" },
+        alg: Algs.EdDSA,
+        privateKey: keyPair.privateKey,
+        protectedHeaders: { alg: Algs.EdDSA },
+    })
+    expect(token).toBeTruthy()
+})
+
+it("matchesHeader returns false when EdDSA token is verified with a non-Ed448 crv key", async () => {
+    const ed448KeyPair = await getKeyPair({ keyFormat: "jwk", algorithmIdentifier: Algs.Ed448 })
+    const ed25519KeyPair = await getKeyPair({ keyFormat: "jwk", algorithmIdentifier: Algs.EdDSA })
+    const token = await signJwtWithPrivateKey({ sub: "test" }, Algs.EdDSA, ed448KeyPair.privateKey)
+    await expect(
+        verifyPortableJwt({ token, publicKeys: [ed25519KeyPair.publicKey] }),
+    ).rejects.toThrow("Invalid signature")
+})
+
 it("skips candidate key when kid in token header mismatches the key kid", async () => {
     const signingKeyPair = await getKeyPair({
         keyFormat: "jwk",

@@ -251,6 +251,7 @@ const matchesHeader = (jwk: any, protectedHeader: any) => {
 
     if (protectedHeader?.alg === Algs.EdDSA) {
         return normalizeCurveName(jwk.crv) === "Ed448"
+        /* v8 ignore next */
     }
     /* v8 ignore next 2 */
     return false
