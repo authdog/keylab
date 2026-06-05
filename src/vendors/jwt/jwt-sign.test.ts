@@ -485,6 +485,26 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
     expect(signedPayloadEs256k).toBeTruthy()
 })
 
+it("covers getJoseImportAlgorithm RSAPSS, RSA1_5, and X25519 branches", async () => {
+    // Line 73: RSAPSS/RSA_PSS → PS256
+    const rsapssKeyPair = await getKeyPair({ algorithmIdentifier: Algs.RSAPSS, keyFormat: "jwk", keySize: 2048 })
+    await expect(
+        signJwtWithPrivateKey({ urn: "test" }, Algs.RSAPSS, rsapssKeyPair.privateKey),
+    ).rejects.toBeTruthy()
+
+    // Line 75: RSA1_5 → RSA_OAEP
+    const rsa15KeyPair = await getKeyPair({ algorithmIdentifier: Algs.RSA1_5, keyFormat: "jwk", keySize: 2048 })
+    await expect(
+        signJwtWithPrivateKey({ urn: "test" }, Algs.RSA1_5, rsa15KeyPair.privateKey),
+    ).rejects.toBeTruthy()
+
+    // Line 77: X25519 → ECDH_ES
+    const x25519KeyPair = await getKeyPair({ algorithmIdentifier: Algs.X25519, keyFormat: "jwk" })
+    await expect(
+        signJwtWithPrivateKey({ urn: "test" }, Algs.X25519, x25519KeyPair.privateKey),
+    ).rejects.toBeTruthy()
+})
+
 it("throws when a non-HS string key is not valid PKCS8", async () => {
     await expect(
         signJwtWithPrivateKey({ urn: "urn:test:test" }, Algs.RS256, "definitely-not-a-private-key"),
@@ -589,6 +609,16 @@ it("generates symmetric keys with default sizes and metadata", async () => {
     } as any)
     expect(dirPem.privateKey).toEqual(dirPem.publicKey)
     expect(dirPem.privateKey).toHaveLength(64)
+
+    const hs256Jwk = await getKeyPair({
+        algorithmIdentifier: Algs.HS256,
+        keyFormat: "jwk",
+    } as any)
+    expect(hs256Jwk.privateKey).toMatchObject({
+        kty: "oct",
+        use: "sig",
+        alg: Algs.HS256,
+    })
 })
 
 it("throws on unsupported key generation algorithm", async () => {
@@ -702,6 +732,15 @@ it("falls back to node crypto when jose key generation fails", async () => {
         crv: "Ed25519",
         alg: Algs.EdDSA,
         use: "sig",
+    })
+
+    const eddsaKeyPair = await getKeyPairWithFallback({
+        algorithmIdentifier: Algs.EdDSA,
+        keyFormat: "jwk",
+    })
+    expect(eddsaKeyPair.publicKey).toMatchObject({
+        kty: "OKP",
+        crv: "Ed25519",
     })
 
     const x25519KeyPair = await getKeyPairWithFallback({

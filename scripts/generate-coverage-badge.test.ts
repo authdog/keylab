@@ -15,7 +15,10 @@ describe("generate-coverage-badge", () => {
         expect(formatCoverageLabel(97.76)).toBe("97.8%")
         expect(formatCoverageLabel(80)).toBe("80%")
         expect(getColor(95)).toBe("#16a34a")
+        expect(getColor(85)).toBe("#65a30d")
         expect(getColor(75)).toBe("#ca8a04")
+        expect(getColor(65)).toBe("#ea580c")
+        expect(getColor(50)).toBe("#dc2626")
         expect(measureWidth("ok")).toBeGreaterThanOrEqual(44)
         expect(escapeXml(`5" < 6 & 7`)).toBe("5&quot; &lt; 6 &amp; 7")
     })
@@ -50,6 +53,19 @@ describe("generate-coverage-badge", () => {
             "badges/coverage.svg",
             expect.stringContaining("88.7%"),
         )
+    })
+
+    it("defaults to 0 when coverage summary has no pct value", () => {
+        const readFileSync = vi.fn(() => JSON.stringify({}))
+        const mkdirSync = vi.fn()
+        const writeFileSync = vi.fn()
+
+        const coverage = readCoveragePercent("coverage-summary.json", {
+            readFileSync,
+            mkdirSync,
+            writeFileSync,
+        })
+        expect(coverage).toBe(0)
     })
 
     it("generates a badge label from summary data", () => {

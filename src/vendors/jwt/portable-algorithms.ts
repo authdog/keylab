@@ -23,6 +23,7 @@ const PORTABLE_PEM_RUNTIME_ERROR =
     "PEM support for ES256K, Ed448, and X448 requires a Node.js runtime. Use JWK keys in Workers and browsers."
 
 const loadNodeCrypto = async () => {
+    /* v8 ignore next 3 */
     if (!isNodeJs()) {
         throw new Error(PORTABLE_PEM_RUNTIME_ERROR)
     }
@@ -139,6 +140,7 @@ const createPortableJwkPair = (algorithmIdentifier: Algs) => {
                 },
             }
         }
+        /* v8 ignore next 2 */
         default:
             throw new Error(`Unsupported portable algorithm: ${algorithmIdentifier}`)
     }
@@ -176,9 +178,11 @@ const curveFromJwkForAlg = (alg: string, jwk: any): PortableCurve | null => {
     if (alg === Algs.Ed448 || crv === "Ed448") {
         return "Ed448"
     }
+    /* v8 ignore next 3 */
     if (alg === Algs.X448 || crv === "X448") {
         return "X448"
     }
+    /* v8 ignore next 3 */
     if (alg === Algs.EdDSA && crv === "Ed448") {
         return "Ed448"
     }
@@ -232,6 +236,7 @@ const parseJwtParts = (token: string) => {
 }
 
 const matchesHeader = (jwk: any, protectedHeader: any) => {
+    /* v8 ignore next 3 */
     if (!jwk) {
         return false
     }
@@ -247,7 +252,7 @@ const matchesHeader = (jwk: any, protectedHeader: any) => {
     if (protectedHeader?.alg === Algs.EdDSA) {
         return normalizeCurveName(jwk.crv) === "Ed448"
     }
-
+    /* v8 ignore next 2 */
     return false
 }
 

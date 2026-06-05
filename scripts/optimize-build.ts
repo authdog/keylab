@@ -248,6 +248,7 @@ export async function optimizeBuild(
     dependencies.log("\nBuild optimization complete.")
 }
 
+/* v8 ignore next 6 */
 if (import.meta.main) {
     void optimizeBuild().catch((error) => {
         console.error(getErrorMessage(error))

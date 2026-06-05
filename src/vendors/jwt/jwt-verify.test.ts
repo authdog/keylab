@@ -40,6 +40,12 @@ it("extract properly algorithm from token", async () => {
     expect(getAlgorithmJwt(DUMMY_HS256_TOKEN)).toEqual(Algs.HS256)
 })
 
+it("throws on jwt header missing alg field", () => {
+    const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url")
+    const noAlgToken = `${encode({ typ: "JWT" })}.${encode({ sub: "123" })}.sig`
+    expect(() => getAlgorithmJwt(noAlgToken)).toThrow(c.JWT_MALFORMED_HEADERS)
+})
+
 it("extracts algorithm directly from jwt header", () => {
     expect(extractAlgFromJwtHeader(DUMMY_HS256_TOKEN)).toEqual(Algs.HS256)
 })

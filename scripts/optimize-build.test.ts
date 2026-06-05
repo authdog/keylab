@@ -102,6 +102,24 @@ describe("optimize-build", () => {
         expect(error).toHaveBeenCalledWith("Error processing index.js:", "missing file")
     })
 
+    it("skips files when optimizeFile propagates an error", async () => {
+        const { dependencies, log } = createDependencies()
+        // Make dependencies.error throw so optimizeFile's catch re-throws to optimizeBuild's catch
+        dependencies.error = vi.fn(() => {
+            throw new Error("error handler failed")
+        })
+        dependencies.readFileSync = vi.fn(() => {
+            throw new Error("read error")
+        })
+
+        await optimizeBuild(["index.js"], dependencies)
+
+        expect(log).toHaveBeenCalledWith(
+            "Skipping index.js (not found or error):",
+            "error handler failed",
+        )
+    })
+
     it("runs the optimize build loop", async () => {
         const { dependencies, log } = createDependencies()
         dependencies.minify = vi.fn().mockResolvedValue({ code: "const a=1" })

@@ -104,6 +104,7 @@ export const generateCoverageBadge = (
     return formatCoverageLabel(coverage)
 }
 
+/* v8 ignore next 3 */
 if (import.meta.main) {
     process.stdout.write(`${generateCoverageBadge()}\n`)
 }

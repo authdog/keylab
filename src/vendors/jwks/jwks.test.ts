@@ -650,7 +650,81 @@ it("verifies correctly token with public uri", async () => {
     fetchMock.disableMocks()
 })
 
+it("verifies token with pem public key and required audiences", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "pem",
+        algorithmIdentifier: Algs.RS256,
+        keySize: 2048,
+    })
+    const token = await signJwtWithPrivateKey(
+        { aud: "test-audience" },
+        Algs.RS256,
+        keyPair.privateKey,
+    )
+    const verified = await verifyTokenWithPublicKey(token, keyPair.publicKey, {
+        requiredAudiences: ["test-audience"],
+    })
+    expect(verified?.payload?.aud).toBe("test-audience")
+})
+
+it("sends X-Issuer header when requiredIssuer is set on jwksUri request", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RS256,
+        keySize: 2048,
+    })
+    const token = await signJwtWithPrivateKey(
+        { iss: "https://example.com", urn: "urn:test:issuer" },
+        Algs.RS256,
+        keyPair.privateKey,
+    )
+
+    fetchMock.mockIf("https://as.example.com/issuer-jwks", () => ({
+        status: 200,
+        body: JSON.stringify({ keys: [keyPair.publicKey] }),
+    }))
+
+    const verified = await verifyTokenWithPublicKey(token, null, {
+        jwksUri: "https://as.example.com/issuer-jwks",
+        requiredIssuer: "https://example.com",
+    })
+    expect(verified?.payload?.urn).toBe("urn:test:issuer")
+})
+
+it("handles jwks response where keys is not an array", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.RS256,
+        keySize: 2048,
+    })
+    const token = await signJwtWithPrivateKey(
+        { urn: "urn:test:bad-keys" },
+        Algs.RS256,
+        keyPair.privateKey,
+    )
+
+    fetchMock.mockIf("https://as.example.com/non-array-jwks", () => ({
+        status: 200,
+        body: JSON.stringify({ keys: "not-an-array" }),
+    }))
+
+    await expect(
+        verifyTokenWithPublicKey(token, null, {
+            jwksUri: "https://as.example.com/non-array-jwks",
+        }),
+    ).rejects.toThrow(c.JWK_NO_APPLICABLE_KEY)
+})
+
 describe("pemToJwk", () => {
+    test("converts Ed25519 public key PEM to JWK using EdDSA algorithm", async () => {
+        const keyPair = await getKeyPair({
+            keyFormat: "pem",
+            algorithmIdentifier: Algs.Ed25519,
+        })
+        const key = await pemToJwk(keyPair.publicKey as string, "Ed25519")
+        expect(key).toBeTruthy()
+    })
+
     test("converts RSA public key PEM to JWK", async () => {
         const pemString0 = `-----BEGIN PUBLIC KEY-----
         MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqjB7Y3MqL/Vg7pFwThG1

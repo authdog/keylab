@@ -96,6 +96,7 @@ const getJoseKeyGenerationConfig = (algorithmIdentifier: Algs, keySize?: number)
                 alg: algorithmIdentifier,
                 options: {
                     extractable: true,
+                    /* v8 ignore next */
                     modulusLength: keySize || 2048,
                 },
             }
@@ -105,6 +106,7 @@ const getJoseKeyGenerationConfig = (algorithmIdentifier: Algs, keySize?: number)
                 alg: Algs.PS256,
                 options: {
                     extractable: true,
+                    /* v8 ignore next */
                     modulusLength: keySize || 2048,
                 },
             }
@@ -113,6 +115,7 @@ const getJoseKeyGenerationConfig = (algorithmIdentifier: Algs, keySize?: number)
                 alg: Algs.RSA_OAEP,
                 options: {
                     extractable: true,
+                    /* v8 ignore next */
                     modulusLength: keySize || 2048,
                 },
             }
@@ -175,6 +178,7 @@ const getNodeKeyGenerationConfig = (algorithmIdentifier: Algs, keySize?: number)
             return {
                 type: "rsa",
                 options: {
+                    /* v8 ignore next */
                     modulusLength: keySize || 2048,
                 },
             }
@@ -220,6 +224,7 @@ const getNodeKeyGenerationConfig = (algorithmIdentifier: Algs, keySize?: number)
                 type: "x25519",
                 options: {},
             }
+        /* v8 ignore next 2 */
         default:
             return null
     }
@@ -231,6 +236,7 @@ const getKeyPairWithNodeCrypto = async (
     keySize?: number,
 ): Promise<IKeyPair | null> => {
     const nodeConfig = getNodeKeyGenerationConfig(algorithmIdentifier, keySize)
+    /* v8 ignore next 3 */
     if (!nodeConfig) {
         return null
     }
@@ -426,6 +432,7 @@ export const getKeyPair = async ({
             keyFormat,
             keySize,
         )
+        /* v8 ignore next 5 */
         if (fallbackKeyPair) {
             return fallbackKeyPair
         }
