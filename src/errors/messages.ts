@@ -32,3 +32,20 @@ export const INVALID_PEM_STRING = "Invalid PEM string"
 
 export const INVALID_PUBLIC_KEY_FORMAT =
     "Invalid public key format (must be PEM, JWK, adhoc JWks or JWKs URI)"
+
+export const TOKEN_EXPIRED = "Token has expired"
+export const INVALID_SIGNATURE = "Invalid signature"
+export const ALGORITHM_MISMATCH = "Algorithm mismatch"
+export const MALFORMED_TOKEN = "Malformed token"
+export const JWKS_ENDPOINT_ERROR = "Expected 200 OK from the JSON Web Key Set HTTP response"
+
+export const ERROR_CODES = {
+    TOKEN_EXPIRED: "TOKEN_EXPIRED",
+    INVALID_SIGNATURE: "INVALID_SIGNATURE",
+    ALGORITHM_MISMATCH: "ALGORITHM_MISMATCH",
+    MALFORMED_TOKEN: "MALFORMED_TOKEN",
+    JWKS_ENDPOINT_ERROR: "JWKS_ENDPOINT_ERROR",
+    UNAUTHORIZED: "UNAUTHORIZED",
+    JWT_ERROR: "JWT_ERROR",
+    ENVIRONMENT_ERROR: "ENVIRONMENT_ERROR",
+} as const

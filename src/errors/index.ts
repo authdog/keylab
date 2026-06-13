@@ -18,3 +18,12 @@ export const throwEnvironmentError = (message?: string) => {
 }
 
 export * as msg from "./messages"
+
+export { JsonWebTokenError } from "./jwt-error"
+export { UnauthorizedError } from "./unauthorized"
+export { EnvironmentError } from "./environment"
+export { TokenExpiredError } from "./token-expired"
+export { InvalidSignatureError } from "./invalid-signature"
+export { AlgorithmMismatchError } from "./algorithm-mismatch"
+export { MalformedTokenError } from "./malformed-token"
+export { JwksEndpointError } from "./jwks-endpoint"

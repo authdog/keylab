@@ -52,6 +52,11 @@ export interface IJwtTokenClaims {
     scp: string // scopes eg: "user openid"
     pld?: any // payload
     aid?: string // authdog global identifier
+    nbf?: number // not before
+    jti?: string // JWT ID
+    nonce?: string // nonce
+    auth_time?: number // authentication time
+    azp?: string // authorized party
 }
 
 export interface IJwtTokenOpts {

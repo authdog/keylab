@@ -1,9 +1,11 @@
-import { createLocalJWKSet, importSPKI, jwtVerify, JWK } from "jose"
+import { createLocalJWKSet, importSPKI, jwtVerify, JWK, JWTPayload, JWTHeaderParameters } from "jose"
 import { extractAlgFromJwtHeader } from "../jwt/jwt-verify"
 import { JwtAlgorithmsEnum as Algs } from "../../enums"
 import { INVALID_PUBLIC_KEY_FORMAT, JWK_NO_APPLICABLE_KEY } from "../../errors/messages"
+import { JwksEndpointError } from "../../errors/jwks-endpoint"
 import { needsPortableEdDsa, verifyPortableJwt } from "../jwt/portable-algorithms"
 import { normalizeCurveName, normalizeJwk } from "../jwt/utils"
+import { IJwkPrivateKey } from "../jwt/interfaces"
 
 export interface IJwksClient {
     jwksUri?: string // required for RS256
@@ -34,17 +36,16 @@ export interface IRSAKeyStore {
     keys: [IJwkRecordVisible]
 }
 
-// TODO: add proper type for key parameter
 /**
  * @param privateKey is a JSON Web Key object with private fields
  * @returns public key (without private fields)
  * will remove private fields from jwk, in order to make sure a jwk is exposable publicly
  */
-export const makePublicKey = (privateKey: any) => {
+export const makePublicKey = (privateKey: IJwkPrivateKey) => {
     const publicKey = {
         kty: privateKey.kty,
         kid: privateKey.kid,
-        use: privateKey.sig,
+        use: privateKey.use,
         alg: privateKey.alg,
         x5c: privateKey.x5c,
         x5t: privateKey.x5t,
@@ -65,8 +66,8 @@ export const makePublicKey = (privateKey: any) => {
 }
 
 export interface ITokenExtractedWithPubKey {
-    payload: any
-    protectedHeader: any
+    payload: JWTPayload
+    protectedHeader: JWTHeaderParameters
 }
 
 /**
@@ -134,7 +135,10 @@ export const verifyTokenWithPublicKey = async (
         })
 
         if (!response?.ok) {
-            throw new Error("Expected 200 OK from the JSON Web Key Set HTTP response")
+            throw new JwksEndpointError(
+                "Expected 200 OK from the JSON Web Key Set HTTP response",
+                response?.status || 0,
+            )
         }
 
         const jwksJson = await response.json()
@@ -186,4 +190,27 @@ export const verifyTokenWithPublicKey = async (
  */
 export const pemToJwk = async (pemString: string, algorithm: string) => {
     return await importSPKI(pemString, algorithm === "Ed25519" ? "EdDSA" : algorithm)
+}
+
+// JWKS Cache factory functions
+import { JwksCache, IJwksCacheOptions } from "./jwks-cache"
+
+let defaultJwksCache: JwksCache | null = null
+
+export const createJwksCache = (options?: IJwksCacheOptions): JwksCache => {
+    return new JwksCache(options)
+}
+
+export const getDefaultJwksCache = (): JwksCache => {
+    if (!defaultJwksCache) {
+        defaultJwksCache = new JwksCache()
+    }
+    return defaultJwksCache
+}
+
+export const clearJwksCache = (): void => {
+    if (defaultJwksCache) {
+        defaultJwksCache.clear()
+        defaultJwksCache = null
+    }
 }

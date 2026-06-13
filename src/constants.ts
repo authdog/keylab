@@ -8,6 +8,8 @@ export const JWT_PUBLIC_KEY_USES = Object.values(enums.JwtPublicKeyUse)
 export const AUTHDOG_ID_ISSUER = "https://id.authdog.com"
 export const AUTHDOG_JWKS_API_ID = "v1"
 
+export const KID_BYTE_LENGTH = 16
+
 export const EMPTY_STRING = ""
 
 export const CHARS = {

@@ -48,6 +48,11 @@ export interface IDecodedJwt {
     iat: number
     exp: number
     scp?: string[] | string // scopes can be separated by space or comma
+    nbf?: number
+    jti?: string
+    nonce?: string
+    auth_time?: number
+    azp?: string
 }
 
 export interface IGetKeyPair {
@@ -75,6 +80,10 @@ export interface IJwkPrivateKey {
     x5c?: string[]
     x5t?: string
     x5tS256?: string
+    x5u?: string
+    key_ops?: string[]
+    key_id?: string
+    alg?: string
     ext?: any
 }
 

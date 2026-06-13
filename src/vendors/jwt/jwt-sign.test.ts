@@ -778,8 +778,7 @@ it("experiment algorithm", async () => {
                 (err, publicKey, privateKey) => {
                     if (err) return reject(err)
 
-                    // TODO: define kid length in constants
-                    const kid = randomBytes(16).toString("hex")
+                    const kid = randomBytes(c.KID_BYTE_LENGTH).toString("hex")
 
                     resolve({ publicKey, privateKey, kid })
                 },

@@ -1,7 +1,7 @@
 import { atob } from "../ponyfills/ponyfills"
 import * as c from "../../constants"
 import * as enums from "../../enums"
-import { msg, throwJwtError } from "../../errors"
+import { msg, throwJwtError, TokenExpiredError } from "../../errors"
 import { IDecodedJwt } from "./interfaces"
 import { ICheckJwtFields, IcheckTokenValidnessCredentials, ICreateSignedJwtOptions } from ".."
 import { signJwtWithPrivateKey } from "./jwt-sign"
@@ -35,7 +35,7 @@ export const checkTokenValidness = async (
         requiredScopes,
         publicKey,
     }: IcheckTokenValidnessCredentials,
-): Promise<boolean | any> => {
+): Promise<boolean | ITokenExtractedWithPubKey> => {
     const algorithm = getAlgorithmJwt(token)
     const missingCredentials = []
     let extractedPayload: ITokenExtractedWithPubKey | any = null
@@ -139,10 +139,20 @@ export const verifyHSTokenWithSecretString = async (
 
             if (exp) {
                 const now = Math.floor(Date.now() / 1000)
-                isVerified = now < exp
+                if (now >= exp) {
+                    throw new TokenExpiredError(
+                        "Token has expired",
+                        new Date(exp * 1000),
+                    )
+                }
+                isVerified = true
             }
         }
-    } catch (e) {}
+    } catch (e) {
+        if (e instanceof TokenExpiredError) {
+            throw e
+        }
+    }
 
     return isVerified ? decoded?.payload : null
 }
@@ -257,7 +267,6 @@ export const createSignedJwt = async (
 ): Promise<string> => {
     const algEnums = enums.JwtAlgorithmsEnum
     let token
-    // TODO: reflect all fields standard JWT
     const jwtClaims: IDecodedJwt = {
         iss: claims?.iss,
         aud: claims?.aud,
@@ -266,6 +275,11 @@ export const createSignedJwt = async (
         sub: claims?.sub,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000 + signinOptions?.sessionDuration * 60),
+        ...(claims?.nbf !== undefined ? { nbf: claims.nbf } : {}),
+        ...(claims?.jti ? { jti: claims.jti } : {}),
+        ...(claims?.nonce ? { nonce: claims.nonce } : {}),
+        ...(claims?.auth_time !== undefined ? { auth_time: claims.auth_time } : {}),
+        ...(claims?.azp ? { azp: claims.azp } : {}),
         ...payload,
     }
 

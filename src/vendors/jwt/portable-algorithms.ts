@@ -1,5 +1,7 @@
 import type { JWK } from "jose"
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums"
+import { InvalidSignatureError } from "../../errors/invalid-signature"
+import { KID_BYTE_LENGTH } from "../../constants"
 import {
     base64UrlToBytes,
     bytesToBase64Url,
@@ -61,7 +63,7 @@ const createOkpJwk = ({
 })
 
 const createPortableJwkPair = (algorithmIdentifier: Algs) => {
-    const kid = bytesToHex(getRandomBytes(16))
+    const kid = bytesToHex(getRandomBytes(KID_BYTE_LENGTH))
 
     switch (algorithmIdentifier) {
         case Algs.ES256K: {
@@ -374,5 +376,5 @@ export const verifyPortableJwt = async ({
         }
     }
 
-    throw new Error("Invalid signature")
+    throw new InvalidSignatureError()
 }

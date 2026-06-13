@@ -19,6 +19,8 @@ export default defineConfig({
                     { text: "Getting Started", link: "/getting-started" },
                     { text: "Runtime Compatibility", link: "/runtime-compatibility" },
                     { text: "API Summary", link: "/api" },
+                    { text: "Portable Algorithms", link: "/portable-algorithms" },
+                    { text: "Migration from jsonwebtoken", link: "/migration" },
                     { text: "Security", link: "/security" },
                 ],
             },

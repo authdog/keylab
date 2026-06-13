@@ -10,6 +10,7 @@ import {
     JWTHeaderParameters,
     SignJWT,
 } from "jose"
+import { KID_BYTE_LENGTH } from "../../constants"
 import { IGetKeyPair, IKeyPair } from "./interfaces"
 import {
     bytesToBase64Url,
@@ -249,7 +250,7 @@ const getKeyPairWithNodeCrypto = async (
         publicKey: KeyObject
         privateKey: KeyObject
     }
-    const kid = bytesToHex(getRandomBytes(16))
+    const kid = bytesToHex(getRandomBytes(KID_BYTE_LENGTH))
 
     if (keyFormat === "pem") {
         return {
@@ -318,11 +319,11 @@ const getSymmetricKeySize = (algorithmIdentifier: Algs, keySize?: number) => {
 }
 
 export const signJwtWithPrivateKey = async (
-    payload: any,
+    payload: Record<string, unknown>,
     alg: Algs,
     privateKey: string | any,
     opts: ISignJwtOpts = {},
-    altOpts: any = {},
+    altOpts: { keyId?: string } = {},
 ) => {
     const protectedHeaders: JWTHeaderParameters = {
         alg: normalizedJwtAlg(alg),
@@ -388,7 +389,7 @@ export const getKeyPair = async ({
             Algs.PBES2_HS512_A256KW,
         ].includes(algorithmIdentifier)
     ) {
-        const kid = bytesToHex(getRandomBytes(16))
+        const kid = bytesToHex(getRandomBytes(KID_BYTE_LENGTH))
         if (keyFormat === "pem") {
             const secret = bytesToHex(
                 getRandomBytes(getSymmetricKeySize(algorithmIdentifier, keySize)),
@@ -438,7 +439,7 @@ export const getKeyPair = async ({
         }
         throw error
     }
-    const kid = bytesToHex(getRandomBytes(16))
+    const kid = bytesToHex(getRandomBytes(KID_BYTE_LENGTH))
 
     if (keyFormat === "pem") {
         return {

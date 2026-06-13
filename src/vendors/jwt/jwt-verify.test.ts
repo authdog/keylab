@@ -677,3 +677,33 @@ it("throws an error while verifying token with public uri whose key is missing f
 
     fetchMock.disableMocks()
 })
+
+it("creates signed jwt with nbf, jti, nonce, and azp claims", async () => {
+    const now = Math.floor(Date.now() / 1000)
+    const token = await createSignedJwt(
+        { custom: "data" },
+        {
+            algorithm: Algs.HS256,
+            claims: {
+                iss: "issuer",
+                aud: ["audience"],
+                scp: "scope:one",
+                sub: "sub-1",
+                nbf: now,
+                jti: "unique-token-id",
+                nonce: "nonce-value",
+                azp: "authorized-party",
+            },
+            signinOptions: {
+                secret: "secret",
+                sessionDuration: 5,
+            } as any,
+        },
+    )
+    const payload = parseJwt(token)
+    expect(payload.nbf).toEqual(now)
+    expect(payload.jti).toEqual("unique-token-id")
+    expect(payload.nonce).toEqual("nonce-value")
+    expect(payload.azp).toEqual("authorized-party")
+    expect(payload.custom).toEqual("data")
+})
