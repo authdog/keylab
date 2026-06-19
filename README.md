@@ -14,6 +14,7 @@ Install with `bun add keylab`, `npm install keylab`, or `yarn add keylab`.
 
 ## Docs
 
+- [Deep wiki](https://deepwiki.com/authdog/keylab)
 - [Full documentation](llm-docs/index.md)
 - [Security Policy](SECURITY.md)
 - [Code of Conduct](md/CODE_OF_CONDUCT.md)
