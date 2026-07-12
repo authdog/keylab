@@ -39,7 +39,13 @@ jobs:
       - name: Verify release version
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "::error::NPM_TOKEN secret is missing. Add an org or repo secret and grant this repository access."
+            exit 1
+          fi
+
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           if [ -n "$RELEASE_TAG" ] && [ "$PACKAGE_VERSION" != "${RELEASE_TAG#v}" ]; then
             echo "::error::Release tag $RELEASE_TAG does not match package version $PACKAGE_VERSION"
@@ -57,4 +63,6 @@ jobs:
         run: bun run build
 
       - name: Publish package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public --provenance
