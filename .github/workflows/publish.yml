@@ -1,11 +1,12 @@
 name: Publish to npm
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
 concurrency:
-  group: npm-publish-${{ github.event.release.tag_name }}
+  group: npm-publish-${{ github.event.release.tag_name || github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -14,6 +15,7 @@ permissions:
 
 jobs:
   publish:
+    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -39,9 +41,12 @@ jobs:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          TAG_VERSION=${RELEASE_TAG#v}
-          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+          if [ -n "$RELEASE_TAG" ] && [ "$PACKAGE_VERSION" != "${RELEASE_TAG#v}" ]; then
             echo "::error::Release tag $RELEASE_TAG does not match package version $PACKAGE_VERSION"
+            exit 1
+          fi
+          if npm view "keylab@$PACKAGE_VERSION" version >/dev/null 2>&1; then
+            echo "::error::keylab@$PACKAGE_VERSION is already published"
             exit 1
           fi
 
