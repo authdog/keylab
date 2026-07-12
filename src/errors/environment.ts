@@ -1,6 +1,6 @@
 export class EnvironmentError extends Error {
     code = 500
-    constructor(message) {
+    constructor(message: string) {
         super(message)
         this.name = "EnvironmentError"
         Error.call(this, message)

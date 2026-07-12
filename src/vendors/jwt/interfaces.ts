@@ -42,6 +42,7 @@ type AlgorithmIdentifier =
     | Algs.PBES2_HS512_A256KW
 
 export interface IDecodedJwt {
+    [claim: string]: unknown
     iss?: string
     aud?: string[] | string
     sub?: string

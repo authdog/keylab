@@ -1,4 +1,4 @@
-import type { CompactJWEHeaderParameters, JWK, KeyLike } from "jose"
+import type { CompactJWEHeaderParameters, CryptoKey, JWK } from "jose"
 import { CompactEncrypt, compactDecrypt, importJWK, importPKCS8, importSPKI } from "jose"
 
 export interface IEncryptJweOptions {
@@ -29,13 +29,13 @@ const resolveKey = async (
     key: string | JWK | Uint8Array,
     alg: string,
     isPrivate: boolean,
-): Promise<KeyLike | Uint8Array> => {
+): Promise<CryptoKey | Uint8Array> => {
     if (key instanceof Uint8Array) {
         return key
     }
 
     if (typeof key === "object" && key !== null && "kty" in key) {
-        return (await importJWK(key as JWK, alg)) as KeyLike
+        return await importJWK(key as JWK, alg)
     }
 
     if (typeof key === "string") {

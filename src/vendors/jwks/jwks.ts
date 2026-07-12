@@ -56,11 +56,11 @@ export const makePublicKey = (privateKey: IJwkPrivateKey) => {
         key_id: privateKey.key_id,
     }
 
-    Object.keys(publicKey).forEach((key) => {
+    for (const key of Object.keys(publicKey) as Array<keyof typeof publicKey>) {
         if (publicKey[key] === undefined) {
             delete publicKey[key]
         }
-    })
+    }
 
     return publicKey
 }
