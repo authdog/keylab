@@ -31,7 +31,9 @@
         "docs:pages": "rm -rf public && vitepress build llm-docs --outDir public",
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
         "lib:build:clean": "rm -rf dist",
-        "build": "bun run lib:build:clean && tsup",
+        "build:js": "bun build src/index.ts --outdir dist --target browser --format esm --packages external --minify --define 'process.env.NODE_ENV=\"production\"' && bun build src/index.ts --outfile dist/index.cjs --target browser --format cjs --packages external --minify --define 'process.env.NODE_ENV=\"production\"'",
+        "build:types": "tsc -p tsconfig.build.json",
+        "build": "bun run lib:build:clean && bun run build:js && bun run build:types",
         "build:optimize": "bun scripts/optimize-build.ts",
         "lib:publish": "bun run build && bun publish",
         "version": "bun run build"
@@ -66,9 +68,7 @@
         "raw-loader": "^4.0.2",
         "terser": "^5.43.1",
         "ts-node": "^10.1.0",
-        "tsup": "^8.5.1",
-        "typedoc": "^0.28.18",
-        "typescript": "^6.0.2",
+        "typescript": "^7.0.2",
         "vitepress": "^1.6.4",
         "vitest": "^1.6.0",
         "vitest-fetch-mock": "^0.4.0"
