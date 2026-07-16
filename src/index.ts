@@ -3,6 +3,7 @@ export {
     checkTokenValidness,
     createSignedJwt,
     extractBearerTokenFromHeaders,
+    parseJwt,
     pemToJwk,
     getKeyPair,
 } from "./vendors"
