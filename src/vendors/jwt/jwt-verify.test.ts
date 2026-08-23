@@ -1,17 +1,17 @@
+import { afterEach, beforeEach, expect, it, vi } from "vitest"
+import createFetchMock from "vitest-fetch-mock"
+import * as c from "../../constants"
+import { JwtAlgorithmsEnum as Algs, JwtParts, JwtKeyTypes as Kty } from "../../enums"
+import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign"
 import {
-    getAlgorithmJwt,
-    verifyHSTokenWithSecretString,
     checkJwtFields,
-    parseJwt,
     checkTokenValidness,
     createSignedJwt,
     extractAlgFromJwtHeader,
+    getAlgorithmJwt,
+    parseJwt,
+    verifyHSTokenWithSecretString,
 } from "./jwt-verify"
-import { JwtAlgorithmsEnum as Algs, JwtParts, JwtKeyTypes as Kty } from "../../enums"
-import * as c from "../../constants"
-import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign"
-import { vi, beforeEach, afterEach, it, expect } from "vitest"
-import createFetchMock from "vitest-fetch-mock"
 
 const fetchMock = createFetchMock(vi)
 
@@ -639,14 +639,14 @@ it("throws an error while verifying token with public uri whose key is missing f
     })
 
     const regExpPathAppJwks = new RegExp(
-        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`,
+        `api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json*`,
     )
 
     const keys = [keyPairES512.publicKey]
     const AUTHDOG_API_ROOT = "https://api.authdog.xyz"
 
     const fullRegex = new RegExp(
-        `^${AUTHDOG_API_ROOT.replace(/\\./g, "\\.")}\/${regExpPathAppJwks.source}$`,
+        `^${AUTHDOG_API_ROOT.replace(/\\./g, "\\.")}/${regExpPathAppJwks.source}$`,
     )
     fetchMock.mockIf(fullRegex, () => ({ status: 200, body: JSON.stringify({ keys }) }))
 

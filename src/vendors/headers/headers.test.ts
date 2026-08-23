@@ -1,6 +1,6 @@
-import { extractBearerTokenFromHeaders } from "./headers"
 import { expect, it } from "vitest"
 import * as c from "../../constants"
+import { extractBearerTokenFromHeaders } from "./headers"
 
 it("extracts properly Bearer token from req", () => {
     expect(

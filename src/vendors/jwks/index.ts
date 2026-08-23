@@ -1,2 +1,2 @@
 export * from "./jwks"
-export { JwksCache, type IJwksCacheOptions } from "./jwks-cache"
+export { type IJwksCacheOptions, JwksCache } from "./jwks-cache"

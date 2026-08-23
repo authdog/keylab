@@ -1,11 +1,11 @@
-import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign"
-import { parseJwt } from "./jwt-verify"
+import { generateKeyPair, randomBytes } from "node:crypto"
+import { afterEach, expect, it, vi } from "vitest"
 import * as c from "../../constants"
 import { JwtAlgorithmsEnum as Algs, JwtParts } from "../../enums"
+import type { IKeyPair } from "./interfaces"
+import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign"
+import { parseJwt } from "./jwt-verify"
 import { strToUint8Array, uint8ArrayToStr } from "./utils"
-import { generateKeyPair, randomBytes } from "crypto"
-import { IKeyPair } from "./interfaces"
-import { afterEach, expect, it, vi } from "vitest"
 
 const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined"
 
@@ -487,13 +487,21 @@ it("signs payload with pkcs8 private key - ES256k", async () => {
 
 it("covers getJoseImportAlgorithm RSAPSS, RSA1_5, and X25519 branches", async () => {
     // Line 73: RSAPSS/RSA_PSS → PS256
-    const rsapssKeyPair = await getKeyPair({ algorithmIdentifier: Algs.RSAPSS, keyFormat: "jwk", keySize: 2048 })
+    const rsapssKeyPair = await getKeyPair({
+        algorithmIdentifier: Algs.RSAPSS,
+        keyFormat: "jwk",
+        keySize: 2048,
+    })
     await expect(
         signJwtWithPrivateKey({ urn: "test" }, Algs.RSAPSS, rsapssKeyPair.privateKey),
     ).rejects.toBeTruthy()
 
     // Line 75: RSA1_5 → RSA_OAEP
-    const rsa15KeyPair = await getKeyPair({ algorithmIdentifier: Algs.RSA1_5, keyFormat: "jwk", keySize: 2048 })
+    const rsa15KeyPair = await getKeyPair({
+        algorithmIdentifier: Algs.RSA1_5,
+        keyFormat: "jwk",
+        keySize: 2048,
+    })
     await expect(
         signJwtWithPrivateKey({ urn: "test" }, Algs.RSA1_5, rsa15KeyPair.privateKey),
     ).rejects.toBeTruthy()
@@ -757,14 +765,8 @@ it("falls back to node crypto when jose key generation fails", async () => {
 })
 
 it("experiment algorithm", async () => {
-    const generateKey = async ({
-        alg,
-        fallbackAlg,
-    }: {
-        alg: string
-        fallbackAlg: Algs
-    }): Promise<IKeyPair> => {
-        return new Promise((resolve: Function, reject: Function) => {
+    const generateKey = async ({ alg }: { alg: string; fallbackAlg: Algs }): Promise<IKeyPair> => {
+        return new Promise((resolve: (value: any) => void, reject: (reason?: any) => void) => {
             generateKeyPair(
                 alg as any,
                 {

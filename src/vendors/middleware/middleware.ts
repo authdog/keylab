@@ -1,6 +1,6 @@
 import { extractBearerTokenFromHeaders } from "../headers/headers"
 import type { ITokenExtractedWithPubKey } from "../jwks/jwks"
-import type { IcheckTokenValidnessCredentials } from "../jwt/jwt_d"
+import type { IcheckTokenValidnessCredentials } from "../jwt/jwt-types"
 import { checkTokenValidness } from "../jwt/jwt-verify"
 
 export interface IMiddlewareOptions extends IcheckTokenValidnessCredentials {

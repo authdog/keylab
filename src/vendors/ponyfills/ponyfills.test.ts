@@ -1,7 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest"
-import { btoa, atob, getClientWindowMethod, IS_NODEJS, isServer } from "./ponyfills"
-
 import * as c from "../../constants"
+import { atob, btoa, getClientWindowMethod, IS_NODEJS, isServer } from "./ponyfills"
 
 afterEach(() => {
     vi.unstubAllGlobals()

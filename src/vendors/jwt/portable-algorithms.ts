@@ -1,13 +1,15 @@
+import { ed448, x448 } from "@noble/curves/ed448.js"
+import { secp256k1 } from "@noble/curves/secp256k1.js"
 import type { JWK } from "jose"
+import { KID_BYTE_LENGTH } from "../../constants"
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums"
 import { InvalidSignatureError } from "../../errors/invalid-signature"
-import { KID_BYTE_LENGTH } from "../../constants"
 import {
     base64UrlToBytes,
     bytesToBase64Url,
+    bytesToHex,
     concatBytes,
     getRandomBytes,
-    bytesToHex,
     isNodeJs,
     looksLikePem,
     normalizeCurveName,
@@ -15,8 +17,6 @@ import {
     strToUint8Array,
     utf8ToBase64Url,
 } from "./utils"
-import { secp256k1 } from "@noble/curves/secp256k1.js"
-import { ed448, x448 } from "@noble/curves/ed448.js"
 
 type PortableCurve = "ES256K" | "Ed448" | "X448"
 type PortableKey = string | JWK | Record<string, any>
@@ -30,7 +30,7 @@ const loadNodeCrypto = async () => {
         throw new Error(PORTABLE_PEM_RUNTIME_ERROR)
     }
 
-    return import("crypto")
+    return import("node:crypto")
 }
 
 const decodePublicPoint = (jwk: any) =>

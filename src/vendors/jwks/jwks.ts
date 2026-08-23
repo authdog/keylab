@@ -1,11 +1,18 @@
-import { createLocalJWKSet, importSPKI, jwtVerify, JWK, JWTPayload, JWTHeaderParameters } from "jose"
-import { extractAlgFromJwtHeader } from "../jwt/jwt-verify"
+import {
+    createLocalJWKSet,
+    importSPKI,
+    type JWK,
+    type JWTHeaderParameters,
+    type JWTPayload,
+    jwtVerify,
+} from "jose"
 import { JwtAlgorithmsEnum as Algs } from "../../enums"
-import { INVALID_PUBLIC_KEY_FORMAT, JWK_NO_APPLICABLE_KEY } from "../../errors/messages"
 import { JwksEndpointError } from "../../errors/jwks-endpoint"
+import { INVALID_PUBLIC_KEY_FORMAT, JWK_NO_APPLICABLE_KEY } from "../../errors/messages"
+import type { IJwkPrivateKey } from "../jwt/interfaces"
+import { extractAlgFromJwtHeader } from "../jwt/jwt-verify"
 import { needsPortableEdDsa, verifyPortableJwt } from "../jwt/portable-algorithms"
 import { normalizeCurveName, normalizeJwk } from "../jwt/utils"
-import { IJwkPrivateKey } from "../jwt/interfaces"
 
 export interface IJwksClient {
     jwksUri?: string // required for RS256
@@ -193,7 +200,7 @@ export const pemToJwk = async (pemString: string, algorithm: string) => {
 }
 
 // JWKS Cache factory functions
-import { JwksCache, IJwksCacheOptions } from "./jwks-cache"
+import { type IJwksCacheOptions, JwksCache } from "./jwks-cache"
 
 let defaultJwksCache: JwksCache | null = null
 

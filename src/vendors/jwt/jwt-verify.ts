@@ -1,12 +1,12 @@
-import { atob } from "../ponyfills/ponyfills"
+import { type JWTVerifyResult, jwtVerify } from "jose"
 import * as c from "../../constants"
 import * as enums from "../../enums"
-import { msg, throwJwtError, TokenExpiredError } from "../../errors"
-import { IDecodedJwt } from "./interfaces"
-import { ICheckJwtFields, IcheckTokenValidnessCredentials, ICreateSignedJwtOptions } from ".."
+import { msg, TokenExpiredError, throwJwtError } from "../../errors"
+import type { ICheckJwtFields, ICreateSignedJwtOptions, IcheckTokenValidnessCredentials } from ".."
+import { type ITokenExtractedWithPubKey, verifyTokenWithPublicKey } from "../jwks"
+import { atob } from "../ponyfills/ponyfills"
+import type { IDecodedJwt } from "./interfaces"
 import { signJwtWithPrivateKey } from "./jwt-sign"
-import { ITokenExtractedWithPubKey, verifyTokenWithPublicKey } from "../jwks"
-import { jwtVerify } from "jose"
 import { base64UrlToBase64, base64UrlToUtf8 } from "./utils"
 
 /**
@@ -15,9 +15,9 @@ import { base64UrlToBase64, base64UrlToUtf8 } from "./utils"
  * @returns algorithm used for used
  */
 export const getAlgorithmJwt = (token: string) => {
-    let algorithm
+    let algorithm: string
     const headers = parseJwt(token, enums?.JwtParts?.HEADER)
-    if (headers && headers.alg) {
+    if (headers?.alg) {
         algorithm = headers.alg
     } else {
         throw throwJwtError(c.JWT_MALFORMED_HEADERS)
@@ -54,7 +54,7 @@ export const checkTokenValidness = async (
                 extractedPayload = !!(await verifyHSTokenWithSecretString(token, secret))
                 break
             } else {
-                throwJwtError(
+                throw throwJwtError(
                     `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(missingCredentials)}`,
                 )
             }
@@ -106,13 +106,13 @@ export const checkTokenValidness = async (
 
                 break
             } else {
-                throwJwtError(
+                throw throwJwtError(
                     `${c.JWT_MISSING_VALIDATION_CREDENTIALS} ${JSON.stringify(missingCredentials)}`,
                 )
             }
 
         default:
-            throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM)
+            throw throwJwtError(c.JWT_NON_SUPPORTED_ALGORITHM)
     }
 
     return extractedPayload
@@ -125,7 +125,7 @@ export const verifyHSTokenWithSecretString = async (
     issuer?: any,
     audience?: any,
 ) => {
-    let decoded
+    let decoded: JWTVerifyResult | undefined
     let isVerified = false
 
     try {
@@ -140,10 +140,7 @@ export const verifyHSTokenWithSecretString = async (
             if (exp) {
                 const now = Math.floor(Date.now() / 1000)
                 if (now >= exp) {
-                    throw new TokenExpiredError(
-                        "Token has expired",
-                        new Date(exp * 1000),
-                    )
+                    throw new TokenExpiredError("Token has expired", new Date(exp * 1000))
                 }
                 isVerified = true
             }
@@ -176,7 +173,7 @@ export const checkJwtFields = (
             Array.isArray(parsedToken?.aud) &&
             requiredAudiences.length > 0
         ) {
-            requiredAudiences.map((el: string) => {
+            requiredAudiences.forEach((el: string) => {
                 if (!parsedToken?.aud.includes(el)) {
                     validFields = false
                 }
@@ -204,13 +201,13 @@ export const checkJwtFields = (
                 throw new Error(msg.INVALID_SCOPE_FIELD_TYPE)
             }
 
-            requiredScopes.map((el: string) => {
+            requiredScopes.forEach((el: string) => {
                 if (!scopes.includes(el)) {
                     validFields = false
                 }
             })
         }
-    } catch (e) {
+    } catch (_e) {
         validFields = false
     }
     return validFields
@@ -250,7 +247,7 @@ export const parseJwt = (token: string, part: enums.JwtParts = enums.JwtParts.PA
             atob(base64)
                 .split(c.EMPTY_STRING)
                 .map((char: string) => {
-                    return "%" + ("00" + char.charCodeAt(0).toString(16)).slice(-2)
+                    return `%${(`00${char.charCodeAt(0).toString(16)}`).slice(-2)}`
                 })
                 .join(c.EMPTY_STRING),
         )
@@ -266,7 +263,7 @@ export const createSignedJwt = async (
     { algorithm, claims, signinOptions }: ICreateSignedJwtOptions,
 ): Promise<string> => {
     const algEnums = enums.JwtAlgorithmsEnum
-    let token
+    let token: string | undefined
     const jwtClaims: IDecodedJwt = {
         iss: claims?.iss,
         aud: claims?.aud,
@@ -287,7 +284,7 @@ export const createSignedJwt = async (
         case algEnums.HS256:
         case algEnums.HS384:
         case algEnums.HS512:
-            token = signJwtWithPrivateKey(jwtClaims, algorithm, signinOptions?.secret)
+            token = await signJwtWithPrivateKey(jwtClaims, algorithm, signinOptions?.secret)
             break
 
         case algEnums.RS256:
@@ -327,7 +324,7 @@ export const createSignedJwt = async (
             }
             break
         default:
-            throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM)
+            throw throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM)
     }
     return token
 }

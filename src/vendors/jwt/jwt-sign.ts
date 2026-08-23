@@ -1,17 +1,24 @@
-import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums"
-import type { KeyObject } from "crypto"
+import type { KeyObject } from "node:crypto"
 import {
+    type CryptoKey,
     exportJWK,
     exportPKCS8,
     exportSPKI,
     generateKeyPair as generateJoseKeyPair,
     importJWK,
     importPKCS8,
-    JWTHeaderParameters,
+    type JWTHeaderParameters,
     SignJWT,
 } from "jose"
 import { KID_BYTE_LENGTH } from "../../constants"
-import { IGetKeyPair, IKeyPair } from "./interfaces"
+import { JwtAlgorithmsEnum as Algs, JwtKeyTypes } from "../../enums"
+import type { IGetKeyPair, IKeyPair } from "./interfaces"
+import {
+    createPortableKeyPair,
+    isPortableAlgorithm,
+    needsPortableEdDsa,
+    signPortableJwt,
+} from "./portable-algorithms"
 import {
     bytesToBase64Url,
     bytesToHex,
@@ -19,12 +26,6 @@ import {
     normalizeJwk,
     strToUint8Array,
 } from "./utils"
-import {
-    createPortableKeyPair,
-    isPortableAlgorithm,
-    needsPortableEdDsa,
-    signPortableJwt,
-} from "./portable-algorithms"
 
 interface ISignJwtOpts {
     kid?: string
@@ -242,7 +243,7 @@ const getKeyPairWithNodeCrypto = async (
         return null
     }
 
-    const crypto = await import("crypto")
+    const crypto = await import("node:crypto")
     const { publicKey, privateKey } = crypto.generateKeyPairSync(
         nodeConfig.type as any,
         nodeConfig.options as any,
@@ -343,7 +344,7 @@ export const signJwtWithPrivateKey = async (
         })
     }
 
-    let privateKeyObj
+    let privateKeyObj: CryptoKey | Uint8Array
     if (privateKey?.kty) {
         privateKeyObj = await importJWK(normalizeJwk(privateKey), getJoseImportAlgorithm(alg))
     } else {
@@ -422,8 +423,8 @@ export const getKeyPair = async ({
         throw new Error(`Unsupported algorithm ${algorithmIdentifier}`)
     }
 
-    let publicKey
-    let privateKey
+    let publicKey: CryptoKey
+    let privateKey: CryptoKey
 
     try {
         ;({ publicKey, privateKey } = await generateJoseKeyPair(joseConfig.alg, joseConfig.options))

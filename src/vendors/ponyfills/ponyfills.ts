@@ -1,5 +1,5 @@
-import * as e from "../../errors"
 import * as c from "../../constants"
+import * as e from "../../errors"
 import {
     base64ToBytes,
     binaryStringToBytes,
@@ -23,7 +23,7 @@ export const IS_NODEJS = isServer()
  */
 export const getClientWindowMethod = (method: string) => {
     if (IS_NODEJS) {
-        e.throwEnvironmentError()
+        throw e.throwEnvironmentError()
     }
 
     const browserImplementation = (globalThis as any)?.[method]

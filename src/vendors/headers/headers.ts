@@ -1,5 +1,5 @@
-import { UnauthorizedError } from "../../errors/unauthorized"
 import * as c from "../../constants"
+import { UnauthorizedError } from "../../errors/unauthorized"
 
 export const extractBearerTokenFromHeaders = (
     headers: Record<string, string>,

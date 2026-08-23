@@ -1,14 +1,14 @@
 import { expect, it } from "vitest"
-import { EnvironmentError } from "./environment"
-import { JsonWebTokenError } from "./jwt-error"
-import { UnauthorizedError } from "./unauthorized"
-import { TokenExpiredError } from "./token-expired"
-import { InvalidSignatureError } from "./invalid-signature"
-import { AlgorithmMismatchError } from "./algorithm-mismatch"
-import { MalformedTokenError } from "./malformed-token"
-import { JwksEndpointError } from "./jwks-endpoint"
-import { throwEnvironmentError, throwJwtError, throwUnauthorized } from "./index"
 import * as c from "../constants"
+import { AlgorithmMismatchError } from "./algorithm-mismatch"
+import { EnvironmentError } from "./environment"
+import { throwEnvironmentError, throwJwtError, throwUnauthorized } from "./index"
+import { InvalidSignatureError } from "./invalid-signature"
+import { JwksEndpointError } from "./jwks-endpoint"
+import { JsonWebTokenError } from "./jwt-error"
+import { MalformedTokenError } from "./malformed-token"
+import { TokenExpiredError } from "./token-expired"
+import { UnauthorizedError } from "./unauthorized"
 
 it("creates custom error instances with expected metadata", () => {
     const jwtError = new JsonWebTokenError("jwt failure")

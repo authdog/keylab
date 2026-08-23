@@ -1,84 +1,76 @@
 // Export functions
-export {
-    checkTokenValidness,
-    createSignedJwt,
-    extractBearerTokenFromHeaders,
-    parseJwt,
-    pemToJwk,
-    getKeyPair,
-} from "./vendors"
-
-export { signJwtWithPrivateKey } from "./vendors/jwt/jwt-sign"
-export { verifyTokenWithPublicKey } from "./vendors"
-export { isTokenExpired, getTimeToExpiry } from "./vendors/jwt/token-expiry"
-
-// Export JWE
-export {
-    encryptJwe,
-    decryptJwe,
-    type IEncryptJweOptions,
-    type IDecryptJweOptions,
-    type IDecryptedJwe,
-} from "./vendors/jwe/jwe"
-
-// Export Middleware
-export {
-    createJwtMiddleware,
-    createJwtHandler,
-    type IMiddlewareOptions,
-    type IJwtHandlerResult,
-} from "./vendors/middleware/middleware"
-
-// Export error classes
-export {
-    JsonWebTokenError,
-    UnauthorizedError,
-    EnvironmentError,
-    TokenExpiredError,
-    InvalidSignatureError,
-    AlgorithmMismatchError,
-    MalformedTokenError,
-    JwksEndpointError,
-} from "./errors"
 
 // Export enums
 export * from "./enums"
 export { JwtAlgorithmsEnum } from "./enums"
-
-// Export JWT interfaces and types
+// Export error classes
 export {
-    type IDecodedJwt,
-    type IGetKeyPair,
-    type IJwkPrivateKey,
-    type IJwkPublicKey,
-    type IKeyPair,
-} from "./vendors/jwt/interfaces"
-
+    AlgorithmMismatchError,
+    EnvironmentError,
+    InvalidSignatureError,
+    JsonWebTokenError,
+    JwksEndpointError,
+    MalformedTokenError,
+    TokenExpiredError,
+    UnauthorizedError,
+} from "./errors"
 export {
-    type IcheckTokenValidnessCredentials,
-    type ISignTokenCredentials,
-    type IJwtTokenClaims,
-    type IJwtTokenOpts,
-    type ICheckJwtFields,
-    type ICreateSignedJwtOptions,
-} from "./vendors/jwt/jwt_d"
-
+    checkTokenValidness,
+    createSignedJwt,
+    extractBearerTokenFromHeaders,
+    getKeyPair,
+    parseJwt,
+    pemToJwk,
+    verifyTokenWithPublicKey,
+} from "./vendors"
+// Export JWE
+export {
+    decryptJwe,
+    encryptJwe,
+    type IDecryptedJwe,
+    type IDecryptJweOptions,
+    type IEncryptJweOptions,
+} from "./vendors/jwe/jwe"
 // Export JWKS interfaces and types
 export {
-    type IJwksClient,
+    clearJwksCache,
+    createJwksCache,
     type IJwkRecordVisible,
-    type IVerifyRSATokenCredentials,
+    type IJwksClient,
     type IRSAKeyStore,
     type ITokenExtractedWithPubKey,
-    createJwksCache,
-    clearJwksCache,
+    type IVerifyRSATokenCredentials,
 } from "./vendors/jwks/jwks"
+export { type IJwksCacheOptions, JwksCache } from "./vendors/jwks/jwks-cache"
+// Re-export from jwks-types for consistency
+export type {
+    IJwkRecordVisible as IJwkRecordVisibleLegacy,
+    IJwksClient as IJwksClientLegacy,
+    IVerifyRSATokenCredentials as IVerifyRSATokenCredentialsLegacy,
+} from "./vendors/jwks/jwks-types"
 
-export { JwksCache, type IJwksCacheOptions } from "./vendors/jwks/jwks-cache"
-
-// Re-export from jwks_d for consistency
+// Export JWT interfaces and types
+export type {
+    IDecodedJwt,
+    IGetKeyPair,
+    IJwkPrivateKey,
+    IJwkPublicKey,
+    IKeyPair,
+} from "./vendors/jwt/interfaces"
+export { signJwtWithPrivateKey } from "./vendors/jwt/jwt-sign"
+export type {
+    ICheckJwtFields,
+    ICreateSignedJwtOptions,
+    IcheckTokenValidnessCredentials,
+    IJwtTokenClaims,
+    IJwtTokenOpts,
+    ISignTokenCredentials,
+} from "./vendors/jwt/jwt-types"
+export { getTimeToExpiry, isTokenExpired } from "./vendors/jwt/token-expiry"
+// Export Middleware
 export {
-    type IJwksClient as IJwksClientLegacy,
-    type IJwkRecordVisible as IJwkRecordVisibleLegacy,
-    type IVerifyRSATokenCredentials as IVerifyRSATokenCredentialsLegacy,
-} from "./vendors/jwks/jwks_d"
+    createJwtHandler,
+    createJwtMiddleware,
+    type IJwtHandlerResult,
+    type IMiddlewareOptions,
+} from "./vendors/middleware/middleware"

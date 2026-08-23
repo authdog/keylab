@@ -1,5 +1,5 @@
-import { JwtAlgorithmsEnum as Algs } from "../../enums"
-import { IJwkRecordVisible } from "../jwks/jwks_d"
+import type { JwtAlgorithmsEnum as Algs } from "../../enums"
+import type { IJwkRecordVisible } from "../jwks/jwks-types"
 
 export interface IcheckTokenValidnessCredentials {
     // HS256 | HS384 | HS512

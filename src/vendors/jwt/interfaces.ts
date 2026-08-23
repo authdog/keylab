@@ -1,4 +1,4 @@
-import { JwtAlgorithmsEnum as Algs } from "../../enums"
+import type { JwtAlgorithmsEnum as Algs } from "../../enums"
 
 type AlgorithmIdentifier =
     | Algs.HS256

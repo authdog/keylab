@@ -1,18 +1,16 @@
+import { jwtVerify, SignJWT } from "jose"
+import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest"
+import createFetchMock from "vitest-fetch-mock"
+import * as c from "../../constants"
+import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums"
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign"
 import {
-    ITokenExtractedWithPubKey,
+    type ITokenExtractedWithPubKey,
     makePublicKey,
     pemToJwk,
     verifyTokenWithPublicKey,
 } from "./jwks"
 
-import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums"
-import createFetchMock from "vitest-fetch-mock"
-
-import { expect, test, beforeEach, afterEach, vi, it, describe } from "vitest"
-
-import * as c from "../../constants"
-import { SignJWT, jwtVerify } from "jose"
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz"
 const fetchMock = createFetchMock(vi)
 const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined"
@@ -552,7 +550,7 @@ it("verifies token with public key - ES256k / pem", async () => {
 
 // Ed25519 is the EdDSA signature scheme using SHA-512 (SHA-2) and Curve25519
 it("signs with Ed25519 key pair", async () => {
-    const crypto = require("crypto")
+    const crypto = require("node:crypto")
     const { publicKey, privateKey } = crypto.generateKeyPairSync("ed25519")
 
     expect(publicKey).toBeTruthy()
@@ -579,7 +577,7 @@ it("signs with Ed25519 key pair", async () => {
     expect(verifiedPayload?.protectedHeader).toMatchObject(protectedHeaders)
 })
 nodeOnlyIt("verifies Ed448 Key pair", async () => {
-    const crypto = require("crypto")
+    const crypto = require("node:crypto")
     const { publicKey, privateKey } = crypto.generateKeyPairSync("ed448")
     expect(publicKey).toBeTruthy()
     expect(privateKey).toBeTruthy()
@@ -612,13 +610,13 @@ it("verifies correctly token with public uri", async () => {
     })
 
     const regExpPathAppJwks = new RegExp(
-        `api\/${c.AUTHDOG_JWKS_API_ID}\/${tenantUuid2}\/${applicationUuid2}\/.well-known\/jwks.json*`,
+        `api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json*`,
     )
 
     const keys = [keyPairES512.publicKey]
 
     const fullRegex = new RegExp(
-        `^${AUTHDOG_API_ROOT.replace(/\\./g, "\\.")}\/${regExpPathAppJwks.source}$`,
+        `^${AUTHDOG_API_ROOT.replace(/\\./g, "\\.")}/${regExpPathAppJwks.source}$`,
     )
     fetchMock.mockIf(fullRegex, () => ({ status: 200, body: JSON.stringify({ keys }) }))
 
@@ -635,11 +633,13 @@ it("verifies correctly token with public uri", async () => {
 
     const jwksUri = `${AUTHDOG_API_ROOT}/api/${c.AUTHDOG_JWKS_API_ID}/${tenantUuid2}/${applicationUuid2}/.well-known/jwks.json`
 
-    let verified: ITokenExtractedWithPubKey | undefined
-
-    verified = await verifyTokenWithPublicKey(signedPayloadEs512, null, {
-        jwksUri,
-    })
+    const verified: ITokenExtractedWithPubKey = await verifyTokenWithPublicKey(
+        signedPayloadEs512,
+        null,
+        {
+            jwksUri,
+        },
+    )
 
     expect(verified.protectedHeader).toEqual({ alg: "ES512", type: "jwt" })
     expect(verified.payload).toEqual({
