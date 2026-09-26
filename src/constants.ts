@@ -42,12 +42,12 @@ export const CHARS = {
 export const publicKeyEncodingPem = {
     type: "spki",
     format: "pem",
-}
+} as const
 
 export const privateKeyEncodingPem = {
     type: "pkcs8",
     format: "jwk",
-}
+} as const
 
 export const namedCurves = {
     es256: "P-256",

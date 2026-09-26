@@ -1,5 +1,6 @@
 import type { JwtAlgorithmsEnum as Algs } from "../../enums"
 import type { IJwkRecordVisible } from "../jwks/jwks-types"
+import type { IJwkPrivateKey, IJwkPublicKey } from "./interfaces"
 
 export interface IcheckTokenValidnessCredentials {
     // HS256 | HS384 | HS512
@@ -40,7 +41,7 @@ export interface ISignTokenCredentials {
     secret?: string
     // RS256 | RS384 | RS512 | PS256 | PS384 | PS512 | ES256 | ES384 | ES512 | EdDSA | ES256K
     pemPrivateKey?: string
-    jwkPrivateKey?: any
+    jwkPrivateKey?: IJwkPrivateKey
     // any algorithm supported by jwt
     sessionDuration: number
 }
@@ -50,7 +51,7 @@ export interface IJwtTokenClaims {
     iss: string // issuer
     aud: string[] // audiences
     scp: string // scopes eg: "user openid"
-    pld?: any // payload
+    pld?: unknown // payload
     aid?: string // authdog global identifier
     nbf?: number // not before
     jti?: string // JWT ID
@@ -61,7 +62,7 @@ export interface IJwtTokenClaims {
 
 export interface IJwtTokenOpts {
     compact?: true
-    jwk: any
+    jwk: IJwkPrivateKey | IJwkPublicKey
     fields?: {
         typ: string
     }

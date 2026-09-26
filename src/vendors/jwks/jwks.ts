@@ -13,31 +13,13 @@ import type { IJwkPrivateKey } from "../jwt/interfaces"
 import { extractAlgFromJwtHeader } from "../jwt/jwt-verify"
 import { needsPortableEdDsa, verifyPortableJwt } from "../jwt/portable-algorithms"
 import { normalizeCurveName, normalizeJwk } from "../jwt/utils"
+import type { IJwkRecordVisible, IVerifyRSATokenCredentials } from "./jwks-types"
 
-export interface IJwksClient {
-    jwksUri?: string // required for RS256
-    domainUri?: string // required when domainUri doesn't match jwksUri's host
-    verifySsl?: boolean // set it to true if you're using self-signed certificate in local environment
-}
-
-// https://datatracker.ietf.org/doc/html/rfc7517
-export interface IJwkRecordVisible {
-    kty: string // key type
-    kid: string // key id
-    use: string // public key use
-    alg: string // algorithm
-    e: string // exponent
-    n: string // modulus
-}
-
-export interface IVerifyRSATokenCredentials {
-    jwksUri?: string
-    verifySsl?: boolean
-    requiredAudiences?: string[]
-    requiredIssuer?: string
-    requiredScopes?: string[]
-    adhoc?: [IJwkRecordVisible]
-}
+export type {
+    IJwkRecordVisible,
+    IJwksClient,
+    IVerifyRSATokenCredentials,
+} from "./jwks-types"
 
 export interface IRSAKeyStore {
     keys: [IJwkRecordVisible]
@@ -87,7 +69,7 @@ export interface ITokenExtractedWithPubKey {
 export const verifyTokenWithPublicKey = async (
     token: string,
     publicKey: string | JWK | null,
-    opts: IVerifyRSATokenCredentials = null,
+    opts?: IVerifyRSATokenCredentials,
 ): Promise<ITokenExtractedWithPubKey> => {
     const tokenAlg = extractAlgFromJwtHeader(token)
     const joseCandidates: any[] = []

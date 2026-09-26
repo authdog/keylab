@@ -85,7 +85,7 @@ export interface IJwkPrivateKey {
     key_ops?: string[]
     key_id?: string
     alg?: string
-    ext?: any
+    ext?: unknown
 }
 
 export interface IJwkPublicKey {
@@ -100,7 +100,7 @@ export interface IJwkPublicKey {
     x5c?: string[]
     x5t?: string
     x5tS256?: string
-    ext?: any
+    ext?: unknown
 }
 
 export interface IKeyPair {

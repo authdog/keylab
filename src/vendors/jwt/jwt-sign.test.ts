@@ -507,7 +507,11 @@ it("covers getJoseImportAlgorithm RSAPSS, RSA1_5, and X25519 branches", async ()
     ).rejects.toBeTruthy()
 
     // Line 77: X25519 → ECDH_ES
-    const x25519KeyPair = await getKeyPair({ algorithmIdentifier: Algs.X25519, keyFormat: "jwk" })
+    const x25519KeyPair = await getKeyPair({
+        algorithmIdentifier: Algs.X25519,
+        keyFormat: "jwk",
+        keySize: 256,
+    })
     await expect(
         signJwtWithPrivateKey({ urn: "test" }, Algs.X25519, x25519KeyPair.privateKey),
     ).rejects.toBeTruthy()
@@ -745,6 +749,7 @@ it("falls back to node crypto when jose key generation fails", async () => {
     const eddsaKeyPair = await getKeyPairWithFallback({
         algorithmIdentifier: Algs.EdDSA,
         keyFormat: "jwk",
+        keySize: 256,
     })
     expect(eddsaKeyPair.publicKey).toMatchObject({
         kty: "OKP",

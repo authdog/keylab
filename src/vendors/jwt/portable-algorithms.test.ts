@@ -62,6 +62,7 @@ it("skips keys with wrong curve and verifies with the matching one", async () =>
     const wrongCurveKeyPair = await getKeyPair({
         keyFormat: "jwk",
         algorithmIdentifier: Algs.Ed448,
+        keySize: 256,
     })
 
     const token = await signJwtWithPrivateKey(
@@ -125,14 +126,22 @@ it("returns correct value from needsPortableEdDsa when no key is provided", asyn
 })
 
 it("throws on malformed jwt token with fewer than 3 parts", async () => {
-    const keyPair = await getKeyPair({ keyFormat: "jwk", algorithmIdentifier: Algs.ES256K })
+    const keyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.ES256K,
+        keySize: 256,
+    })
     await expect(
         verifyPortableJwt({ token: "only.two", publicKeys: [keyPair.publicKey] }),
     ).rejects.toThrow("Malformed JWT.")
 })
 
 it("uses JwtKeyTypes.JWT as default type when protectedHeaders has no type field", async () => {
-    const keyPair = await getKeyPair({ keyFormat: "jwk", algorithmIdentifier: Algs.Ed448 })
+    const keyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.Ed448,
+        keySize: 256,
+    })
     const token = await signPortableJwt({
         payload: { sub: "test" },
         alg: Algs.EdDSA,
@@ -143,8 +152,16 @@ it("uses JwtKeyTypes.JWT as default type when protectedHeaders has no type field
 })
 
 it("matchesHeader returns false when EdDSA token is verified with a non-Ed448 crv key", async () => {
-    const ed448KeyPair = await getKeyPair({ keyFormat: "jwk", algorithmIdentifier: Algs.Ed448 })
-    const ed25519KeyPair = await getKeyPair({ keyFormat: "jwk", algorithmIdentifier: Algs.EdDSA })
+    const ed448KeyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.Ed448,
+        keySize: 256,
+    })
+    const ed25519KeyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.EdDSA,
+        keySize: 256,
+    })
     const token = await signJwtWithPrivateKey({ sub: "test" }, Algs.EdDSA, ed448KeyPair.privateKey)
     await expect(
         verifyPortableJwt({ token, publicKeys: [ed25519KeyPair.publicKey] }),
@@ -175,7 +192,11 @@ it("skips candidate key when kid in token header mismatches the key kid", async 
 })
 
 it("throws when signPortableJwt is called with a public key lacking the private component", async () => {
-    const keyPair = await getKeyPair({ keyFormat: "jwk", algorithmIdentifier: Algs.ES256K })
+    const keyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.ES256K,
+        keySize: 256,
+    })
     await expect(
         signPortableJwt({
             payload: { urn: "test" },

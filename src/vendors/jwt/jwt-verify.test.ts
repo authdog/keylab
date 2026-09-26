@@ -530,7 +530,9 @@ it("verifies a token with adhoc jwk credentials", async () => {
         adhoc: [keyPairES256.publicKey as any],
     })
 
-    expect(verified?.payload?.urn).toEqual("urn:test:adhoc")
+    expect(verified !== true && verified !== false && verified.payload.urn).toEqual(
+        "urn:test:adhoc",
+    )
 })
 
 it("creates signed jwt tokens for symmetric and asymmetric flows", async () => {

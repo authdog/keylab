@@ -2,8 +2,6 @@
     "compilerOptions": {
         "target": "es2020",
         "module": "esnext",
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
         "allowJs": true,
         "declaration": true,
         "esModuleInterop": true,
@@ -14,9 +12,8 @@
         "lib": ["es2020", "dom"],
         "types": ["node"],
         "sourceMap": true,
-        "strictNullChecks": false,
+        "strictNullChecks": true,
         "noUnusedLocals": true,
-        "ignoreDeprecations": "6.0",
         "pretty": true,
         "skipLibCheck": true
     },

@@ -50,7 +50,7 @@ export const checkTokenValidness = async (
                 missingCredentials.push("secret")
             }
 
-            if (missingCredentials.length === 0) {
+            if (missingCredentials.length === 0 && secret) {
                 extractedPayload = !!(await verifyHSTokenWithSecretString(token, secret))
                 break
             } else {
@@ -92,7 +92,7 @@ export const checkTokenValidness = async (
                         adhoc,
                     })
                 } else {
-                    extractedPayload = await verifyTokenWithPublicKey(token, publicKey, {
+                    extractedPayload = await verifyTokenWithPublicKey(token, publicKey ?? null, {
                         jwksUri,
                         verifySsl,
                         adhoc,
@@ -156,7 +156,7 @@ export const verifyHSTokenWithSecretString = async (
 
 export const checkJwtFields = (
     token: string,
-    { requiredAudiences = [], requiredIssuer = null, requiredScopes = [] }: ICheckJwtFields,
+    { requiredAudiences = [], requiredIssuer, requiredScopes = [] }: ICheckJwtFields,
 ) => {
     let validFields = true
     try {
@@ -326,7 +326,7 @@ export const createSignedJwt = async (
         default:
             throw throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM)
     }
-    return token
+    return token as string
 }
 
 export const extractAlgFromJwtHeader = (jwt: string) => {

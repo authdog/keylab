@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, test, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 import * as c from "../../constants"
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums"
+import type { IJwkPrivateKey } from "../jwt/interfaces"
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign"
 import {
     type ITokenExtractedWithPubKey,
@@ -35,7 +36,7 @@ it("creates a public jwk without private fields", () => {
             e: "AQAB",
             d: "private-part",
             x5u: undefined,
-        }),
+        } as IJwkPrivateKey),
     ).toEqual({
         kty: "RSA",
         kid: "kid-1",
@@ -720,6 +721,7 @@ describe("pemToJwk", () => {
         const keyPair = await getKeyPair({
             keyFormat: "pem",
             algorithmIdentifier: Algs.Ed25519,
+            keySize: 256,
         })
         const key = await pemToJwk(keyPair.publicKey as string, "Ed25519")
         expect(key).toBeTruthy()
