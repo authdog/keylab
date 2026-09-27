@@ -169,6 +169,12 @@ Keylab exports all TypeScript interfaces and types for comprehensive type safety
 
 ## Changelog
 
+- 0.1.40:
+  - Enable TypeScript `strictNullChecks` without renaming public functions or the `*Legacy` JWKS aliases
+  - Replace exported `any` on JWK `ext`, claim `pld`, `jwkPrivateKey`, and `IJwtTokenOpts.jwk` with `unknown` or the existing JWK interfaces
+  - Define `IJwksClient`, `IJwkRecordVisible`, and `IVerifyRSATokenCredentials` once, and stop re-exporting ponyfills from the internal vendors barrel
+  - Keep `node:crypto` off the import path, with a load-time check and a browser-style ES256 and ES256K sign-and-verify test
+  - Remove unused devDependencies `@swc/core`, `raw-loader`, `ts-node`, `codecov`, and `husky`
 - 0.1.36:
   - Switch the codebase from `pnpm` to Bun, including lockfile, CI, and local scripts
   - Upgrade `jose` to `6.2.2` and add portable curve support for `ES256K`, `Ed448`, and `X448`
