@@ -20,7 +20,7 @@ stays in `llm-docs/`. This file does not restate those pages.
   the module is imported.
 - Accepted algorithms are not removed or weakened. Verification is not
   skipped. Secrets, tokens, and private keys are not logged.
-- Vulnerability intake stays in `SECURITY.md`.
+- Vulnerability intake stays in [SECURITY.md](../../../SECURITY.md).
 
 ## Allowed inside a wave
 

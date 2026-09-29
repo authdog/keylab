@@ -33,6 +33,8 @@ Not redefined here. The contract is the behavior already described in:
 - [llm-docs/portable-algorithms.md](../../llm-docs/portable-algorithms.md)
 - [llm-docs/migration.md](../../llm-docs/migration.md)
 
+Vulnerability intake stays in [SECURITY.md](../../SECURITY.md). It is not restated here.
+
 Invariants that waves must preserve are listed in
 [contracts/compatibility.md](./contracts/compatibility.md).
 

@@ -121,8 +121,8 @@ description: "Task list for the next keylab modernization waves"
 
 **Purpose**: Checks that apply after the waves you chose to ship
 
-- [ ] T024 [P] Confirm `specs/001-modernization-waves/` links to `llm-docs/` and `SECURITY.md` and does not copy their API, migration, runtime, or security sections
-- [ ] T025 Run the every-wave commands in `specs/001-modernization-waves/quickstart.md` for each wave that was implemented
+- [x] T024 [P] Confirm `specs/001-modernization-waves/` links to `llm-docs/` and `SECURITY.md` and does not copy their API, migration, runtime, or security sections
+- [x] T025 Run the every-wave commands in `specs/001-modernization-waves/quickstart.md` for each wave that was implemented
 
 ---
 

@@ -126,6 +126,14 @@ build
 
 pkg/
 
+# Local env files, editor state, and scratch files
+.env*
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+
 *.js
 llm-docs/.vitepress/cache
 llm-docs/.vitepress/dist
