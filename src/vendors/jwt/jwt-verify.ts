@@ -71,6 +71,9 @@ export const checkTokenValidness = async (
         case algEnums.ES256K:
         case algEnums.Ed25519:
         case algEnums.Ed448:
+        case algEnums.ML_DSA_44:
+        case algEnums.ML_DSA_65:
+        case algEnums.ML_DSA_87:
         case algEnums.RSA1_5:
         case algEnums.A128KW:
         case algEnums.A192KW:
@@ -298,6 +301,9 @@ export const createSignedJwt = async (
         case algEnums.ES512:
         case algEnums.EdDSA:
         case algEnums.ES256K:
+        case algEnums.ML_DSA_44:
+        case algEnums.ML_DSA_65:
+        case algEnums.ML_DSA_87:
         case algEnums.RSA1_5:
         case algEnums.A128KW:
         case algEnums.A192KW:

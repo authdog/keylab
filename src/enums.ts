@@ -21,6 +21,9 @@ export enum JwtAlgorithmsEnum {
     X25519 = "X25519",
     Ed448 = "Ed448",
     X448 = "X448",
+    ML_DSA_44 = "ML-DSA-44",
+    ML_DSA_65 = "ML-DSA-65",
+    ML_DSA_87 = "ML-DSA-87",
     // RSA-OAEP algorithms for key wrapping/encryption
     RSA_OAEP = "RSA-OAEP",
     RSA_OAEP_256 = "RSA-OAEP-256",
@@ -47,6 +50,15 @@ export enum JwtAlgorithmsEnum {
     PBES2_HS256_A128KW = "PBES2-HS256+A128KW",
     PBES2_HS384_A192KW = "PBES2-HS384+A192KW",
     PBES2_HS512_A256KW = "PBES2-HS512+A256KW",
+}
+
+export enum JweContentEncryption {
+    A128GCM = "A128GCM",
+    A192GCM = "A192GCM",
+    A256GCM = "A256GCM",
+    A128CBC_HS256 = "A128CBC-HS256",
+    A192CBC_HS384 = "A192CBC-HS384",
+    A256CBC_HS512 = "A256CBC-HS512",
 }
 
 // https://datatracker.ietf.org/doc/html/rfc7517#section-4.2

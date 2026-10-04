@@ -21,6 +21,9 @@ type AlgorithmIdentifier =
     | Algs.Ed448
     | Algs.X25519
     | Algs.X448
+    | Algs.ML_DSA_44
+    | Algs.ML_DSA_65
+    | Algs.ML_DSA_87
     | Algs.RSA_OAEP
     | Algs.RSA_OAEP_256
     | Algs.RSA_OAEP_384
@@ -63,12 +66,14 @@ export interface IGetKeyPair {
 }
 
 export interface IJwkPrivateKey {
-    kty: "RSA" | "EC" | "oct" | "OKP"
+    kty: "RSA" | "EC" | "oct" | "OKP" | "AKP"
     use: "sig" | "enc"
     kid: string
     n?: string // RSA modulus
     e?: string // RSA exponent
     d?: string // RSA/EC private exponent
+    pub?: string // AKP public key
+    priv?: string // AKP private seed; private keys only
     p?: string // RSA first prime factor
     q?: string // RSA second prime factor
     dp?: string // RSA first factor CRT exponent
@@ -89,11 +94,12 @@ export interface IJwkPrivateKey {
 }
 
 export interface IJwkPublicKey {
-    kty: "RSA" | "EC" | "oct" | "OKP"
+    kty: "RSA" | "EC" | "oct" | "OKP" | "AKP"
     use: "sig" | "enc"
     kid: string
     n?: string // RSA modulus
     e?: string // RSA exponent
+    pub?: string // AKP public key
     x?: string // EC/OKP x coordinate
     y?: string // EC y coordinate
     crv?: string // Curve name

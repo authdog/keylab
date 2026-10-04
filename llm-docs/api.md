@@ -186,6 +186,13 @@ Supported algorithm families:
 - **Symmetric**: dir, A128KW, A192KW, A256KW, A128GCMKW, A192GCMKW, A256GCMKW
 - **Password**: PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW
 
+Content encryption (`enc`) names:
+
+- `A128GCM`, `A192GCM`, `A256GCM`
+- `A128CBC-HS256`, `A192CBC-HS384`, `A256CBC-HS512`
+
+These names are exported as `JweContentEncryption`. `enc` still accepts any string the library already accepted.
+
 ## Middleware
 
 ### `createJwtMiddleware(options)`

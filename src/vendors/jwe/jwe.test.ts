@@ -1,5 +1,6 @@
 import { exportJWK, exportPKCS8, exportSPKI, generateKeyPair } from "jose"
 import { expect, it } from "vitest"
+import { JweContentEncryption as Enc } from "../../enums"
 import { decryptJwe, encryptJwe } from "./jwe"
 
 it("round-trips JWE with RSA-OAEP + A256GCM using PEM keys", async () => {
@@ -141,4 +142,48 @@ it("propagates kid in JWE header", async () => {
     })
 
     expect(result.protectedHeader.kid).toBe("my-key-id")
+})
+
+it("round-trips each named content-encryption algorithm", async () => {
+    const cases = [
+        { enc: Enc.A128GCM, bytes: 16 },
+        { enc: Enc.A192GCM, bytes: 24 },
+        { enc: Enc.A256GCM, bytes: 32 },
+        { enc: Enc.A128CBC_HS256, bytes: 32 },
+        { enc: Enc.A192CBC_HS384, bytes: 48 },
+        { enc: Enc.A256CBC_HS512, bytes: 64 },
+    ]
+
+    for (const { enc, bytes } of cases) {
+        const key = crypto.getRandomValues(new Uint8Array(bytes))
+        const plaintext = `hello ${enc}`
+        const compact = await encryptJwe(plaintext, {
+            alg: "dir",
+            enc,
+            key,
+        })
+        const result = await decryptJwe(compact, {
+            key,
+            expectedAlg: "dir",
+        })
+
+        expect(result.plaintext).toBe(plaintext)
+        expect(result.protectedHeader.enc).toBe(enc)
+    }
+})
+
+it("accepts content encryption as a plain string", async () => {
+    const enc: string = "A256GCM"
+    const key = crypto.getRandomValues(new Uint8Array(32))
+    const compact = await encryptJwe("plain-string-enc", {
+        alg: "dir",
+        enc,
+        key,
+    })
+    const result = await decryptJwe(compact, {
+        key,
+        expectedAlg: "dir",
+    })
+
+    expect(result.plaintext).toBe("plain-string-enc")
 })

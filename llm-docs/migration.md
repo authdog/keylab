@@ -125,10 +125,10 @@ try {
 | Feature | jsonwebtoken | keylab |
 |---|---|---|
 | Async | No (sync API) | Yes (all async) |
-| Algorithms | RS/HS/ES/PS | RS/HS/ES/PS + EdDSA, ES256K, Ed448, X448, ECDH-ES, AES KW, PBES2 |
+| Algorithms | RS/HS/ES/PS | RS/HS/ES/PS + EdDSA, ES256K, Ed448, X448, ML-DSA-44, ML-DSA-65, ML-DSA-87, ECDH-ES, AES KW, PBES2 |
 | JWE | Not supported | `encryptJwe` / `decryptJwe` |
 | JWKS | Requires `jwks-rsa` | Built-in with caching |
 | Cross-runtime | Node.js only | Node.js, Bun, Deno, Workers, browsers |
 | Middleware | Requires `express-jwt` | Built-in `createJwtMiddleware` |
 | Token expiry utils | Not included | `isTokenExpired`, `getTimeToExpiry` |
-| Dependencies | 0 | 2 (`jose`, `@noble/curves`) |
+| Dependencies | 0 | 3 (`jose`, `@noble/curves`, `@noble/post-quantum`) |

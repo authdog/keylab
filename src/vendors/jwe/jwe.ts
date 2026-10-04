@@ -4,7 +4,7 @@ import { CompactEncrypt, compactDecrypt, importJWK, importPKCS8, importSPKI } fr
 export interface IEncryptJweOptions {
     /** JWE key management algorithm (e.g. "RSA-OAEP", "ECDH-ES", "A256KW", "dir") */
     alg: string
-    /** Content encryption algorithm (e.g. "A256GCM", "A128CBC-HS256") */
+    /** Content encryption algorithm (e.g. "A256GCM", "A128CBC-HS256"). Stays a string so other accepted labels still pass through. */
     enc: string
     /** The public key or symmetric key to encrypt with (PEM string, JWK object, or raw secret) */
     key: string | JWK | Uint8Array

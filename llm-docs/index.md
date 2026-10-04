@@ -22,7 +22,7 @@ features:
   - title: JWT and JWKS focused
     details: Generate keys, sign tokens, verify claims, and validate against adhoc keys or remote JWKS endpoints.
   - title: Portable curve support
-    details: Keep using ES256K, Ed448, and X448 through keylab's portable fallback layer when modern jose does not cover them directly.
+    details: Keep using ES256K, Ed448, X448, and ML-DSA through keylab's portable fallback layer when the runtime does not cover them directly.
 ---
 
 ## Install

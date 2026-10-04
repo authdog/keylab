@@ -169,6 +169,11 @@ Keylab exports all TypeScript interfaces and types for comprehensive type safety
 
 ## Changelog
 
+- 0.1.41:
+  - Add ML-DSA-44, ML-DSA-65, and ML-DSA-87 key generation, signing, and verification as AKP JWKs
+  - Keep the private key as a 32-byte seed, reject PEM for these algorithms, and sign with an empty context string
+  - Use `jose` when the runtime can import an AKP key, and `@noble/post-quantum` otherwise, loaded only for that operation
+  - Export `JweContentEncryption` for A128GCM, A192GCM, A256GCM, A128CBC-HS256, A192CBC-HS384, and A256CBC-HS512, while leaving `enc` a string
 - 0.1.40:
   - Enable TypeScript `strictNullChecks` without renaming public functions or the `*Legacy` JWKS aliases
   - Replace exported `any` on JWK `ext`, claim `pld`, `jwkPrivateKey`, and `IJwtTokenOpts.jwk` with `unknown` or the existing JWK interfaces

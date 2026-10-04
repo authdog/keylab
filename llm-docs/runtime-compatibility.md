@@ -27,6 +27,10 @@ Recent `jose` versions do not directly cover every algorithm that older integrat
 - `Ed448`
 - `X448`
 
+## Post-quantum signatures
+
+`ML-DSA-44`, `ML-DSA-65`, and `ML-DSA-87` sign and verify through the same key, sign, and verify jobs. Use JWK (`kty` `AKP`). PEM is not available for these algorithms. A runtime without native ML-DSA still completes the JWK flow through the portable layer.
+
 ## Practical guidance
 
 - Prefer `jwk` keys for cross-runtime use.

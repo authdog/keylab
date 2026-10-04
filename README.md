@@ -17,6 +17,7 @@ Install with `bun add keylab`, `npm install keylab`, or `yarn add keylab`.
 - [Deep wiki](https://deepwiki.com/authdog/keylab)
 - [Full documentation](llm-docs/index.md)
 - [Modernization plan](specs/001-modernization-waves/plan.md) (change planning only; the product manual stays in `llm-docs/`)
+- [Algorithm plan](specs/002-more-algorithms/plan.md) (next waves for additional algorithms; the product manual stays in `llm-docs/`)
 - [Security Policy](SECURITY.md)
 - [Code of Conduct](md/CODE_OF_CONDUCT.md)
 

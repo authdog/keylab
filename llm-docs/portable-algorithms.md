@@ -9,6 +9,9 @@ keylab includes a portable implementation layer for algorithms that are not univ
 | ES256K | secp256k1 | Blockchain/DID signing (Bitcoin, Ethereum) |
 | Ed448 | Ed448 | High-security EdDSA signing (448-bit) |
 | X448 | X448 | Key agreement (448-bit Diffie-Hellman) |
+| ML-DSA-44 | ML-DSA | Post-quantum signatures (FIPS 204) |
+| ML-DSA-65 | ML-DSA | Post-quantum signatures (FIPS 204) |
+| ML-DSA-87 | ML-DSA | Post-quantum signatures (FIPS 204) |
 
 EdDSA with Ed25519 does **not** use the portable layer — it goes through `jose` and Web Crypto directly.
 
@@ -16,18 +19,21 @@ EdDSA with Ed25519 does **not** use the portable layer — it goes through `jose
 
 The portable path is activated automatically when:
 
-1. You call `getKeyPair()` with `ES256K`, `Ed448`, or `X448`
+1. You call `getKeyPair()` with `ES256K`, `Ed448`, `X448`, `ML-DSA-44`, `ML-DSA-65`, or `ML-DSA-87`
 2. You call `signJwtWithPrivateKey()` with one of these algorithms
-3. You call `verifyTokenWithPublicKey()` or `checkTokenValidness()` and the token header or key material indicates one of these curves
+3. You call `verifyTokenWithPublicKey()` or `checkTokenValidness()` and the token header or key material indicates one of these algorithms
 
 You do not need to opt in — keylab detects the algorithm and routes accordingly.
 
 ## Implementation
 
-The portable layer uses `@noble/curves`:
+The portable layer uses `@noble/curves` for the curves below and `@noble/post-quantum` for ML-DSA:
 
 - **ES256K**: `secp256k1` from `@noble/curves/secp256k1`
 - **Ed448** / **X448**: `ed448` / `x448` from `@noble/curves/ed448`
+- **ML-DSA-44** / **ML-DSA-65** / **ML-DSA-87**: `@noble/post-quantum` when the runtime cannot import an AKP key itself
+
+ML-DSA keys are JWK only. `kty` is `AKP`, `alg` is required, and `priv` is the 32-byte seed. The seed is not returned on the public key. PEM is not supported for these algorithms. The library signs with an empty context string.
 
 These are pure JavaScript implementations that work in every runtime without native crypto dependencies.
 

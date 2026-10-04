@@ -12,6 +12,7 @@ import { INVALID_PUBLIC_KEY_FORMAT, JWK_NO_APPLICABLE_KEY } from "../../errors/m
 import type { IJwkPrivateKey } from "../jwt/interfaces"
 import { extractAlgFromJwtHeader } from "../jwt/jwt-verify"
 import { needsPortableEdDsa, verifyPortableJwt } from "../jwt/portable-algorithms"
+import { isMlDsaAlgorithm, verifyMlDsaJwt } from "../jwt/portable-ml-dsa"
 import { normalizeCurveName, normalizeJwk } from "../jwt/utils"
 import type { IJwkRecordVisible, IVerifyRSATokenCredentials } from "./jwks-types"
 
@@ -74,8 +75,14 @@ export const verifyTokenWithPublicKey = async (
     const tokenAlg = extractAlgFromJwtHeader(token)
     const joseCandidates: any[] = []
     const portableCandidates: any[] = []
+    const mlDsaCandidates: any[] = []
 
     const pushCandidate = (candidate: any) => {
+        if (isMlDsaAlgorithm(tokenAlg)) {
+            mlDsaCandidates.push(candidate)
+            return
+        }
+
         const normalized = normalizeJwk(candidate)
         const curve = normalizeCurveName(normalized?.crv)
         const isPortableCandidate =
@@ -93,6 +100,10 @@ export const verifyTokenWithPublicKey = async (
 
     if (publicKey || opts?.adhoc) {
         if (typeof publicKey === "string") {
+            if (isMlDsaAlgorithm(tokenAlg)) {
+                throw new Error("ML-DSA requires a JWK key. PEM is not supported.")
+            }
+
             if (tokenAlg === Algs.ES256K || (await needsPortableEdDsa(tokenAlg, publicKey))) {
                 return verifyPortableJwt({
                     token,
@@ -136,6 +147,17 @@ export const verifyTokenWithPublicKey = async (
         }
     } else {
         throw new Error(INVALID_PUBLIC_KEY_FORMAT)
+    }
+
+    if (isMlDsaAlgorithm(tokenAlg)) {
+        if (mlDsaCandidates.length === 0) {
+            throw new Error(JWK_NO_APPLICABLE_KEY)
+        }
+
+        return (await verifyMlDsaJwt({
+            token,
+            publicKeys: mlDsaCandidates,
+        })) as ITokenExtractedWithPubKey
     }
 
     if (portableCandidates.length > 0) {

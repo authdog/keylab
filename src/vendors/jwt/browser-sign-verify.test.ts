@@ -54,3 +54,23 @@ it("signs and verifies a portable ES256K JWK without node:crypto", async () => {
 
     expect(verified !== true && verified !== false && verified.payload.sub).toEqual("portable-user")
 })
+
+it("signs and verifies an ML-DSA-65 JWK without node:crypto", async () => {
+    const keyPair = await getKeyPair({
+        keyFormat: "jwk",
+        algorithmIdentifier: Algs.ML_DSA_65,
+        keySize: 256,
+    })
+
+    const token = await signJwtWithPrivateKey(
+        { sub: "ml-dsa-user" },
+        Algs.ML_DSA_65,
+        keyPair.privateKey,
+    )
+
+    const verified = await checkTokenValidness(token, {
+        adhoc: [keyPair.publicKey as unknown as IJwkRecordVisible],
+    })
+
+    expect(verified !== true && verified !== false && verified.payload.sub).toEqual("ml-dsa-user")
+}, 60_000)

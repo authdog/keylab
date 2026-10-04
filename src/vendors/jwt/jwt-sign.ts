@@ -19,6 +19,7 @@ import {
     needsPortableEdDsa,
     signPortableJwt,
 } from "./portable-algorithms"
+import { createMlDsaKeyPair, isMlDsaAlgorithm, signMlDsaJwt } from "./portable-ml-dsa"
 import {
     bytesToBase64Url,
     bytesToHex,
@@ -335,6 +336,15 @@ export const signJwtWithPrivateKey = async (
         protectedHeaders.kid = altOpts.keyId
     }
 
+    if (isMlDsaAlgorithm(alg)) {
+        return signMlDsaJwt({
+            payload: { ...payload, ...opts },
+            alg,
+            privateKey,
+            protectedHeaders,
+        })
+    }
+
     if (isPortableAlgorithm(alg) || (await needsPortableEdDsa(alg, privateKey))) {
         return signPortableJwt({
             payload: { ...payload, ...opts },
@@ -369,6 +379,10 @@ export const getKeyPair = async ({
     algorithmIdentifier,
     keySize,
 }: IGetKeyPair): Promise<IKeyPair> => {
+    if (isMlDsaAlgorithm(algorithmIdentifier)) {
+        return createMlDsaKeyPair(algorithmIdentifier, keyFormat) as unknown as Promise<IKeyPair>
+    }
+
     if (isPortableAlgorithm(algorithmIdentifier)) {
         return createPortableKeyPair(algorithmIdentifier, keyFormat) as Promise<IKeyPair>
     }

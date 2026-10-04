@@ -1,6 +1,6 @@
 {
     "name": "keylab",
-    "version": "0.1.40",
+    "version": "0.1.41",
     "packageManager": "bun@1.2.11",
     "type": "module",
     "source": "src/index.ts",
@@ -71,6 +71,7 @@
     },
     "dependencies": {
         "@noble/curves": "^2.0.1",
+        "@noble/post-quantum": "^0.7.1",
         "jose": "6.2.3"
     }
 }
