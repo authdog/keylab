@@ -59,18 +59,18 @@ const signNoble = async (alg: Algs.ML_DSA_44 | Algs.ML_DSA_65 | Algs.ML_DSA_87) 
     return { ...keyPair, token }
 }
 
-it.each([
-    Algs.ML_DSA_44,
-    Algs.ML_DSA_65,
-    Algs.ML_DSA_87,
-] as const)("signs and verifies %s with the portable implementation", async (alg) => {
-    const { publicKey, kid, token } = await signNoble(alg)
+it.each([Algs.ML_DSA_44, Algs.ML_DSA_65, Algs.ML_DSA_87] as const)(
+    "signs and verifies %s with the portable implementation",
+    async (alg) => {
+        const { publicKey, kid, token } = await signNoble(alg)
 
-    const result = await verifyMlDsaJwt({ token, publicKeys: [publicKey] })
+        const result = await verifyMlDsaJwt({ token, publicKeys: [publicKey] })
 
-    expect(result.payload.sub).toBe(alg)
-    expect(result.protectedHeader).toEqual({ kid, alg })
-}, 60_000)
+        expect(result.payload.sub).toBe(alg)
+        expect(result.protectedHeader).toEqual({ kid, alg })
+    },
+    60_000,
+)
 
 it("produces tokens that native jose verifies", async ({ skip }) => {
     const actual = await vi.importActual<typeof import("jose")>("jose")
