@@ -1,9 +1,11 @@
 import { expect, it } from "vitest"
 import { JwtAlgorithmsEnum as Algs } from "../../enums"
+import { AlgorithmMismatchError, InvalidSignatureError } from "../../errors"
 import type { IJwkRecordVisible } from "../jwks/jwks-types"
 import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign"
 import { checkTokenValidness } from "./jwt-verify"
-import { base64UrlToBytes, bytesToBase64Url } from "./utils"
+import { createMlDsaKeyPair, signMlDsaJwt, verifyMlDsaJwt } from "./portable-ml-dsa"
+import { base64UrlToBytes, bytesToBase64Url, utf8ToBase64Url } from "./utils"
 
 const signAndVerify = async (alg: Algs) => {
     const keyPair = await getKeyPair({
@@ -95,5 +97,78 @@ it("signs and verifies ML-DSA-44 and ML-DSA-87 and rejects a different parameter
         checkTokenValidness(signed.token, {
             adhoc: [other.publicKey as unknown as IJwkRecordVisible],
         }),
-    ).rejects.toThrow("Invalid signature")
+    ).rejects.toBeInstanceOf(AlgorithmMismatchError)
+}, 60_000)
+
+const mlDsa65 = async () => {
+    const keyPair = await createMlDsaKeyPair(Algs.ML_DSA_65, "jwk")
+    const token = await signMlDsaJwt({
+        payload: { sub: "edge" },
+        alg: Algs.ML_DSA_65,
+        privateKey: keyPair.privateKey,
+        protectedHeaders: { kid: keyPair.kid },
+    })
+    return { ...keyPair, token }
+}
+
+it("rejects PEM private keys and keys for another parameter set when signing", async () => {
+    const { privateKey } = await createMlDsaKeyPair(Algs.ML_DSA_44, "jwk")
+    const sign = (key: unknown) =>
+        signMlDsaJwt({ payload: {}, alg: Algs.ML_DSA_65, privateKey: key, protectedHeaders: {} })
+
+    await expect(sign("-----BEGIN PRIVATE KEY-----")).rejects.toThrow(
+        "ML-DSA requires a JWK key. PEM is not supported.",
+    )
+    await expect(sign(privateKey)).rejects.toThrow(
+        "ML-DSA key algorithm does not match the requested algorithm",
+    )
+}, 60_000)
+
+it("rejects malformed tokens and non ML-DSA headers", async () => {
+    await expect(verifyMlDsaJwt({ token: "a.b", publicKeys: [] })).rejects.toThrow("Malformed JWT.")
+
+    const hsHeader = utf8ToBase64Url(JSON.stringify({ alg: "HS256" }))
+    await expect(
+        verifyMlDsaJwt({ token: `${hsHeader}.${utf8ToBase64Url("{}")}.c2ln`, publicKeys: [] }),
+    ).rejects.toBeInstanceOf(InvalidSignatureError)
+})
+
+it("skips unusable candidates and keys with a different kid", async () => {
+    const { publicKey, kid, token } = await mlDsa65()
+
+    const result = await verifyMlDsaJwt({
+        token,
+        publicKeys: [
+            null,
+            { kty: "RSA", alg: Algs.ML_DSA_65 },
+            { ...publicKey, alg: Algs.ML_DSA_44 },
+            { ...publicKey, kid: "other-kid" },
+            publicKey,
+        ],
+    })
+
+    expect(result.payload.sub).toBe("edge")
+    expect(result.protectedHeader.kid).toBe(kid)
+}, 60_000)
+
+it("rejects public keys with missing, invalid, or wrongly sized material", async () => {
+    const { publicKey, token } = await mlDsa65()
+    const verifyWith = (pub: string | undefined) =>
+        verifyMlDsaJwt({ token, publicKeys: [{ ...publicKey, pub }] })
+
+    await expect(verifyWith(undefined)).rejects.toBeInstanceOf(InvalidSignatureError)
+    await expect(verifyWith("a b")).rejects.toBeInstanceOf(InvalidSignatureError)
+    await expect(verifyWith(bytesToBase64Url(new Uint8Array(16)))).rejects.toBeInstanceOf(
+        InvalidSignatureError,
+    )
+}, 60_000)
+
+it("rejects signatures with the wrong length", async () => {
+    const { publicKey, token } = await mlDsa65()
+    const [header, payload, signature] = token.split(".")
+    const truncated = bytesToBase64Url(base64UrlToBytes(signature).slice(0, 100))
+
+    await expect(
+        verifyMlDsaJwt({ token: `${header}.${payload}.${truncated}`, publicKeys: [publicKey] }),
+    ).rejects.toBeInstanceOf(InvalidSignatureError)
 }, 60_000)

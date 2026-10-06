@@ -9,9 +9,16 @@ export default defineConfig({
         testTimeout: 25000,
         setupFiles: ["./vitest.setup.ts"],
         coverage: {
-            all: false,
+            all: true,
             provider: "v8",
             reporter: ["text", "html", "json-summary"],
+            include: ["src/**"],
+            thresholds: {
+                statements: 100,
+                branches: 100,
+                functions: 100,
+                lines: 100,
+            },
             exclude: [
                 "coverage/**",
                 "dist/**",
@@ -19,6 +26,7 @@ export default defineConfig({
                 "src/errors/index.ts",
                 "src/vendors/index.ts",
                 "src/vendors/**/index.ts",
+                "src/**/*.test.ts",
             ],
         },
     },

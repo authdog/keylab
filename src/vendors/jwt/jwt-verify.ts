@@ -1,13 +1,14 @@
-import { type JWTVerifyResult, jwtVerify } from "jose"
+import { errors, type JWTVerifyResult, jwtVerify } from "jose"
 import * as c from "../../constants"
 import * as enums from "../../enums"
-import { msg, TokenExpiredError, throwJwtError } from "../../errors"
+import { MalformedTokenError, TokenExpiredError, throwJwtError } from "../../errors"
 import type { ICheckJwtFields, ICreateSignedJwtOptions, IcheckTokenValidnessCredentials } from ".."
 import { type ITokenExtractedWithPubKey, verifyTokenWithPublicKey } from "../jwks"
 import { atob } from "../ponyfills/ponyfills"
+import { assertRequiredScopes, hasRequiredScopes } from "./claims"
 import type { IDecodedJwt } from "./interfaces"
 import { signJwtWithPrivateKey } from "./jwt-sign"
-import { base64UrlToBase64, base64UrlToUtf8 } from "./utils"
+import { base64UrlToBase64 } from "./utils"
 
 /**
  *
@@ -20,7 +21,7 @@ export const getAlgorithmJwt = (token: string) => {
     if (headers?.alg) {
         algorithm = headers.alg
     } else {
-        throw throwJwtError(c.JWT_MALFORMED_HEADERS)
+        throw new MalformedTokenError(c.JWT_MALFORMED_HEADERS)
     }
     return algorithm
 }
@@ -30,10 +31,10 @@ export const checkTokenValidness = async (
     {
         secret,
         jwksUri,
-        verifySsl = true,
         adhoc,
         requiredScopes,
         publicKey,
+        jwksCache,
     }: IcheckTokenValidnessCredentials,
 ): Promise<boolean | ITokenExtractedWithPubKey> => {
     const algorithm = getAlgorithmJwt(token)
@@ -51,7 +52,11 @@ export const checkTokenValidness = async (
             }
 
             if (missingCredentials.length === 0 && secret) {
-                extractedPayload = !!(await verifyHSTokenWithSecretString(token, secret))
+                const payload = await verifyHSTokenWithSecretString(token, secret)
+                if (payload) {
+                    assertRequiredScopes(payload, requiredScopes)
+                }
+                extractedPayload = !!payload
                 break
             } else {
                 throw throwJwtError(
@@ -90,23 +95,16 @@ export const checkTokenValidness = async (
             }
 
             if (missingCredentials.length === 0) {
-                if (adhoc) {
-                    extractedPayload = await verifyTokenWithPublicKey(token, null, {
-                        adhoc,
-                    })
-                } else {
-                    extractedPayload = await verifyTokenWithPublicKey(token, publicKey ?? null, {
-                        jwksUri,
-                        verifySsl,
+                extractedPayload = await verifyTokenWithPublicKey(
+                    token,
+                    adhoc ? null : (publicKey ?? null),
+                    {
+                        jwksUri: adhoc ? undefined : jwksUri,
                         adhoc,
                         requiredScopes,
-                    })
-                }
-
-                // if (!!extractedPayload) {
-                //     isValid = true;
-                // }
-
+                        jwksCache,
+                    },
+                )
                 break
             } else {
                 throw throwJwtError(
@@ -128,33 +126,21 @@ export const verifyHSTokenWithSecretString = async (
     issuer?: any,
     audience?: any,
 ) => {
-    let decoded: JWTVerifyResult | undefined
-    let isVerified = false
-
+    let decoded: JWTVerifyResult
     try {
         decoded = await jwtVerify(token, new TextEncoder().encode(secret), {
             issuer,
             audience,
         })
-
-        if (decoded?.payload) {
-            const { exp } = parseJwt(token, enums.JwtParts.PAYLOAD)
-
-            if (exp) {
-                const now = Math.floor(Date.now() / 1000)
-                if (now >= exp) {
-                    throw new TokenExpiredError("Token has expired", new Date(exp * 1000))
-                }
-                isVerified = true
-            }
-        }
     } catch (e) {
-        if (e instanceof TokenExpiredError) {
-            throw e
+        if (e instanceof errors.JWTExpired) {
+            throw new TokenExpiredError("Token has expired", new Date(Number(e.payload.exp) * 1000))
         }
+        return null
     }
 
-    return isVerified ? decoded?.payload : null
+    // Tokens without an exp claim are rejected.
+    return decoded.payload.exp ? decoded.payload : null
 }
 
 export const checkJwtFields = (
@@ -176,39 +162,16 @@ export const checkJwtFields = (
             Array.isArray(parsedToken?.aud) &&
             requiredAudiences.length > 0
         ) {
-            requiredAudiences.forEach((el: string) => {
-                if (!parsedToken?.aud.includes(el)) {
-                    validFields = false
-                }
-            })
+            validFields = requiredAudiences.every((el: string) => parsedToken?.aud.includes(el))
         }
         // issuer
         if (parsedToken?.iss && typeof parsedToken?.iss === "string" && requiredIssuer) {
-            validFields = parsedToken?.iss === requiredIssuer
+            validFields &&= parsedToken?.iss === requiredIssuer
         }
 
         // scopes
-        if (parsedToken?.scp && requiredScopes?.length > 0) {
-            let scopes = []
-            if (typeof parsedToken?.scp === "string") {
-                if (parsedToken?.scp.includes(c.CHARS.SPACE)) {
-                    scopes = parsedToken?.scp.split(c.CHARS.SPACE)
-                } else if (parsedToken?.scp.includes(c.CHARS.COMMA)) {
-                    scopes = parsedToken?.scp.split(c.CHARS.COMMA)
-                } else {
-                    scopes = [parsedToken?.scp]
-                }
-            } else if (Array.isArray(parsedToken?.scp)) {
-                scopes = parsedToken?.scp
-            } else {
-                throw new Error(msg.INVALID_SCOPE_FIELD_TYPE)
-            }
-
-            requiredScopes.forEach((el: string) => {
-                if (!scopes.includes(el)) {
-                    validFields = false
-                }
-            })
+        if (requiredScopes?.length > 0) {
+            validFields &&= hasRequiredScopes(parsedToken, requiredScopes)
         }
     } catch (_e) {
         validFields = false
@@ -241,7 +204,7 @@ export const parseJwt = (token: string, part: enums.JwtParts = enums.JwtParts.PA
 
     const base64Url = token.split(".")[indexPart]?.trim()
     if (!base64Url) {
-        throw new URIError(c.MALFORMED_URI)
+        throw new MalformedTokenError(c.MALFORMED_URI)
     }
 
     try {
@@ -257,7 +220,7 @@ export const parseJwt = (token: string, part: enums.JwtParts = enums.JwtParts.PA
 
         return JSON.parse(jsonPayload)
     } catch {
-        throw new URIError(c.MALFORMED_URI)
+        throw new MalformedTokenError(c.MALFORMED_URI)
     }
 }
 
@@ -333,12 +296,4 @@ export const createSignedJwt = async (
             throw throwJwtError(c.JWT_NON_IMPLEMENTED_ALGORITHM)
     }
     return token as string
-}
-
-export const extractAlgFromJwtHeader = (jwt: string) => {
-    // Split the JWT into its three parts: header, payload, and signature
-    const parts = jwt.split(".")
-    const headerJson = base64UrlToUtf8(parts[0])
-    const { alg } = JSON.parse(headerJson)
-    return alg
 }

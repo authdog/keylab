@@ -5,12 +5,20 @@ import * as c from "../../constants"
 import { JwtAlgorithmsEnum as Algs, JwtKeyTypes as Kty } from "../../enums"
 import type { IJwkPrivateKey } from "../jwt/interfaces"
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign"
+import { checkTokenValidness } from "../jwt/jwt-verify"
+import { utf8ToBase64Url } from "../jwt/utils"
+import { createJwtHandler } from "../middleware/middleware"
 import {
+    clearJwksCache,
+    createJwksCache,
+    getDefaultJwksCache,
     type ITokenExtractedWithPubKey,
     makePublicKey,
     pemToJwk,
     verifyTokenWithPublicKey,
 } from "./jwks"
+import { JwksCache, MemoryJwksCacheStore } from "./jwks-cache"
+import type { IJwkRecordVisible } from "./jwks-types"
 
 const AUTHDOG_API_ROOT = "https://api.authdog.xyz"
 const fetchMock = createFetchMock(vi)
@@ -18,6 +26,7 @@ const isBunRuntime = typeof (globalThis as { Bun?: unknown }).Bun !== "undefined
 const nodeOnlyIt = isBunRuntime ? it.skip : it
 
 beforeEach(() => {
+    clearJwksCache()
     fetchMock.enableMocks()
     fetchMock.resetMocks()
 })
@@ -716,6 +725,51 @@ it("handles jwks response where keys is not an array", async () => {
     ).rejects.toThrow(c.JWK_NO_APPLICABLE_KEY)
 })
 
+const unsignedMlDsaToken = `${utf8ToBase64Url(JSON.stringify({ alg: Algs.ML_DSA_65 }))}.${utf8ToBase64Url("{}")}.c2ln`
+
+it("rejects PEM public keys for ML-DSA tokens", async () => {
+    await expect(verifyTokenWithPublicKey(unsignedMlDsaToken, "pem-string")).rejects.toThrow(
+        "ML-DSA requires a JWK key. PEM is not supported.",
+    )
+})
+
+it("throws no applicable key for ML-DSA tokens without candidate keys", async () => {
+    await expect(
+        verifyTokenWithPublicKey(unsignedMlDsaToken, null, {
+            adhoc: [] as unknown as [IJwkRecordVisible],
+        }),
+    ).rejects.toThrow(c.JWK_NO_APPLICABLE_KEY)
+})
+
+it("reports status 0 when the jwks fetch resolves without a response", async () => {
+    fetchMock.mockImplementationOnce(() => Promise.resolve(undefined as unknown as Response))
+
+    const error = await verifyTokenWithPublicKey(unsignedMlDsaToken, null, {
+        jwksUri: "https://as.example.com/no-response",
+        jwksCache: createJwksCache({ maxRetries: 1 }),
+    }).catch((e) => e)
+
+    expect(error.statusCode).toBe(0)
+})
+
+describe("jwks cache factories", () => {
+    test("createJwksCache returns a new cache each call", () => {
+        const first = createJwksCache({ ttlMs: 1 })
+        expect(first).toBeInstanceOf(JwksCache)
+        expect(createJwksCache()).not.toBe(first)
+    })
+
+    test("getDefaultJwksCache is a singleton until cleared", () => {
+        clearJwksCache()
+        const first = getDefaultJwksCache()
+        expect(getDefaultJwksCache()).toBe(first)
+
+        clearJwksCache()
+        expect(getDefaultJwksCache()).not.toBe(first)
+        clearJwksCache()
+    })
+})
+
 describe("pemToJwk", () => {
     test("converts Ed25519 public key PEM to JWK using EdDSA algorithm", async () => {
         const keyPair = await getKeyPair({
@@ -768,5 +822,89 @@ describe("pemToJwk", () => {
 
         const key2 = await pemToJwk(pemString2, "RS256")
         expect(key2).toBeTruthy()
+    })
+})
+
+describe("jwksUri verification caching", () => {
+    const JWKS = "https://as.example.com/cached-jwks"
+
+    // Serves each queued key set once, then repeats the last one.
+    const serveKeySets = (...sets: unknown[][]) => {
+        fetchMock.mockIf(JWKS, () => {
+            const keys = sets.length > 1 ? sets.shift() : sets[0]
+            return { status: 200, body: JSON.stringify({ keys }) }
+        })
+    }
+
+    const signedWithKid = async () => {
+        const keyPair = await getKeyPair({
+            keyFormat: "jwk",
+            algorithmIdentifier: Algs.ES256,
+            keySize: 256,
+        })
+        const token = await signJwtWithPrivateKey(
+            { sub: "cached" },
+            Algs.ES256,
+            keyPair.privateKey,
+            {},
+            { keyId: keyPair.kid },
+        )
+        return { keyPair, token }
+    }
+
+    test("fetches the key set once for repeated verifications", async () => {
+        const { keyPair, token } = await signedWithKid()
+        serveKeySets([keyPair.publicKey])
+
+        await verifyTokenWithPublicKey(token, null, { jwksUri: JWKS })
+        await verifyTokenWithPublicKey(token, null, { jwksUri: JWKS })
+        expect(fetchMock).toHaveBeenCalledTimes(1)
+
+        clearJwksCache()
+        await verifyTokenWithPublicKey(token, null, { jwksUri: JWKS })
+        expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+
+    test("refetches once when the token's kid is missing from the cached set", async () => {
+        const old = await signedWithKid()
+        const rotated = await signedWithKid()
+        serveKeySets([old.keyPair.publicKey], [rotated.keyPair.publicKey])
+        const jwksCache = createJwksCache({ minRefreshIntervalMs: 0 })
+
+        await verifyTokenWithPublicKey(old.token, null, { jwksUri: JWKS, jwksCache })
+        const result = await verifyTokenWithPublicKey(rotated.token, null, {
+            jwksUri: JWKS,
+            jwksCache,
+        })
+
+        expect(result.payload.sub).toBe("cached")
+        expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+
+    test("does not refetch for unknown kids within the refresh interval", async () => {
+        const known = await signedWithKid()
+        const unknown = await signedWithKid()
+        serveKeySets([known.keyPair.publicKey])
+
+        await verifyTokenWithPublicKey(known.token, null, { jwksUri: JWKS })
+        await expect(
+            verifyTokenWithPublicKey(unknown.token, null, { jwksUri: JWKS }),
+        ).rejects.toThrow(c.JWK_NO_APPLICABLE_KEY)
+        expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
+    test("uses a caller-provided cache through checkTokenValidness and the handler", async () => {
+        const { keyPair, token } = await signedWithKid()
+        serveKeySets([keyPair.publicKey])
+        const store = new MemoryJwksCacheStore()
+        const jwksCache = createJwksCache({ store })
+
+        await checkTokenValidness(token, { jwksUri: JWKS, jwksCache })
+        const handler = createJwtHandler({ jwksUri: JWKS, jwksCache })
+        const result = await handler({ headers: { authorization: `Bearer ${token}` } })
+
+        expect(result.success).toBe(true)
+        expect(store.get(`keylab:jwks:${JWKS}`)?.kids).toEqual([keyPair.kid])
+        expect(fetchMock).toHaveBeenCalledTimes(1)
     })
 })

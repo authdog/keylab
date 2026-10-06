@@ -1,4 +1,5 @@
 import { jwtVerify } from "jose"
+import { expect, it } from "vitest"
 import { JwtAlgorithmsEnum as Algs } from "../../enums"
 import { pemToJwk } from "../jwks/jwks"
 import { getKeyPair, signJwtWithPrivateKey } from "../jwt/jwt-sign"
@@ -13,8 +14,8 @@ it("test verify token with pem - ES256", async () => {
     expect(keyPairES256?.privateKey).toBeTruthy()
     expect(keyPairES256?.publicKey).toBeTruthy()
 
-    expect(typeof keyPairES256?.publicKey === "string")
-    expect(typeof keyPairES256?.privateKey === "string")
+    expect(typeof keyPairES256?.publicKey).toBe("string")
+    expect(typeof keyPairES256?.privateKey).toBe("string")
 
     const signedPayloadEs256 = await signJwtWithPrivateKey(
         {
@@ -43,8 +44,8 @@ it("test verify token with pem - ES384", async () => {
     expect(keyPairES384?.privateKey).toBeTruthy()
     expect(keyPairES384?.publicKey).toBeTruthy()
 
-    expect(typeof keyPairES384?.publicKey === "string")
-    expect(typeof keyPairES384?.privateKey === "string")
+    expect(typeof keyPairES384?.publicKey).toBe("string")
+    expect(typeof keyPairES384?.privateKey).toBe("string")
 
     const signedPayloadEs384 = await signJwtWithPrivateKey(
         {
@@ -71,8 +72,8 @@ it("test verify token with pem - ES512", async () => {
     expect(keyPairES512?.privateKey).toBeTruthy()
     expect(keyPairES512?.publicKey).toBeTruthy()
 
-    expect(typeof keyPairES512?.publicKey === "string")
-    expect(typeof keyPairES512?.privateKey === "string")
+    expect(typeof keyPairES512?.publicKey).toBe("string")
+    expect(typeof keyPairES512?.privateKey).toBe("string")
 
     const signedPayloadEs512 = await signJwtWithPrivateKey(
         {
@@ -101,8 +102,8 @@ it("test verify token with pem - RS256", async () => {
     expect(keyPairRS256?.privateKey).toBeTruthy()
     expect(keyPairRS256?.publicKey).toBeTruthy()
 
-    expect(typeof keyPairRS256?.publicKey === "string")
-    expect(typeof keyPairRS256?.privateKey === "string")
+    expect(typeof keyPairRS256?.publicKey).toBe("string")
+    expect(typeof keyPairRS256?.privateKey).toBe("string")
 
     const signedPayloadRs256 = await signJwtWithPrivateKey(
         {
@@ -130,8 +131,8 @@ it("test verify token with pem - RS384", async () => {
     expect(keyPairRS384?.privateKey).toBeTruthy()
     expect(keyPairRS384?.publicKey).toBeTruthy()
 
-    expect(typeof keyPairRS384?.publicKey === "string")
-    expect(typeof keyPairRS384?.privateKey === "string")
+    expect(typeof keyPairRS384?.publicKey).toBe("string")
+    expect(typeof keyPairRS384?.privateKey).toBe("string")
 
     const signedPayloadRs384 = await signJwtWithPrivateKey(
         {
@@ -159,8 +160,8 @@ it("test verify token with pem - RS512", async () => {
     expect(keyPairRS512?.privateKey).toBeTruthy()
     expect(keyPairRS512?.publicKey).toBeTruthy()
 
-    expect(typeof keyPairRS512?.publicKey === "string")
-    expect(typeof keyPairRS512?.privateKey === "string")
+    expect(typeof keyPairRS512?.publicKey).toBe("string")
+    expect(typeof keyPairRS512?.privateKey).toBe("string")
 
     const signedPayloadRs512 = await signJwtWithPrivateKey(
         {

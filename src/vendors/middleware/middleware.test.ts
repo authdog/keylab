@@ -122,3 +122,26 @@ it("handler returns error for invalid token", async () => {
     expect(result.success).toBe(false)
     expect(result.error).toBeDefined()
 })
+
+it("middleware responds 401 when the request has no headers", async () => {
+    const middleware = createJwtMiddleware({ secret: SECRET })
+    const req = {} as any
+    const res = { status: vi.fn().mockReturnThis(), json: vi.fn() } as any
+    const next = vi.fn()
+
+    await middleware(req, res, next)
+
+    expect(next).not.toHaveBeenCalled()
+    expect(res.status).toHaveBeenCalledWith(401)
+})
+
+it("handler uses custom getHeaders", async () => {
+    const token = await createValidToken()
+    const handler = createJwtHandler({
+        secret: SECRET,
+        getHeaders: () => ({ authorization: `Bearer ${token}` }),
+    })
+
+    const result = await handler({ headers: {} })
+    expect(result.success).toBe(true)
+})

@@ -37,6 +37,7 @@ export const TOKEN_EXPIRED = "Token has expired"
 export const INVALID_SIGNATURE = "Invalid signature"
 export const ALGORITHM_MISMATCH = "Algorithm mismatch"
 export const MALFORMED_TOKEN = "Malformed token"
+export const INSUFFICIENT_SCOPE = "Token is missing required scopes"
 export const JWKS_ENDPOINT_ERROR = "Expected 200 OK from the JSON Web Key Set HTTP response"
 
 export const ERROR_CODES = {
@@ -44,6 +45,7 @@ export const ERROR_CODES = {
     INVALID_SIGNATURE: "INVALID_SIGNATURE",
     ALGORITHM_MISMATCH: "ALGORITHM_MISMATCH",
     MALFORMED_TOKEN: "MALFORMED_TOKEN",
+    INSUFFICIENT_SCOPE: "INSUFFICIENT_SCOPE",
     JWKS_ENDPOINT_ERROR: "JWKS_ENDPOINT_ERROR",
     UNAUTHORIZED: "UNAUTHORIZED",
     JWT_ERROR: "JWT_ERROR",

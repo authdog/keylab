@@ -124,7 +124,7 @@ const { plaintext } = await decryptJwe(jwe, {
 Use the built-in cache for efficient JWKS endpoint access:
 
 ```ts
-import { JwksCache } from "keylab"
+import { checkTokenValidness, JwksCache } from "keylab"
 
 const cache = new JwksCache({
   ttlMs: 600_000,    // cache for 10 minutes
@@ -136,7 +136,15 @@ const cache = new JwksCache({
 })
 
 const keys = await cache.getKeys("https://issuer.example/.well-known/jwks.json")
+
+// Verification by jwksUri uses a shared default cache; pass your own to configure it.
+await checkTokenValidness(token, {
+  jwksUri: "https://issuer.example/.well-known/jwks.json",
+  jwksCache: cache,
+})
 ```
+
+To keep key sets in Workers KV, Redis, or another shared store, see [cache storage adapters](./api.md#cache-storage-adapters).
 
 ## Express middleware
 

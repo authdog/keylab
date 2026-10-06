@@ -187,3 +187,29 @@ it("accepts content encryption as a plain string", async () => {
 
     expect(result.plaintext).toBe("plain-string-enc")
 })
+
+it("rejects unsupported key formats", async () => {
+    await expect(
+        encryptJwe("plaintext", {
+            alg: "RSA-OAEP",
+            enc: "A256GCM",
+            key: 42 as unknown as string,
+        }),
+    ).rejects.toThrow("Unsupported key format for JWE")
+})
+
+it("decrypts with RSA-OAEP when expectedAlg is omitted", async () => {
+    const { publicKey, privateKey } = await generateKeyPair("RSA-OAEP", {
+        extractable: true,
+        modulusLength: 2048,
+    })
+    const jwe = await encryptJwe("default alg", {
+        alg: "RSA-OAEP",
+        enc: "A256GCM",
+        key: await exportSPKI(publicKey),
+    })
+
+    const result = await decryptJwe(jwe, { key: await exportPKCS8(privateKey) })
+
+    expect(result.plaintext).toBe("default alg")
+})

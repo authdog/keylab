@@ -1,3 +1,5 @@
+import { MalformedTokenError } from "../../errors/malformed-token"
+
 const textEncoder = new TextEncoder()
 const textDecoder = new TextDecoder()
 const base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
@@ -70,7 +72,7 @@ export const bytesToBase64 = (bytes: Uint8Array) => {
 
 export const base64ToBytes = (value: string) => {
     const normalized = value.replace(/\s+/g, "")
-    if (normalized.length % 4 !== 0) {
+    if (normalized.length % 4 !== 0 || !/^[A-Za-z0-9+/]*={0,2}$/.test(normalized)) {
         throw new Error("Invalid base64 string.")
     }
 
@@ -158,3 +160,26 @@ export const normalizeJwk = (jwk: any) => {
 
 export const looksLikePem = (value: unknown): value is string =>
     typeof value === "string" && value.includes("-----BEGIN")
+
+/** Splits and decodes a compact JWS. Any structural problem raises MalformedTokenError. */
+export const parseJwtParts = (token: string) => {
+    const [headerPart, payloadPart, signaturePart] = token.split(".")
+    if (!headerPart || !payloadPart || !signaturePart) {
+        throw new MalformedTokenError("Malformed JWT.")
+    }
+
+    try {
+        return {
+            signingInput: `${headerPart}.${payloadPart}`,
+            protectedHeader: JSON.parse(base64UrlToUtf8(headerPart)) as {
+                alg: string
+                kid?: string
+                [key: string]: unknown
+            },
+            payload: JSON.parse(base64UrlToUtf8(payloadPart)) as Record<string, unknown>,
+            signature: base64UrlToBytes(signaturePart),
+        }
+    } catch {
+        throw new MalformedTokenError("Malformed JWT.")
+    }
+}

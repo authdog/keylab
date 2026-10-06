@@ -2,12 +2,13 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 import * as c from "../../constants"
 import { JwtAlgorithmsEnum as Algs, JwtParts, JwtKeyTypes as Kty } from "../../enums"
+import { MalformedTokenError, TokenExpiredError } from "../../errors"
+import { clearJwksCache } from "../jwks/jwks"
 import { getKeyPair, signJwtWithPrivateKey } from "./jwt-sign"
 import {
     checkJwtFields,
     checkTokenValidness,
     createSignedJwt,
-    extractAlgFromJwtHeader,
     getAlgorithmJwt,
     parseJwt,
     verifyHSTokenWithSecretString,
@@ -16,6 +17,7 @@ import {
 const fetchMock = createFetchMock(vi)
 
 beforeEach(() => {
+    clearJwksCache()
     fetchMock.enableMocks()
     fetchMock.resetMocks()
 })
@@ -44,10 +46,6 @@ it("throws on jwt header missing alg field", () => {
     const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url")
     const noAlgToken = `${encode({ typ: "JWT" })}.${encode({ sub: "123" })}.sig`
     expect(() => getAlgorithmJwt(noAlgToken)).toThrow(c.JWT_MALFORMED_HEADERS)
-})
-
-it("extracts algorithm directly from jwt header", () => {
-    expect(extractAlgFromJwtHeader(DUMMY_HS256_TOKEN)).toEqual(Algs.HS256)
 })
 
 it("should throw an exception if token is malformed", async () => {
@@ -96,12 +94,9 @@ it("verifies HS256 token", async () => {
         SECRET_STRING,
     )
 
-    const shouldNotBeVerifiedAsExpired = await verifyHSTokenWithSecretString(
-        signedTokenAlreadyExpired,
-        SECRET_STRING,
-        Algs.HS256,
-    )
-    expect(shouldNotBeVerifiedAsExpired).toBeFalsy()
+    await expect(
+        verifyHSTokenWithSecretString(signedTokenAlreadyExpired, SECRET_STRING, Algs.HS256),
+    ).rejects.toBeInstanceOf(TokenExpiredError)
 
     const signedTokenNotExpired = await signJwtWithPrivateKey(
         {
@@ -132,6 +127,16 @@ it("verifies HS256 token", async () => {
         Algs.HS256,
     )
     expect(shouldNotVerifyWithoutExp).toBeFalsy()
+})
+
+it("throws TokenExpiredError with expiredAt for an expired HS token", async () => {
+    const exp = Math.floor(Date.now() / 1000) - 60
+    const token = await signJwtWithPrivateKey({ exp, sub: "expired" }, Algs.HS256, "secret")
+
+    const error = await checkTokenValidness(token, { secret: "secret" }).catch((e) => e)
+
+    expect(error).toBeInstanceOf(TokenExpiredError)
+    expect(error.expiredAt).toEqual(new Date(exp * 1000))
 })
 
 it("verifies HS token through checkTokenValidness", async () => {
@@ -553,7 +558,7 @@ it("creates signed jwt tokens for symmetric and asymmetric flows", async () => {
             } as any,
         },
     )
-    expect(extractAlgFromJwtHeader(hsToken)).toEqual(Algs.HS256)
+    expect(getAlgorithmJwt(hsToken)).toEqual(Algs.HS256)
     expect(parseJwt(hsToken).feature).toEqual("hs")
 
     const pemKeyPair = await getKeyPair({
@@ -577,7 +582,7 @@ it("creates signed jwt tokens for symmetric and asymmetric flows", async () => {
             } as any,
         },
     )
-    expect(extractAlgFromJwtHeader(pemToken)).toEqual(Algs.RS256)
+    expect(getAlgorithmJwt(pemToken)).toEqual(Algs.RS256)
 
     const jwkKeyPair = await getKeyPair({
         algorithmIdentifier: Algs.RS256,
@@ -600,7 +605,7 @@ it("creates signed jwt tokens for symmetric and asymmetric flows", async () => {
             } as any,
         },
     )
-    expect(extractAlgFromJwtHeader(jwkToken)).toEqual(Algs.RS256)
+    expect(getAlgorithmJwt(jwkToken)).toEqual(Algs.RS256)
 })
 
 it("rejects unsupported algorithms in createSignedJwt", async () => {
@@ -695,6 +700,7 @@ it("creates signed jwt with nbf, jti, nonce, and azp claims", async () => {
                 jti: "unique-token-id",
                 nonce: "nonce-value",
                 azp: "authorized-party",
+                auth_time: now - 30,
             },
             signinOptions: {
                 secret: "secret",
@@ -707,5 +713,26 @@ it("creates signed jwt with nbf, jti, nonce, and azp claims", async () => {
     expect(payload.jti).toEqual("unique-token-id")
     expect(payload.nonce).toEqual("nonce-value")
     expect(payload.azp).toEqual("authorized-party")
+    expect(payload.auth_time).toEqual(now - 30)
     expect(payload.custom).toEqual("data")
+})
+
+it("checkJwtFields requires scopes to be present and keeps an audience failure", async () => {
+    const token = await signJwtWithPrivateKey(
+        { aud: ["other"], iss: "issuer" },
+        Algs.HS256,
+        "secret",
+    )
+
+    expect(checkJwtFields(token, { requiredScopes: ["read"] })).toBe(false)
+    expect(checkJwtFields(token, { requiredAudiences: ["api"], requiredIssuer: "issuer" })).toBe(
+        false,
+    )
+    expect(checkJwtFields(token, { requiredAudiences: ["other"], requiredIssuer: "issuer" })).toBe(
+        true,
+    )
+})
+
+it("parseJwt raises MalformedTokenError", () => {
+    expect(() => parseJwt("not-a-jwt", JwtParts.PAYLOAD)).toThrow(MalformedTokenError)
 })

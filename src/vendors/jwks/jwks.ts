@@ -7,13 +7,16 @@ import {
     jwtVerify,
 } from "jose"
 import { JwtAlgorithmsEnum as Algs } from "../../enums"
-import { JwksEndpointError } from "../../errors/jwks-endpoint"
+import { AlgorithmMismatchError } from "../../errors/algorithm-mismatch"
+import { MalformedTokenError } from "../../errors/malformed-token"
 import { INVALID_PUBLIC_KEY_FORMAT, JWK_NO_APPLICABLE_KEY } from "../../errors/messages"
+import { assertClaims } from "../jwt/claims"
 import type { IJwkPrivateKey } from "../jwt/interfaces"
-import { extractAlgFromJwtHeader } from "../jwt/jwt-verify"
 import { needsPortableEdDsa, verifyPortableJwt } from "../jwt/portable-algorithms"
 import { isMlDsaAlgorithm, verifyMlDsaJwt } from "../jwt/portable-ml-dsa"
-import { normalizeCurveName, normalizeJwk } from "../jwt/utils"
+import { base64UrlToUtf8, normalizeCurveName, normalizeJwk } from "../jwt/utils"
+import { toVerificationError } from "../jwt/verification-errors"
+import { type IJwksCacheOptions, JwksCache } from "./jwks-cache"
 import type { IJwkRecordVisible, IVerifyRSATokenCredentials } from "./jwks-types"
 
 export type {
@@ -60,6 +63,87 @@ export interface ITokenExtractedWithPubKey {
     protectedHeader: JWTHeaderParameters
 }
 
+const readHeader = (token: string): { alg: string; kid?: string } => {
+    const [headerPart] = token.split(".")
+    let header: unknown
+    try {
+        header = JSON.parse(base64UrlToUtf8(headerPart))
+    } catch (error) {
+        throw Object.defineProperty(new MalformedTokenError(), "cause", { value: error })
+    }
+    if (!header || typeof header !== "object" || typeof (header as any).alg !== "string") {
+        throw new MalformedTokenError()
+    }
+    return header as { alg: string; kid?: string }
+}
+
+// Ed25519 and Ed448 keys are commonly published with the generic EdDSA label.
+const algFamily = (alg: string) => (alg === "Ed25519" || alg === "Ed448" ? Algs.EdDSA : alg)
+
+/**
+ * Raises AlgorithmMismatchError when the key meant for this token declares another `alg`:
+ * the keys whose `kid` matches the token's, or the single key the caller supplied when the
+ * token has no `kid`. Anything else falls through to the usual "no applicable key" handling.
+ */
+const assertAlgorithmMatches = (
+    header: { alg: string; kid?: string },
+    candidates: any[],
+    callerSupplied: boolean,
+) => {
+    const keys = candidates.filter((key) => key && typeof key === "object")
+    const intended = header.kid
+        ? keys.filter((key) => key.kid === header.kid)
+        : callerSupplied && keys.length === 1
+          ? keys
+          : []
+    if (
+        intended.length > 0 &&
+        intended.every((key) => key.alg && algFamily(key.alg) !== algFamily(header.alg))
+    ) {
+        throw new AlgorithmMismatchError(
+            `Token algorithm ${header.alg} does not match the key algorithm`,
+        )
+    }
+}
+
+let defaultJwksCache: JwksCache | null = null
+
+export const createJwksCache = (options?: IJwksCacheOptions): JwksCache => {
+    return new JwksCache(options)
+}
+
+export const getDefaultJwksCache = (): JwksCache => {
+    if (!defaultJwksCache) {
+        defaultJwksCache = new JwksCache()
+    }
+    return defaultJwksCache
+}
+
+export const clearJwksCache = (): void => {
+    if (defaultJwksCache) {
+        void defaultJwksCache.clear()
+        defaultJwksCache = null
+    }
+}
+
+const fetchJwksKeys = async (
+    jwksUri: string,
+    header: { kid?: string },
+    opts: IVerifyRSATokenCredentials,
+) => {
+    const cache = opts.jwksCache ?? getDefaultJwksCache()
+    const headers: Record<string, string> = opts.requiredIssuer
+        ? { "X-Issuer": opts.requiredIssuer }
+        : {}
+
+    const keys = await cache.getKeys(jwksUri, headers)
+    if (header.kid && !keys.some((key: any) => key?.kid === header.kid)) {
+        // The issuer may have rotated keys since the set was cached.
+        return cache.refresh(jwksUri, headers)
+    }
+    return keys
+}
+
 /**
  *
  * @param token token to verify
@@ -72,12 +156,29 @@ export const verifyTokenWithPublicKey = async (
     publicKey: string | JWK | null,
     opts?: IVerifyRSATokenCredentials,
 ): Promise<ITokenExtractedWithPubKey> => {
-    const tokenAlg = extractAlgFromJwtHeader(token)
+    try {
+        const result = await verifySignature(token, publicKey, opts)
+        assertClaims(result.payload as Record<string, unknown>, opts)
+        return result
+    } catch (error) {
+        throw toVerificationError(error)
+    }
+}
+
+const verifySignature = async (
+    token: string,
+    publicKey: string | JWK | null,
+    opts?: IVerifyRSATokenCredentials,
+): Promise<ITokenExtractedWithPubKey> => {
+    const header = readHeader(token)
+    const tokenAlg = header.alg
+    const suppliedKeys: any[] = []
     const joseCandidates: any[] = []
     const portableCandidates: any[] = []
     const mlDsaCandidates: any[] = []
 
     const pushCandidate = (candidate: any) => {
+        suppliedKeys.push(candidate)
         if (isMlDsaAlgorithm(tokenAlg)) {
             mlDsaCandidates.push(candidate)
             return
@@ -126,28 +227,14 @@ export const verifyTokenWithPublicKey = async (
             pushCandidate(adhocKey)
         }
     } else if (opts?.jwksUri) {
-        const response = await (globalThis as any).fetch(opts.jwksUri, {
-            headers: {
-                "Content-Type": "application/json",
-                "User-Agent": "authdog-agent",
-                ...(opts?.requiredIssuer ? { "X-Issuer": opts.requiredIssuer } : {}),
-            },
-        })
-
-        if (!response?.ok) {
-            throw new JwksEndpointError(
-                "Expected 200 OK from the JSON Web Key Set HTTP response",
-                response?.status || 0,
-            )
-        }
-
-        const jwksJson = await response.json()
-        for (const key of Array.isArray((jwksJson as any)?.keys) ? (jwksJson as any).keys : []) {
+        for (const key of await fetchJwksKeys(opts.jwksUri, header, opts)) {
             pushCandidate(key)
         }
     } else {
         throw new Error(INVALID_PUBLIC_KEY_FORMAT)
     }
+
+    assertAlgorithmMatches(header, suppliedKeys, Boolean(publicKey || opts?.adhoc))
 
     if (isMlDsaAlgorithm(tokenAlg)) {
         if (mlDsaCandidates.length === 0) {
@@ -201,27 +288,4 @@ export const verifyTokenWithPublicKey = async (
  */
 export const pemToJwk = async (pemString: string, algorithm: string) => {
     return await importSPKI(pemString, algorithm === "Ed25519" ? "EdDSA" : algorithm)
-}
-
-// JWKS Cache factory functions
-import { type IJwksCacheOptions, JwksCache } from "./jwks-cache"
-
-let defaultJwksCache: JwksCache | null = null
-
-export const createJwksCache = (options?: IJwksCacheOptions): JwksCache => {
-    return new JwksCache(options)
-}
-
-export const getDefaultJwksCache = (): JwksCache => {
-    if (!defaultJwksCache) {
-        defaultJwksCache = new JwksCache()
-    }
-    return defaultJwksCache
-}
-
-export const clearJwksCache = (): void => {
-    if (defaultJwksCache) {
-        defaultJwksCache.clear()
-        defaultJwksCache = null
-    }
 }

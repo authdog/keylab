@@ -7,6 +7,7 @@ export { JwtAlgorithmsEnum } from "./enums"
 export {
     AlgorithmMismatchError,
     EnvironmentError,
+    InsufficientScopeError,
     InvalidSignatureError,
     JsonWebTokenError,
     JwksEndpointError,
@@ -41,7 +42,13 @@ export {
     type ITokenExtractedWithPubKey,
     type IVerifyRSATokenCredentials,
 } from "./vendors/jwks/jwks"
-export { type IJwksCacheOptions, JwksCache } from "./vendors/jwks/jwks-cache"
+export {
+    type IJwksCacheEntry,
+    type IJwksCacheOptions,
+    type IJwksCacheStore,
+    JwksCache,
+    MemoryJwksCacheStore,
+} from "./vendors/jwks/jwks-cache"
 // Re-export from jwks-types for consistency
 export type {
     IJwkRecordVisible as IJwkRecordVisibleLegacy,

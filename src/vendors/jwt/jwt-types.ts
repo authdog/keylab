@@ -1,4 +1,5 @@
 import type { JwtAlgorithmsEnum as Algs } from "../../enums"
+import type { JwksCache } from "../jwks/jwks-cache"
 import type { IJwkRecordVisible } from "../jwks/jwks-types"
 import type { IJwkPrivateKey, IJwkPublicKey } from "./interfaces"
 
@@ -28,10 +29,13 @@ export interface IcheckTokenValidnessCredentials {
         dp?: string
         dq?: string
     }
+    /** @deprecated Has no effect: `fetch` cannot disable TLS verification portably. */
     verifySsl?: boolean
     adhoc?: [IJwkRecordVisible]
     // scopes
     requiredScopes?: string[]
+    /** Cache used for `jwksUri` lookups (default: the shared default cache) */
+    jwksCache?: JwksCache
     // public
     publicKey?: string
 }

@@ -1,7 +1,7 @@
 import { readFileSync, statSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { gzipSync } from "node:zlib"
-import { minify, type MinifyOptions } from "terser"
+import { type MinifyOptions, minify } from "terser"
 
 export const distDir = "dist"
 export const files = ["index.js", "index.cjs"]
@@ -216,7 +216,10 @@ export async function optimizeFile(
 
         const originalGzipped = dependencies.gzipSync(originalCode).length
         const optimizedGzipped = dependencies.gzipSync(result.code).length
-        const gzipSavings = (((originalGzipped - optimizedGzipped) / originalGzipped) * 100).toFixed(1)
+        const gzipSavings = (
+            ((originalGzipped - optimizedGzipped) / originalGzipped) *
+            100
+        ).toFixed(1)
 
         dependencies.log(`Optimized ${filePath}:`)
         dependencies.log(

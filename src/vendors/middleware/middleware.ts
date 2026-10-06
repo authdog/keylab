@@ -1,3 +1,4 @@
+import { InsufficientScopeError } from "../../errors/insufficient-scope"
 import { extractBearerTokenFromHeaders } from "../headers/headers"
 import type { ITokenExtractedWithPubKey } from "../jwks/jwks"
 import type { IcheckTokenValidnessCredentials } from "../jwt/jwt-types"
@@ -43,10 +44,10 @@ export const createJwtMiddleware = (options: IMiddlewareOptions) => {
             const result = await checkTokenValidness(token, {
                 secret: options.secret,
                 jwksUri: options.jwksUri,
-                verifySsl: options.verifySsl,
                 adhoc: options.adhoc,
                 requiredScopes: options.requiredScopes,
                 publicKey: options.publicKey,
+                jwksCache: options.jwksCache,
             })
 
             req.auth = result
@@ -54,6 +55,8 @@ export const createJwtMiddleware = (options: IMiddlewareOptions) => {
         } catch (error) {
             if (options.onError) {
                 options.onError(error as Error, req, res)
+            } else if (error instanceof InsufficientScopeError) {
+                res.status(403).json({ error: "Forbidden" })
             } else {
                 res.status(401).json({ error: "Unauthorized" })
             }
@@ -79,10 +82,10 @@ export const createJwtHandler = (options: IMiddlewareOptions) => {
             const result = await checkTokenValidness(token, {
                 secret: options.secret,
                 jwksUri: options.jwksUri,
-                verifySsl: options.verifySsl,
                 adhoc: options.adhoc,
                 requiredScopes: options.requiredScopes,
                 publicKey: options.publicKey,
+                jwksCache: options.jwksCache,
             })
 
             return { success: true, auth: result }

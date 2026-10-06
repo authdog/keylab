@@ -1,6 +1,6 @@
 {
     "name": "keylab",
-    "version": "0.1.41",
+    "version": "0.1.42",
     "packageManager": "bun@1.2.11",
     "type": "module",
     "source": "src/index.ts",
@@ -16,7 +16,9 @@
     "files": [
         "dist"
     ],
-    "sideEffects": false,
+    "sideEffects": [
+        "./src/**"
+    ],
     "description": "keylab is a library aiming to create and validate JSON Web Tokens without hussle or prerequisitie cryptography knowledge.",
     "scripts": {
         "test": "vitest run",
@@ -24,6 +26,8 @@
         "coverage:badge": "bun scripts/generate-coverage-badge.ts",
         "format": "biome format --write .",
         "lint": "biome check .",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "check:bundle": "bun run build:js && bun scripts/check-bundle.ts",
         "pretty": "bun run format",
         "docs:dev": "vitepress dev llm-docs",
         "docs:build": "vitepress build llm-docs",

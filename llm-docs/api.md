@@ -58,8 +58,21 @@ High-level verification helper that supports:
 
 - shared-secret validation
 - adhoc in-memory public keys
-- remote JWKS endpoints
-- issuer, audience, and scope checks
+- remote JWKS endpoints, cached through `JwksCache`
+- scope checks with `requiredScopes`
+
+Every algorithm goes through the same checks after its signature verifies: `exp`, `nbf`, and `requiredScopes`. A token whose `scp` claim (an array, or a space- or comma-separated string) or OAuth `scope` claim lacks a required scope raises `InsufficientScopeError`. A token with no scope claim at all fails the check too.
+
+```ts
+await checkTokenValidness(token, {
+  jwksUri: "https://issuer.example/.well-known/jwks.json",
+  requiredScopes: ["orders:read"],
+})
+```
+
+Shared-secret tokens resolve `true` when valid and `false` for a wrong secret. An expired token or missing scopes raise an error, as on every other path.
+
+`verifySsl` is deprecated and has no effect: `fetch` cannot turn off TLS verification portably.
 
 ### `verifyHSTokenWithSecretString()`
 
@@ -73,17 +86,13 @@ Validate issuer, audience, and scopes from a JWT payload.
 
 ### `parseJwt()`
 
-Decode JWT headers, payload, or signature sections.
-
-### `extractAlgFromJwtHeader()`
-
-Read the `alg` value from the JWT header.
+Decode JWT headers, payload, or signature sections. Raises `MalformedTokenError` for input that is not a JWT.
 
 ## JWKS helpers
 
 ### `verifyTokenWithPublicKey()`
 
-Verify a token with a PEM key, JWK, or JWKS source.
+Verify a token with a PEM key, JWK, or JWKS source. Accepts `requiredIssuer`, `requiredAudiences`, and `requiredScopes`, and enforces them for every algorithm, including ES256K, Ed448, and ML-DSA. Pass `jwksCache` to use your own `JwksCache` for `jwksUri` lookups.
 
 ### `pemToJwk()`
 
@@ -124,15 +133,16 @@ if (ttl < 60) {
 
 ### `JwksCache`
 
-In-memory JWKS cache with configurable TTL, retry with exponential backoff, request deduplication, and key rotation detection.
+JWKS cache with configurable TTL, retry with exponential backoff, request deduplication, and key rotation detection. Verification by `jwksUri` goes through a shared default cache, so repeated verifications fetch the key set once per TTL. When a token names a `kid` the cached set lacks, the set is refetched once, at most every `minRefreshIntervalMs`.
 
 ```ts
 import { JwksCache } from "keylab"
 
 const cache = new JwksCache({
-  ttlMs: 600_000,      // 10 minutes (default)
-  maxRetries: 3,        // retry count (default)
-  timeoutMs: 5_000,     // request timeout (default)
+  ttlMs: 600_000,               // 10 minutes (default)
+  maxRetries: 3,                // fetch attempts; 4xx other than 408/429 are not retried (default)
+  timeoutMs: 5_000,             // request timeout (default)
+  minRefreshIntervalMs: 30_000, // cooldown for unknown-kid refetches (default)
   onKeyRotation: (oldKids, newKids) => {
     console.log("Keys rotated", { oldKids, newKids })
   },
@@ -141,13 +151,38 @@ const cache = new JwksCache({
 const keys = await cache.getKeys("https://issuer.example/.well-known/jwks.json")
 ```
 
+Pass a cache to verification with `jwksCache`. `checkTokenValidness`, `verifyTokenWithPublicKey`, `createJwtMiddleware`, and `createJwtHandler` all accept it.
+
+### Cache storage adapters
+
+By default a `JwksCache` keeps entries in memory. To share key sets across processes or Worker isolates, pass a `store` that implements `IJwksCacheStore`. Each method may be synchronous or return a promise.
+
+```ts
+import { createJwtHandler, JwksCache, type IJwksCacheStore } from "keylab"
+
+// Cloudflare Workers KV
+const kvStore = (kv: KVNamespace): IJwksCacheStore => ({
+  get: (key) => kv.get(key, "json"),
+  set: (key, entry, ttlMs) =>
+    kv.put(key, JSON.stringify(entry), { expirationTtl: Math.max(60, Math.ceil(ttlMs / 1000)) }),
+  delete: (key) => kv.delete(key),
+})
+
+const handler = createJwtHandler({
+  jwksUri: "https://issuer.example/.well-known/jwks.json",
+  jwksCache: new JwksCache({ store: kvStore(env.JWKS_KV), keyPrefix: "jwks:" }),
+})
+```
+
+Entries are plain JSON (`{ keys, kids, fetchedAt }`). `JwksCache` checks `fetchedAt` against its own TTL, so a store does not have to expire entries itself. If the store throws, the cache fetches the key set instead of failing verification. `keyPrefix` (default `"keylab:jwks:"`) namespaces the keys in a shared store. `MemoryJwksCacheStore` is the default store.
+
 ### `createJwksCache(options?)`
 
 Factory function to create a new `JwksCache` instance.
 
 ### `clearJwksCache()`
 
-Clear the default global JWKS cache.
+Clear the default JWKS cache that `jwksUri` verification uses.
 
 ## JWE (JSON Web Encryption)
 
@@ -197,7 +232,7 @@ These names are exported as `JweContentEncryption`. `enc` still accepts any stri
 
 ### `createJwtMiddleware(options)`
 
-Express-compatible `(req, res, next)` middleware. Sets `req.auth` on success.
+Express-compatible `(req, res, next)` middleware. Sets `req.auth` on success. Without `onError`, it responds 403 when `requiredScopes` are missing and 401 for any other failure.
 
 ```ts
 import { createJwtMiddleware } from "keylab"
@@ -235,10 +270,13 @@ All error classes extend `JsonWebTokenError` (which extends `Error`):
 | Class | `code` | Use case |
 |---|---|---|
 | `TokenExpiredError` | 401 | Token `exp` is in the past. Has `expiredAt: Date` |
+| `InsufficientScopeError` | 403 | Token lacks a scope from `requiredScopes`. Has `requiredScopes` |
 | `InvalidSignatureError` | 401 | Signature verification failed |
 | `AlgorithmMismatchError` | 401 | Algorithm in header doesn't match expected |
 | `MalformedTokenError` | 401 | Token structure is invalid |
 | `JwksEndpointError` | 502 | JWKS endpoint returned non-200. Has `statusCode` |
+
+These classes are raised for every algorithm. When one wraps an error from `jose`, the original stays on `cause`. Other claim failures (`nbf`, `iss`, `aud`) raise `JsonWebTokenError`.
 
 ```ts
 import { TokenExpiredError, InvalidSignatureError } from "keylab"

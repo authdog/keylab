@@ -16,6 +16,17 @@
         }
     },
     "files": {
-        "ignoreUnknown": true
+        "ignoreUnknown": true,
+        "includes": [
+            "**",
+            "!coverage",
+            "!dist",
+            "!public",
+            "!.specify",
+            "!.claude",
+            "!.cursor",
+            "!llm-docs/.vitepress/cache",
+            "!llm-docs/.vitepress/dist"
+        ]
     }
 }

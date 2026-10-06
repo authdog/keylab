@@ -14,6 +14,7 @@ import {
     looksLikePem,
     normalizeCurveName,
     normalizeJwk,
+    parseJwtParts,
     strToUint8Array,
     utf8ToBase64Url,
 } from "./utils"
@@ -220,20 +221,6 @@ const buildPortableHeader = (alg: Algs, key: any, protectedHeaders: any) => {
         alg: curve === "ES256K" ? Algs.ES256K : Algs.EdDSA,
         ...(curve === "ES256K" ? {} : { typ: "JWT" }),
         type: protectedHeaders?.type || JwtKeyTypes.JWT,
-    }
-}
-
-const parseJwtParts = (token: string) => {
-    const [headerPart, payloadPart, signaturePart] = token.split(".")
-    if (!headerPart || !payloadPart || !signaturePart) {
-        throw new Error("Malformed JWT.")
-    }
-
-    return {
-        signingInput: `${headerPart}.${payloadPart}`,
-        protectedHeader: JSON.parse(new TextDecoder().decode(base64UrlToBytes(headerPart))),
-        payload: JSON.parse(new TextDecoder().decode(base64UrlToBytes(payloadPart))),
-        signature: base64UrlToBytes(signaturePart),
     }
 }
 

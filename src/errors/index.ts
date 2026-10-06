@@ -19,6 +19,7 @@ export const throwEnvironmentError = (message?: string) => {
 
 export { AlgorithmMismatchError } from "./algorithm-mismatch"
 export { EnvironmentError } from "./environment"
+export { InsufficientScopeError } from "./insufficient-scope"
 export { InvalidSignatureError } from "./invalid-signature"
 export { JwksEndpointError } from "./jwks-endpoint"
 export { JsonWebTokenError } from "./jwt-error"

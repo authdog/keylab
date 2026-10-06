@@ -13,6 +13,7 @@ import {
     bytesToBase64Url,
     bytesToHex,
     getRandomBytes,
+    parseJwtParts,
     strToUint8Array,
     utf8ToBase64Url,
 } from "./utils"
@@ -86,26 +87,6 @@ const decodeFixed = (value: string | undefined, label: string, expected: number)
     }
 
     return bytes
-}
-
-const parseJwtParts = (token: string) => {
-    const [headerPart, payloadPart, signaturePart] = token.split(".")
-    if (!headerPart || !payloadPart || !signaturePart) {
-        throw new Error("Malformed JWT.")
-    }
-
-    return {
-        signingInput: `${headerPart}.${payloadPart}`,
-        protectedHeader: JSON.parse(new TextDecoder().decode(base64UrlToBytes(headerPart))) as {
-            alg?: string
-            kid?: string
-        },
-        payload: JSON.parse(new TextDecoder().decode(base64UrlToBytes(payloadPart))) as Record<
-            string,
-            unknown
-        >,
-        signature: base64UrlToBytes(signaturePart),
-    }
 }
 
 const probeJoseMlDsa = async () => {

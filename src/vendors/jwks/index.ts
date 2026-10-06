@@ -1,2 +1,8 @@
 export * from "./jwks"
-export { type IJwksCacheOptions, JwksCache } from "./jwks-cache"
+export {
+    type IJwksCacheEntry,
+    type IJwksCacheOptions,
+    type IJwksCacheStore,
+    JwksCache,
+    MemoryJwksCacheStore,
+} from "./jwks-cache"

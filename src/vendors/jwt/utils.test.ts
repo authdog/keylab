@@ -1,9 +1,11 @@
 import { expect, it } from "vitest"
+import { MalformedTokenError } from "../../errors"
 import {
     base64ToBytes,
     getRuntimeCrypto,
     normalizeCurveName,
     normalizeJwk,
+    parseJwtParts,
     strToUint8Array,
     uint8ArrayToStr,
 } from "./utils"
@@ -38,4 +40,15 @@ it("throws when web crypto is not available", () => {
     } finally {
         Object.defineProperty(globalThis, "crypto", { value: originalCrypto, configurable: true })
     }
+})
+
+it("rejects base64 with characters outside the alphabet", () => {
+    expect(() => base64ToBytes("!!!!")).toThrow("Invalid base64 string.")
+    expect(() => base64ToBytes("ab=c")).toThrow("Invalid base64 string.")
+    expect(Array.from(base64ToBytes("AQID"))).toEqual([1, 2, 3])
+})
+
+it("raises MalformedTokenError for undecodable token parts", () => {
+    expect(() => parseJwtParts("a.b")).toThrow(MalformedTokenError)
+    expect(() => parseJwtParts("e30.!!!!.c2ln")).toThrow(MalformedTokenError)
 })
