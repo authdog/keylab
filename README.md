@@ -5,7 +5,6 @@
 [![Coverage](badges/coverage.svg)](md/README.md)
 [![npm version](https://badge.fury.io/js/keylab.svg)](https://badge.fury.io/js/keylab)
 [![code style: biome](https://img.shields.io/badge/code_style-biome-60a5fa.svg?style=flat-square)](https://biomejs.dev/)
-![bundle size](https://img.shields.io/bundlephobia/minzip/keylab?label=zipped)
 
 Create, sign, verify, and inspect JWTs with PEM, JWK, and JWKS support.
 Works across Node.js, Cloudflare Workers, browsers, and Bun, including portable support for curves modern `jose` no longer handles directly.
