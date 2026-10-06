@@ -76,6 +76,6 @@
     "dependencies": {
         "@noble/curves": "^2.0.1",
         "@noble/post-quantum": "^0.7.1",
-        "jose": "6.2.3"
+        "jose": "6.2.12"
     }
 }
