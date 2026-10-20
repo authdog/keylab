@@ -31,5 +31,5 @@
 
 ## Notes
 
-- Paths under `llm-docs/` and `SECURITY.md` are the documentation boundary from the constitution, not an implementation design.
+- Paths under `docs/` and `SECURITY.md` are the documentation boundary from the constitution, not an implementation design.
 - Validation passed on the first pass (2026-09-27).

@@ -1,6 +1,6 @@
 # Quickstart: validating a modernization wave
 
-Planning artifacts only. Do not copy pages out of `llm-docs/`. Behavior
+Planning artifacts only. Do not copy pages out of `docs/`. Behavior
 and examples live there; this file is how to tell a wave is done.
 
 ## Prerequisites
@@ -13,10 +13,9 @@ and examples live there; this file is how to tell a wave is done.
 ```bash
 bun run test
 bun run build
-bun run docs:build
 ```
 
-Expected: all three exit 0. Getting-started examples are unchanged unless
+Expected: both exit 0. Getting-started examples are unchanged unless
 the wave's `manual_edit` says otherwise.
 
 ## Wave 1 — supported surface
@@ -26,7 +25,7 @@ the wave's `manual_edit` says otherwise.
 - `src/index.ts` still exports the current function names and the
   `*Legacy` aliases.
 - `ponyfills` is not exported from `src/index.ts`.
-- Diff `llm-docs/` and expect no edits, unless a public type description
+- Diff `docs/` and expect no edits, unless a public type description
   had to change.
 
 ## Wave 2 — stricter checks
@@ -42,7 +41,7 @@ the wave's `manual_edit` says otherwise.
 - Importing the package does not load `node:crypto`.
 - One published sign-and-verify flow runs outside Node (browser-style or
   worker-style) and passes.
-- If that flow cannot, `llm-docs/runtime-compatibility.md` states the
+- If that flow cannot, `docs/runtime-compatibility.md` states the
   exception in the same change.
 - `createJwtMiddleware` is still the Express adapter. Do not port it.
 
@@ -51,7 +50,7 @@ the wave's `manual_edit` says otherwise.
 - `@swc/core`, `raw-loader`, `ts-node`, `codecov`, and `husky` are gone
   from `package.json` and the lockfile.
 - `terser` remains.
-- `bun run test`, `bun run build`, and `bun run docs:build` pass.
+- `bun run test`, `bun run build` pass.
 
 ## When to generate tasks
 

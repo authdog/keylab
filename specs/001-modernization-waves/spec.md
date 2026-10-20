@@ -118,23 +118,23 @@ still succeed.
 - **FR-008**: Each environment named in the runtime guide MUST pass one published sign-and-verify flow, or the same wave MUST update that guide to state the exception.
 - **FR-009**: A tool MAY be removed only after confirming no script or check still invokes it.
 - **FR-010**: A dependency upgrade that changes how checks are written MUST be its own follow-up, not part of waves 1–3.
-- **FR-011**: Planning notes MUST link to `llm-docs/` for install, API, migration, runtime, portable algorithms, and security narrative. They MUST NOT copy those pages.
-- **FR-012**: A wave that changes caller-visible behavior MUST update the matching `llm-docs` page in the same change.
+- **FR-011**: Planning notes MUST link to `docs/` for install, API, migration, runtime, and portable algorithms, and to `SECURITY.md` for vulnerability intake. They MUST NOT copy those pages.
+- **FR-012**: A wave that changes caller-visible behavior MUST update the matching `docs` page in the same change.
 - **FR-013**: Vulnerability intake MUST stay in `SECURITY.md`. Planning notes MUST link to it.
 - **FR-014**: These waves MUST NOT add new caller-facing jobs beyond what the product manual already describes.
 
 ### Key Entities
 
 - **Wave**: One shippable slice with an order, an acceptance check, and a flag for whether it changes the published contract.
-- **Published contract**: The jobs, names, and examples callers already rely on. Described in `llm-docs/`, not restated here.
-- **Product manual**: The VitePress site under `llm-docs/`. Specs link to it; they do not replace it.
+- **Published contract**: The jobs, names, and examples callers already rely on. Described in `docs/`, not restated here.
+- **Product manual**: The markdown manual under `docs/`. Specs link to it; they do not replace it.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
 - **SC-001**: After each wave, 100% of the current getting-started examples succeed unchanged.
-- **SC-002**: Zero new consumer guides are added outside `llm-docs/`.
+- **SC-002**: Zero new consumer guides are added outside `docs/`.
 - **SC-003**: A reader can skip any later wave and still complete the jobs from the current product manual.
 - **SC-004**: Every caller-visible break is named before that wave starts, or the wave does not ship it.
 - **SC-005**: Planning documents for this feature contain links to the product manual and security policy, and they contain no copied API, migration, runtime, or security sections.
@@ -142,7 +142,7 @@ still succeed.
 ## Assumptions
 
 - The current release line stays compatible. Public renames wait for a later major unless a wave explicitly adopts an alias.
-- `llm-docs/` remains the only consumer manual. Deep wiki and `SECURITY.md` stay where they are.
+- `docs/` remains the only consumer manual. Deep wiki and `SECURITY.md` stay where they are.
 - These four waves are planned together so the sequence is visible. Implementation happens one wave at a time, after tasks are generated for that wave.
 - The cryptographic stack and the set of published jobs stay as they are. This feature does not add algorithms or a new product surface.
 - Server-only cryptography may remain as a fallback when a caller asks for an operation the portable path cannot do. It must not run at import.

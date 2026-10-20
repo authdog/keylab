@@ -1,0 +1,30 @@
+name: Bug report
+description: Report a defect in keylab
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For security issues, follow SECURITY.md instead of opening a public issue.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened
+      description: What you expected, and what keylab did instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: A short snippet, the algorithm, and the runtime (Node.js, Bun, Workers, or browser).
+      render: ts
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: keylab version
+      placeholder: 0.1.41
+    validations:
+      required: true

@@ -101,8 +101,8 @@ rejected solely because it is unnamed.
 - **FR-006**: ML-DSA-44 and ML-DSA-87 MUST support the same jobs, and a token MUST NOT verify under a different parameter set than the one that signed it.
 - **FR-007**: The six content-encryption names listed in User Story 3 MUST each round-trip. A label the library already accepts outside that list MUST NOT start failing only because it is unnamed.
 - **FR-008**: Each environment named in the runtime guide MUST pass the new sign-and-verify flow for the algorithms that wave adds, or the same wave MUST update that guide to state the exception.
-- **FR-009**: A wave that changes caller-visible behavior MUST update the matching `llm-docs` page in the same change.
-- **FR-010**: Planning notes MUST link to `llm-docs/` for install, API, migration, runtime, portable algorithms, and security narrative. They MUST NOT copy those pages.
+- **FR-009**: A wave that changes caller-visible behavior MUST update the matching `docs` page in the same change.
+- **FR-010**: Planning notes MUST link to `docs/` for install, API, migration, runtime, and portable algorithms, and to `SECURITY.md` for vulnerability intake. They MUST NOT copy those pages.
 - **FR-011**: The library MUST NOT log secrets, tokens, or private key material, including a post-quantum private seed.
 - **FR-012**: These waves MUST NOT add `none`, MUST NOT skip verification, and MUST NOT weaken an algorithm the product already accepts.
 - **FR-013**: Algorithms that do not yet have a finished signature or encryption registration MUST stay out of these waves. That includes key-encapsulation drafts, hybrid encryption drafts, hash-based signatures, and hash-then-sign variants of ML-DSA.
@@ -113,7 +113,7 @@ rejected solely because it is unnamed.
 - **Wave**: One shippable slice with an order, an acceptance check, and a flag for whether it changes the published contract.
 - **Signature algorithm**: A named way to sign and verify a token. These waves add ML-DSA-65, then ML-DSA-44 and ML-DSA-87.
 - **Content-encryption algorithm**: A named way to protect the body of an encrypted token. These waves name six existing choices without removing other accepted labels.
-- **Published contract**: The jobs, names, and examples callers already rely on. Described in `llm-docs/`, not restated here.
+- **Published contract**: The jobs, names, and examples callers already rely on. Described in `docs/`, not restated here.
 
 ## Success Criteria *(mandatory)*
 
@@ -130,7 +130,7 @@ rejected solely because it is unnamed.
 - The current release line stays compatible. New names are additions. Public renames stay out of these waves.
 - ML-DSA-65 is the first set because one registered signature is enough to ship, and the middle strength is the usual single choice when a profile picks one.
 - The cross-runtime key format already recommended in the product manual is the format these waves publish for the new signatures. A server-only encoding is not added for them.
-- `llm-docs/` remains the only consumer manual. Specs link to it.
+- `docs/` remains the only consumer manual. Specs link to it.
 - Key encapsulation, hybrid public-key encryption drafts, hash-based signatures, and hash-then-sign ML-DSA wait for a later feature after their registrations are finished.
 - Server-only cryptography may remain a fallback when a caller asks for an operation the portable path cannot do. It must not run merely because the library was loaded.
 - The modernization waves in `specs/001-modernization-waves/` are already complete. This feature does not reopen them.

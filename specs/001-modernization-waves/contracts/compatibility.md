@@ -1,7 +1,7 @@
 # Compatibility contract
 
 This is the invariant set for the four waves. Caller-facing behavior
-stays in `llm-docs/`. This file does not restate those pages.
+stays in `docs/`. This file does not restate those pages.
 
 ## Must remain true after every wave
 
@@ -13,9 +13,9 @@ stays in `llm-docs/`. This file does not restate those pages.
   names.
 - `*Legacy` JWKS type aliases stay exported until a future major.
 - `createJwtMiddleware` stays the Express `(req, res, next)` adapter
-  described in `llm-docs/api.md`.
+  described in `docs/api.md`.
 - Portable curves `ES256K`, `Ed448`, and `X448` still route through the
-  portable layer described in `llm-docs/portable-algorithms.md`.
+  portable layer described in `docs/portable-algorithms.md`.
 - `node:crypto` is loaded only when a server-side fallback runs, not when
   the module is imported.
 - Accepted algorithms are not removed or weakened. Verification is not
@@ -27,7 +27,7 @@ stays in `llm-docs/`. This file does not restate those pages.
 - Narrowing `any` on exported types when the runtime value does not change.
 - Stricter compiler checks that reject code the current tests already forbid.
 - Deleting a devDependency that nothing imports.
-- A `llm-docs` edit that records an environment exception found in wave 3.
+- A `docs` edit that records an environment exception found in wave 3.
 
 ## Not allowed inside these waves
 

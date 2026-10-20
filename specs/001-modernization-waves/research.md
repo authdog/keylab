@@ -13,16 +13,16 @@ CI job, and unused devDependencies, not a missing product.
 **Alternatives considered**: A single rewrite branch (too large to review,
 and it would mix breaks with cleanup). Replacing `jose` (no caller
 benefit, and it would fight the portable-curve layer described in
-`llm-docs/portable-algorithms.md`).
+`docs/portable-algorithms.md`).
 
-## Decision: Product manual stays in llm-docs
+## Decision: Product manual stays in docs
 
-**Decision**: Specs and plans link to `llm-docs/` and `SECURITY.md`. A
+**Decision**: Specs and plans link to `docs/` and `SECURITY.md`. A
 wave updates a product page only when caller-visible behavior changes.
 
-**Rationale**: `llm-docs/` already has getting started, API, migration,
-runtime, portable algorithms, and a security mirror. Copying them into
-`specs/` would drift.
+**Rationale**: `docs/` already has getting started, API, migration,
+runtime, and portable algorithms. Vulnerability intake stays in
+`SECURITY.md`. Copying those pages into `specs/` would drift.
 
 **Alternatives considered**: A second modernization guide under `md/` or
 `specs/` (rejected by constitution principle IV).
@@ -60,7 +60,7 @@ values). Stay on the current flags (leaves story 2 unmet).
 
 **Decision**: Wave 3 guards the existing dynamic `node:crypto` imports and
 adds one non-Node sign-and-verify run. `createJwtMiddleware` stays the
-Express adapter already documented in `llm-docs/api.md`.
+Express adapter already documented in `docs/api.md`.
 
 **Rationale**: `jwt-sign.ts` and `portable-algorithms.ts` already import
 `node:crypto` lazily. CI runs Node 22 plus Bun only, so the Workers and

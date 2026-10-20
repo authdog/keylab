@@ -9,10 +9,10 @@ published contract they must preserve.
 | --- | --- |
 | id | `1` surface, `2` checks, `3` environments, `4` tooling |
 | order | Must ship in id order. A later wave may start only after the previous one is green. |
-| caller_visible | `no` for these four waves. A `yes` requires a versioning note and a matching `llm-docs` edit. |
+| caller_visible | `no` for these four waves. A `yes` requires a versioning note and a matching `docs` edit. |
 | depends_on | Previous wave id, or none for wave 1 |
 | exit_check | Commands in [quickstart.md](./quickstart.md) for that wave |
-| manual_edit | Which `llm-docs` page, if any. Empty means do not touch the manual. |
+| manual_edit | Which `docs` page, if any. Empty means do not touch the manual. |
 
 ### State
 
@@ -27,11 +27,11 @@ except to fix a regression they caused.
 
 Not redefined here. The contract is the behavior already described in:
 
-- [llm-docs/getting-started.md](../../llm-docs/getting-started.md)
-- [llm-docs/api.md](../../llm-docs/api.md)
-- [llm-docs/runtime-compatibility.md](../../llm-docs/runtime-compatibility.md)
-- [llm-docs/portable-algorithms.md](../../llm-docs/portable-algorithms.md)
-- [llm-docs/migration.md](../../llm-docs/migration.md)
+- [docs/getting-started.md](../../docs/getting-started.md)
+- [docs/api.md](../../docs/api.md)
+- [docs/runtime-compatibility.md](../../docs/runtime-compatibility.md)
+- [docs/portable-algorithms.md](../../docs/portable-algorithms.md)
+- [docs/migration.md](../../docs/migration.md)
 
 Vulnerability intake stays in [SECURITY.md](../../SECURITY.md). It is not restated here.
 

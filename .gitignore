@@ -135,6 +135,3 @@ Thumbs.db
 .idea/
 
 *.js
-llm-docs/.vitepress/cache
-llm-docs/.vitepress/dist
-public

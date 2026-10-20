@@ -6,7 +6,3 @@ test_with_coverage:
 
 deploy_lib:
     bun run lib:publish
-
-# documentations
-deploy_docs:
-    bun run docs:pages

@@ -8,8 +8,8 @@ set in place.
 
 **Rationale**: HMAC, RSA, ECDSA, PSS, EdDSA, ES256K, Ed448, X448, and
 the current JWE key-management set are already published. See
-[llm-docs/runtime-compatibility.md](../../llm-docs/runtime-compatibility.md)
-and [llm-docs/api.md](../../llm-docs/api.md). The registered gap is
+[docs/runtime-compatibility.md](../../docs/runtime-compatibility.md)
+and [docs/api.md](../../docs/api.md). The registered gap is
 ML-DSA (RFC 9964). Content encryption already works as a free string in
 `src/vendors/jwe/jwe.ts`; naming it is a later, separate slice.
 
@@ -38,7 +38,7 @@ added.
 
 **Rationale**: Those are the JOSE rules in RFC 9964 sections 3, 4, and 5.
 The product manual already tells callers to prefer JWK for cross-runtime
-keys ([llm-docs/portable-algorithms.md](../../llm-docs/portable-algorithms.md)).
+keys ([docs/portable-algorithms.md](../../docs/portable-algorithms.md)).
 PEM for this key type is not defined there.
 
 **Alternatives considered**: Expanded FIPS private keys (RFC 9964

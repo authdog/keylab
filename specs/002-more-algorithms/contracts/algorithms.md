@@ -1,7 +1,7 @@
 # Algorithm contract
 
 This is the invariant set for the three waves. Caller-facing behavior
-stays in `llm-docs/`. This file does not restate those pages.
+stays in `docs/`. This file does not restate those pages.
 
 ## Must remain true after every wave
 
@@ -15,7 +15,7 @@ stays in `llm-docs/`. This file does not restate those pages.
   values.
 - Portable curves `ES256K`, `Ed448`, and `X448` still route through the
   portable layer described in
-  [llm-docs/portable-algorithms.md](../../../llm-docs/portable-algorithms.md).
+  [docs/portable-algorithms.md](../../../docs/portable-algorithms.md).
 - `node:crypto` is loaded only when a server-side fallback runs, not when
   the module is imported.
 - The post-quantum implementation loads only when an ML-DSA operation runs.
@@ -31,7 +31,7 @@ stays in `llm-docs/`. This file does not restate those pages.
 - An AKP member on the JWK key-type union when wave 1 needs it.
 - A lazy portable ML-DSA module and the `@noble/post-quantum` dependency,
   in wave 1 only.
-- A `llm-docs` edit named by that wave's `manual_edit`.
+- A `docs` edit named by that wave's `manual_edit`.
 - Tests that cover the new name, tamper rejection, and cross-set mismatch.
 
 ## Not allowed inside these waves

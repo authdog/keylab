@@ -29,10 +29,6 @@
         "typecheck": "tsc --noEmit -p tsconfig.json",
         "check:bundle": "bun run build:js && bun scripts/check-bundle.ts",
         "pretty": "bun run format",
-        "docs:dev": "vitepress dev llm-docs",
-        "docs:build": "vitepress build llm-docs",
-        "docs:preview": "vitepress preview llm-docs",
-        "docs:pages": "rm -rf public && vitepress build llm-docs --outDir public",
         "size": "node scripts/file-size ./dist/index.js ./dist/index.js.map",
         "lib:build:clean": "rm -rf dist",
         "build:js": "bun build src/index.ts --outdir dist --target browser --format esm --packages external --minify --define 'process.env.NODE_ENV=\"production\"' && bun build src/index.ts --outfile dist/index.cjs --target browser --format cjs --packages external --minify --define 'process.env.NODE_ENV=\"production\"'",
@@ -69,7 +65,6 @@
         "happy-dom": "14",
         "terser": "^5.43.1",
         "typescript": "^7.0.2",
-        "vitepress": "^1.6.4",
         "vitest": "^1.6.0",
         "vitest-fetch-mock": "^0.4.0"
     },

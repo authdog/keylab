@@ -9,10 +9,10 @@ algorithms they add, and the published contract they must preserve.
 | --- | --- |
 | id | `1` ML-DSA-65, `2` ML-DSA-44 and ML-DSA-87, `3` content-encryption names |
 | order | Must ship in id order. A later wave may start only after the previous one is green. |
-| caller_visible | `yes` for all three. Each requires a versioning note of "additive" and a matching `llm-docs` edit. |
+| caller_visible | `yes` for all three. Each requires a versioning note of "additive" and a matching `docs` edit. |
 | depends_on | Previous wave id, or none for wave 1 |
 | exit_check | Commands in [quickstart.md](./quickstart.md) for that wave |
-| manual_edit | Wave 1 and 2: `llm-docs/portable-algorithms.md` and `llm-docs/runtime-compatibility.md`. Wave 3: `llm-docs/api.md`. |
+| manual_edit | Wave 1 and 2: `docs/portable-algorithms.md` and `docs/runtime-compatibility.md`. Wave 3: `docs/api.md`. |
 
 ### State
 
@@ -45,11 +45,11 @@ except to fix a regression they caused.
 
 Not redefined here. The contract is the behavior already described in:
 
-- [llm-docs/getting-started.md](../../llm-docs/getting-started.md)
-- [llm-docs/api.md](../../llm-docs/api.md)
-- [llm-docs/runtime-compatibility.md](../../llm-docs/runtime-compatibility.md)
-- [llm-docs/portable-algorithms.md](../../llm-docs/portable-algorithms.md)
-- [llm-docs/migration.md](../../llm-docs/migration.md)
+- [docs/getting-started.md](../../docs/getting-started.md)
+- [docs/api.md](../../docs/api.md)
+- [docs/runtime-compatibility.md](../../docs/runtime-compatibility.md)
+- [docs/portable-algorithms.md](../../docs/portable-algorithms.md)
+- [docs/migration.md](../../docs/migration.md)
 
 Vulnerability intake stays in [SECURITY.md](../../SECURITY.md). It is not restated here.
 

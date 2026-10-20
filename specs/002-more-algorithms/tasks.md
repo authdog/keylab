@@ -21,7 +21,7 @@ description: "Task list for additional keylab algorithms"
 ## Path Conventions
 
 - Library code: `src/`
-- Product manual: `llm-docs/` (only the pages a task names)
+- Product manual: `docs/` (only the pages a task names)
 - Planning: `specs/002-more-algorithms/`
 
 ## Phase 1: Setup
@@ -64,7 +64,7 @@ description: "Task list for additional keylab algorithms"
 - [x] T009 [US1] Add `src/vendors/jwt/portable-ml-dsa.ts` that dynamically imports `@noble/post-quantum/ml-dsa.js`, generates AKP JWKs, signs with an empty context, and verifies. Use `jose` when that runtime can import the AKP key. Reject PEM. Do not log the seed
 - [x] T010 [US1] Route ML-DSA-65 key generation and signing through `src/vendors/jwt/portable-ml-dsa.ts` from `src/vendors/jwt/jwt-sign.ts` without changing ES256K, Ed448, or X448
 - [x] T011 [US1] Verify ML-DSA-65 tokens from adhoc keys in `src/vendors/jwks/jwks.ts` and accept the algorithm in `checkTokenValidness` and `createSignedJwt` in `src/vendors/jwt/jwt-verify.ts`
-- [x] T012 [P] [US1] Name ML-DSA-65 in `llm-docs/portable-algorithms.md` and `llm-docs/runtime-compatibility.md`. Leave `llm-docs/getting-started.md` unchanged
+- [x] T012 [P] [US1] Name ML-DSA-65 in `docs/portable-algorithms.md` and `docs/runtime-compatibility.md`. Leave `docs/getting-started.md` unchanged
 - [x] T013 [US1] Run `bun run test` and `bun run build`. Constraint from `specs/002-more-algorithms/data-model.md`: "A wave cannot be `green` if getting-started examples need edits."
 
 **Checkpoint**: Wave 1 is green on its own. Stop here before wave 2.
@@ -84,7 +84,7 @@ description: "Task list for additional keylab algorithms"
 ### Implementation for User Story 2
 
 - [x] T015 [US2] Add `ML_DSA_44 = "ML-DSA-44"` and `ML_DSA_87 = "ML-DSA-87"` to `src/enums.ts` and `src/vendors/jwt/interfaces.ts`, and accept them in `src/vendors/jwt/portable-ml-dsa.ts`, `src/vendors/jwt/jwt-sign.ts`, `src/vendors/jwt/jwt-verify.ts`, and `src/vendors/jwks/jwks.ts`. Constraint from `specs/002-more-algorithms/data-model.md`: "Wave 2 cannot add a new dependency or a PEM encoding."
-- [x] T016 [P] [US2] List ML-DSA-44 and ML-DSA-87 beside ML-DSA-65 in `llm-docs/portable-algorithms.md` and `llm-docs/runtime-compatibility.md`
+- [x] T016 [P] [US2] List ML-DSA-44 and ML-DSA-87 beside ML-DSA-65 in `docs/portable-algorithms.md` and `docs/runtime-compatibility.md`
 - [x] T017 [US2] Run `bun run test` and `bun run build`
 
 **Checkpoint**: All three registered post-quantum signature names work. Encryption examples are unchanged.
@@ -104,7 +104,7 @@ description: "Task list for additional keylab algorithms"
 ### Implementation for User Story 3
 
 - [x] T019 [US3] Add a `JweContentEncryption` enum with those six string values in `src/enums.ts`. Constraint from `specs/002-more-algorithms/data-model.md`: "Wave 3 cannot change `enc` from a string to a closed list." Leave `enc` on `IEncryptJweOptions` in `src/vendors/jwe/jwe.ts` typed as `string`
-- [x] T020 [P] [US3] List the six names in the encryption section of `llm-docs/api.md`. Leave `llm-docs/getting-started.md` unchanged
+- [x] T020 [P] [US3] List the six names in the encryption section of `docs/api.md`. Leave `docs/getting-started.md` unchanged
 - [x] T021 [US3] Run `bun run test` and `bun run build`
 
 **Checkpoint**: Content-encryption names are published and existing encryption calls still compile.
@@ -115,9 +115,9 @@ description: "Task list for additional keylab algorithms"
 
 **Purpose**: Checks that apply after the waves you chose to ship
 
-- [x] T022 [P] Confirm `specs/002-more-algorithms/` links to `llm-docs/` and `SECURITY.md` and does not copy their API, migration, runtime, or security sections
-- [x] T023 Run `bun run test`, `bun run build`, and `bun run docs:build` from `specs/002-more-algorithms/quickstart.md`
-- [x] T024 [P] Update the algorithm and dependency rows in `llm-docs/migration.md` and the portable-curve feature line in `llm-docs/index.md` so they include the new signature names and `@noble/post-quantum`
+- [x] T022 [P] Confirm `specs/002-more-algorithms/` links to `docs/` and `SECURITY.md` and does not copy their API, migration, runtime, or security sections
+- [x] T023 Run `bun run test`, `bun run build` from `specs/002-more-algorithms/quickstart.md`
+- [x] T024 [P] Update the algorithm and dependency rows in `docs/migration.md` and the portable-curve feature line in `README.md` so they include the new signature names and `@noble/post-quantum`
 
 ---
 
@@ -190,6 +190,6 @@ Task: "Add the browser-style case in src/vendors/jwt/browser-sign-verify.test.ts
 
 - [P] tasks touch different files and do not depend on an unfinished task
 - Do not rename `checkTokenValidness` or `IcheckTokenValidnessCredentials`
-- Do not copy pages from `llm-docs/` into `specs/`
+- Do not copy pages from `docs/` into `specs/`
 - Do not log ML-DSA seeds, tokens, or private keys
 - Do not upgrade `jose` in these waves

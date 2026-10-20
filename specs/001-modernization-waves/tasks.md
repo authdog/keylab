@@ -21,7 +21,7 @@ description: "Task list for the next keylab modernization waves"
 ## Path Conventions
 
 - Library code: `src/`
-- Product manual: `llm-docs/` (link only, unless a task names a page)
+- Product manual: `docs/` (link only, unless a task names a page)
 - Planning: `specs/001-modernization-waves/`
 
 ## Phase 1: Setup
@@ -50,7 +50,7 @@ description: "Task list for the next keylab modernization waves"
 
 **Goal**: Narrow exported `any` types and collapse the duplicate JWKS interface definitions. Published names stay. `caller_visible` stays `no`.
 
-**Independent Test**: Getting-started flows still succeed with the same calls. `src/index.ts` still exports `checkTokenValidness`, `IcheckTokenValidnessCredentials`, and the `*Legacy` JWKS aliases. `llm-docs/` is unchanged.
+**Independent Test**: Getting-started flows still succeed with the same calls. `src/index.ts` still exports `checkTokenValidness`, `IcheckTokenValidnessCredentials`, and the `*Legacy` JWKS aliases. `docs/` is unchanged.
 
 ### Implementation for User Story 1
 
@@ -60,7 +60,7 @@ description: "Task list for the next keylab modernization waves"
 - [x] T008 [P] [US1] Remove `export * from "./ponyfills"` from `src/vendors/index.ts`. Keep the direct import in `src/vendors/jwt/jwt-verify.ts`. Confirm `src/index.ts` does not export ponyfills
 - [x] T009 [US1] Keep `IJwkRecordVisibleLegacy`, `IJwksClientLegacy`, and `IVerifyRSATokenCredentialsLegacy` in `src/index.ts`, still sourced from `src/vendors/jwks/jwks-types.ts`
 - [x] T010 [US1] Fix call sites in `src/vendors/jwt/` and `src/vendors/jwks/` that fail after T005–T007, without changing runtime behavior
-- [x] T011 [US1] Run `bun run test` and `bun run build`. Constraint from `specs/001-modernization-waves/data-model.md`: "A wave cannot be `green` if getting-started examples need edits." Leave `llm-docs/` unchanged
+- [x] T011 [US1] Run `bun run test` and `bun run build`. Constraint from `specs/001-modernization-waves/data-model.md`: "A wave cannot be `green` if getting-started examples need edits." Leave `docs/` unchanged
 
 **Checkpoint**: Wave 1 is green on its own. Stop here before wave 2.
 
@@ -93,8 +93,8 @@ description: "Task list for the next keylab modernization waves"
 ### Implementation for User Story 3
 
 - [x] T017 [P] [US3] Add `src/index.load.test.ts` that imports `src/index.ts` and fails when `node:crypto` has been loaded. A type-only import in `src/vendors/jwt/jwt-sign.ts` remains allowed
-- [x] T018 [P] [US3] Add `src/vendors/jwt/browser-sign-verify.test.ts` that runs the JWK ES256 key, sign, and verify flow from `llm-docs/getting-started.md` in a browser-style Vitest environment. Add that environment package only if it is missing. Do not change `createJwtMiddleware` in `src/vendors/middleware/middleware.ts`
-- [x] T019 [US3] If the portable-curve path fails in that environment, fix `src/vendors/jwt/portable-algorithms.ts` or update `llm-docs/runtime-compatibility.md` in the same change. Constraint from `specs/001-modernization-waves/data-model.md`: "`caller_visible: yes` is invalid unless `manual_edit` names a page."
+- [x] T018 [P] [US3] Add `src/vendors/jwt/browser-sign-verify.test.ts` that runs the JWK ES256 key, sign, and verify flow from `docs/getting-started.md` in a browser-style Vitest environment. Add that environment package only if it is missing. Do not change `createJwtMiddleware` in `src/vendors/middleware/middleware.ts`
+- [x] T019 [US3] If the portable-curve path fails in that environment, fix `src/vendors/jwt/portable-algorithms.ts` or update `docs/runtime-compatibility.md` in the same change. Constraint from `specs/001-modernization-waves/data-model.md`: "`caller_visible: yes` is invalid unless `manual_edit` names a page."
 - [x] T020 [US3] Run `bun run test` and `bun run build`
 
 **Checkpoint**: The runtime page matches what the new checks cover.
@@ -105,13 +105,13 @@ description: "Task list for the next keylab modernization waves"
 
 **Goal**: Remove devDependencies that nothing calls. Keep `terser`.
 
-**Independent Test**: The five named packages are gone, `terser` remains, and test, build, and docs build all exit 0.
+**Independent Test**: The five named packages are gone, `terser` remains, and test and build exit 0.
 
 ### Implementation for User Story 4
 
 - [x] T021 [US4] Confirm `@swc/core`, `raw-loader`, `ts-node`, `codecov`, and `husky` have no imports under `src/`, `scripts/`, or `.github/`, and that `.husky/` is absent. Constraint from `specs/001-modernization-waves/data-model.md`: "Wave 4 cannot remove a dependency that a script still imports."
 - [x] T022 [US4] Remove those five packages from `devDependencies` in `package.json`, keep `terser`, and refresh `bun.lock` with `bun install`
-- [x] T023 [US4] Run `bun run test`, `bun run build`, and `bun run docs:build`
+- [x] T023 [US4] Run `bun run test`, `bun run build`
 
 **Checkpoint**: Upgrade surface matches the tools the repo still invokes.
 
@@ -121,7 +121,7 @@ description: "Task list for the next keylab modernization waves"
 
 **Purpose**: Checks that apply after the waves you chose to ship
 
-- [x] T024 [P] Confirm `specs/001-modernization-waves/` links to `llm-docs/` and `SECURITY.md` and does not copy their API, migration, runtime, or security sections
+- [x] T024 [P] Confirm `specs/001-modernization-waves/` links to `docs/` and `SECURITY.md` and does not copy their API, migration, runtime, or security sections
 - [x] T025 Run the every-wave commands in `specs/001-modernization-waves/quickstart.md` for each wave that was implemented
 
 ---
@@ -182,7 +182,7 @@ Task: "Remove the ponyfills barrel export from src/vendors/index.ts"
 1. Complete Phase 1: Setup
 2. Complete Phase 2: Foundational
 3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: `bun run test` and `bun run build` pass, and `llm-docs/` is unchanged
+4. **STOP and VALIDATE**: `bun run test` and `bun run build` pass, and `docs/` is unchanged
 5. Leave waves 2–4 for later passes
 
 ### Incremental Delivery
@@ -199,5 +199,5 @@ Task: "Remove the ponyfills barrel export from src/vendors/index.ts"
 
 - [P] tasks touch different files and do not depend on an unfinished task
 - Do not rename `checkTokenValidness` or `IcheckTokenValidnessCredentials`
-- Do not copy pages from `llm-docs/` into `specs/`
+- Do not copy pages from `docs/` into `specs/`
 - Do not combine a Vitest major with wave 2

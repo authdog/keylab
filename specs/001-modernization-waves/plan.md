@@ -10,7 +10,7 @@
 
 Sequence four non-overlapping modernization waves for keylab. Each wave
 keeps the current getting-started examples working, leaves the
-cryptographic stack in place, and links to `llm-docs/` instead of copying
+cryptographic stack in place, and links to `docs/` instead of copying
 it. Public renames wait for a later major. The test-runner major
 (Vitest 1 to 5) is a separate follow-up.
 
@@ -18,13 +18,13 @@ it. Public renames wait for a later major. The test-runner major
 
 **Language/Version**: TypeScript 7, published as ESM and CJS from `src/index.ts`
 
-**Primary Dependencies**: `jose` 6.2.3, `@noble/curves` 2.x. Dev: Vitest 1, Biome, VitePress, Bun 1.2.11
+**Primary Dependencies**: `jose` 6.2.3, `@noble/curves` 2.x. Dev: Vitest 1, Biome, Bun 1.2.11
 
 **Storage**: N/A
 
-**Testing**: `bun run test` / `bun run test-with-coverage` (Vitest). Docs: `bun run docs:build`
+**Testing**: `bun run test` / `bun run test-with-coverage` (Vitest)
 
-**Target Platform**: Node.js, Cloudflare Workers, browsers, and Bun, as described in [llm-docs/runtime-compatibility.md](../../llm-docs/runtime-compatibility.md)
+**Target Platform**: Node.js, Cloudflare Workers, browsers, and Bun, as described in [docs/runtime-compatibility.md](../../docs/runtime-compatibility.md)
 
 **Project Type**: Library
 
@@ -41,7 +41,7 @@ it. Public renames wait for a later major. The test-runner major
 - **Portable library**: Pass. Waves do not add a static `node:crypto` import. Wave 3 checks the existing lazy fallback.
 - **Published contract**: Pass. Renames of `checkTokenValidness` and `IcheckTokenValidnessCredentials` are deferred. Duplicate type aliases stay as aliases until a major.
 - **Tests gate every wave**: Pass. Each wave requires the current suite to stay green. See [quickstart.md](./quickstart.md).
-- **One manual**: Pass. This plan links to `llm-docs/` and `SECURITY.md`. It does not restate API, migration, runtime, or security pages.
+- **One manual**: Pass. This plan links to `docs/` and `SECURITY.md`. It does not restate API, migration, runtime, or security pages.
 - **Security stays conservative**: Pass. No algorithm, verification, or logging changes.
 
 Post-design re-check: pass. Complexity Tracking records why four waves share one spec.
@@ -77,12 +77,12 @@ src/
     ├── middleware/          # Express adapter; already documented as such
     ├── headers/
     └── ponyfills/           # internal; not re-exported by src/index.ts
-llm-docs/                    # product manual; update only when behavior changes
+docs/                    # product manual; update only when behavior changes
 .github/workflows/ci.yml     # Node 22 + Bun test job
 ```
 
 **Structure Decision**: Single library. Waves edit the tree above. Product
-pages stay in `llm-docs/`. Planning stays in this directory.
+pages stay in `docs/`. Planning stays in this directory.
 
 ## Wave sequence
 
@@ -94,7 +94,7 @@ definition for the duplicated JWKS record types and leave the `*Legacy`
 aliases in `src/index.ts` in place. Do not rename `checkTokenValidness` or
 `IcheckTokenValidnessCredentials`. Do not export `ponyfills`.
 
-Exit: published examples unchanged; `llm-docs/api.md` updated only if an
+Exit: published examples unchanged; `docs/api.md` updated only if an
 exported type's public description actually changes.
 
 ### Wave 2 — Stricter checks
@@ -104,7 +104,7 @@ Turn on `strictNullChecks`. Remove `ignoreDeprecations: "6.0"`,
 `src/`). Fix the fallout without changing runtime behavior. Do not upgrade
 Vitest in this wave.
 
-Exit: `bun run test` and `bun run build` pass. No `llm-docs` change unless
+Exit: `bun run test` and `bun run build` pass. No `docs` change unless
 a public signature had to change, which this wave forbids.
 
 ### Wave 3 — Promised environments
@@ -114,9 +114,9 @@ Keep `node:crypto` behind the existing dynamic imports in `jwt-sign.ts` and
 does not pull `node:crypto`. Add one non-Node execution of a published
 sign-and-verify flow (browser-style or worker-style). Leave
 `createJwtMiddleware` as the Express adapter already described in
-`llm-docs/api.md` and `llm-docs/getting-started.md`. If a portable-curve
+`docs/api.md` and `docs/getting-started.md`. If a portable-curve
 case fails outside Node, fix it or update
-`llm-docs/runtime-compatibility.md` in the same change.
+`docs/runtime-compatibility.md` in the same change.
 
 Exit: the new check passes, and the runtime page matches what the check covers.
 
@@ -127,7 +127,7 @@ Remove devDependencies with no remaining caller: `@swc/core`, `raw-loader`,
 because `scripts/optimize-build.ts` imports it. Do not bump `jose`,
 `@noble/curves`, or Vitest here.
 
-Exit: `bun run test`, `bun run build`, and `bun run docs:build` pass after
+Exit: `bun run test`, `bun run build` pass after
 the lockfile update.
 
 ## Out of scope
@@ -135,10 +135,10 @@ the lockfile update.
 - Vitest 5 (open dependency-update work; its own spec when picked up).
 - Renaming `checkTokenValidness` / `IcheckTokenValidnessCredentials`.
 - New algorithms, a new JWE surface, or a Workers middleware.
-- Copying any page out of `llm-docs/`.
+- Copying any page out of `docs/`.
 
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| Four waves share one spec | The sequence and the shared compatibility rules need to be visible before any wave is tasked | Four specs would repeat the same contract and the `llm-docs` boundary |
+| Four waves share one spec | The sequence and the shared compatibility rules need to be visible before any wave is tasked | Four specs would repeat the same contract and the `docs` boundary |
